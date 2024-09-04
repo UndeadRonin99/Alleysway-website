@@ -1,15 +1,14 @@
 ﻿using FirebaseAdmin;
 using FirebaseAdmin.Auth;
 using Google.Apis.Auth.OAuth2;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies; // For JSON parsing
 using Microsoft.AspNetCore.Mvc;
-using XBCAD.Models;
-using XBCAD.ViewModels;
-using System;
-using System.Threading.Tasks;
-using System.Net.Http;
-using System.Text;
 using Newtonsoft.Json.Linq;
-using System.Text.Json; // For JSON parsing
+using System.Security.Claims;
+using System.Text;
+using System.Text.Json;
+using XBCAD.ViewModels;
 
 namespace XBCAD.Controllers
 {
@@ -138,6 +137,20 @@ namespace XBCAD.Controllers
                 // Store the name and surname in TempData to pass to the next view
                 TempData["FirstName"] = firstName;
                 TempData["LastName"] = lastName;
+                // Create claims for the user
+                var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, uid),
+                        new Claim(ClaimTypes.Name, $"{firstName} {lastName}"),
+                        new Claim(ClaimTypes.Role, role)
+                            // Add other claims as needed
+                    };
+
+                var claimsIdentity = new ClaimsIdentity(claims, "Cookies");
+
+                // Sign in the user with the created claims
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+
 
                 // Redirect based on role
                 return role switch

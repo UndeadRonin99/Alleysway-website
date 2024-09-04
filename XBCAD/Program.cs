@@ -3,6 +3,7 @@ using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Firestore.V1;
 using Google.Cloud.Firestore;
 using Google.Api;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace XBCAD
 {
@@ -23,6 +24,17 @@ namespace XBCAD
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             builder.Services.AddHttpClient();
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/Account/Login"; // Path to login page
+                    options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // You can set a reasonable expiration time
+                    options.SlidingExpiration = true; // Reset the expiration time if the user is active
+                    options.Cookie.HttpOnly = true;
+                    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                });
+
+            builder.Services.AddAuthorization();
 
             //Add sessions
             builder.Services.AddSession(options =>
@@ -46,7 +58,8 @@ namespace XBCAD
 
             app.UseRouting();
             app.UseSession();
-            app.UseAuthorization();
+            app.UseAuthentication(); // Enable authentication
+            app.UseAuthorization();  // Enable authorization
 
             app.MapControllerRoute(
                 name: "default",

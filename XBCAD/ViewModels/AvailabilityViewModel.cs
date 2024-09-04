@@ -1,14 +1,20 @@
-﻿namespace XBCAD.ViewModels
+﻿using Firebase.Auth;
+using System.Security.Claims;
+
+namespace XBCAD.ViewModels
 {
     public class AvailabilityViewModel
     {
         public List<DayAvailability> Days { get; set; }
+        public string UserId {  get; set; }
+        
     }
 
     public class DayAvailability
     {
         public string Day { get; set; } = default!;  // Using default! to satisfy the compiler for non-nullable properties
         public List<TimeSlot> TimeSlots { get; set; } = new List<TimeSlot>();
+
     }
 
     public class TimeSlot

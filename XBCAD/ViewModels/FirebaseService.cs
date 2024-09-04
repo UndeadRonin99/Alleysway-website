@@ -15,7 +15,7 @@ public class FirebaseService
         firebase = new FirebaseClient("https://alleysway-310a8-default-rtdb.firebaseio.com/");
     }
 
-    public async Task<AvailabilityViewModel> GetAvailabilityAsync()
+    public async Task<AvailabilityViewModel> GetAvailabilityAsync(string userId)
     {
         // Initialize the model with default days (Monday to Sunday)
         var model = new AvailabilityViewModel
@@ -34,25 +34,29 @@ public class FirebaseService
 
         try
         {
-            // Fetch data from Firebase and store it in a nested dictionary
+            // Fetch data from Firebase specific to the user
             var daysSnapshot = await firebase
+                .Child("users")
+                .Child(userId)
                 .Child("Days")
-                .OnceAsync<Dictionary<string, Dictionary<string, TimeSlot>>>();
+                .OnceAsync<Dictionary<string, List<TimeSlot>>>();
 
             // If there is data, update the corresponding days in the model
             foreach (var dayEntry in daysSnapshot)
             {
                 var dayAvailability = model.Days.FirstOrDefault(d => d.Day == dayEntry.Key);
-                if (dayAvailability != null)
+                if (dayAvailability != null && dayEntry.Object != null)
                 {
-                    // Flatten the nested dictionary into a list of TimeSlot objects
-                    dayAvailability.TimeSlots = dayEntry.Object.Values.SelectMany(dict => dict.Values).ToList();
+                    // Flattening the dictionary of lists into a single list of TimeSlot
+                    dayAvailability.TimeSlots = dayEntry.Object.Values
+                        .SelectMany(list => list)
+                        .ToList();
                 }
             }
         }
         catch
         {
-            // In case of any exception (e.g., Firebase data fetch fails), just return the default days with no time slots
+            // Handle any exceptions and just return the default days with no time slots
         }
 
         return model;
@@ -60,28 +64,36 @@ public class FirebaseService
 
 
 
-    public async Task SaveTimeSlotAsync(string day, string startTime, string endTime)
+    public async Task SaveTimeSlotAsync(string day, string startTime, string endTime, string userId)
     {
         var timeSlot = new TimeSlot { StartTime = startTime, EndTime = endTime };
         await firebase
+            .Child("users")
+            .Child(userId)
             .Child("Days")
             .Child(day)
             .Child("TimeSlots")
             .PostAsync(timeSlot);
     }
 
-    public async Task RemoveTimeSlotAsync(string day, string startTime, string endTime)
+
+    public async Task RemoveTimeSlotAsync(string day, string startTime, string endTime, string userId)
     {
         var slots = await firebase
+            .Child("users")
+            .Child(userId)
             .Child("Days")
             .Child(day)
             .Child("TimeSlots")
             .OnceAsync<TimeSlot>();
 
         var slotToRemove = slots.FirstOrDefault(ts => ts.Object.StartTime == startTime && ts.Object.EndTime == endTime);
+
         if (slotToRemove != null)
         {
             await firebase
+                .Child("users")
+                .Child(userId)
                 .Child("Days")
                 .Child(day)
                 .Child("TimeSlots")
@@ -89,4 +101,6 @@ public class FirebaseService
                 .DeleteAsync();
         }
     }
+
+
 }

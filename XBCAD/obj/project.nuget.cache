@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "ydBHDU2NAIBoHTpw6vFVLpt5Fg7KFcAl+gOdBeWCcTxUKbJoqYNg6ZtD8GsCJckbFYgHEMgJnqGvTmUrzMpKmQ==",
+  "dgSpecHash": "2hsLwJSjo2oJHsnSNuMEL5rkzSq/vkXQp2FjtndmY8XPqGv/B0TXiHgaD6yOuLpJyHwBlF2WZlT19BLekY+/5w==",
   "success": true,
-  "projectFilePath": "C:\\Users\\thema\\Source\\Repos\\Alleysway-website\\XBCAD\\XBCAD.csproj",
+  "projectFilePath": "C:\\Users\\thema\\source\\repos\\Alleysway-website\\XBCAD\\XBCAD.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\thema\\.nuget\\packages\\firebase.auth\\1.0.0\\firebase.auth.1.0.0.nupkg.sha512",
     "C:\\Users\\thema\\.nuget\\packages\\firebaseadmin\\3.0.0\\firebaseadmin.3.0.0.nupkg.sha512",
