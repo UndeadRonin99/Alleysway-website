@@ -12,7 +12,7 @@ namespace XBCAD
         {
 
             var builder = WebApplication.CreateBuilder(args);
-            var credential = GoogleCredential.FromFile("path/to/alleysway-310a8-firebase-adminsdk-n95a3-2b1da73f9e.json");
+            var credential = GoogleCredential.FromFile("path/to/alleysway-310a8-firebase-adminsdk-n95a3-f5245dd000.json");
             if (FirebaseApp.DefaultInstance == null)
             {
                 FirebaseApp.Create(new AppOptions()

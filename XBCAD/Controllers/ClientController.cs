@@ -7,6 +7,8 @@ namespace XBCAD.Controllers
         public IActionResult Dashboard()
         {
             ViewData["Title"] = "Client Dashboard";
+            ViewBag.FirstName = TempData["FirstName"]?.ToString();
+            ViewBag.LastName = TempData["LastName"]?.ToString();
             return View();
         }
 

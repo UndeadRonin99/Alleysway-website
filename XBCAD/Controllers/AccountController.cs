@@ -38,6 +38,9 @@ namespace XBCAD.Controllers
             return View();
         }
 
+
+        //FOR THE LOVE OF ALL THINGS HOLY PLEASE DO NOT FUCKING TOUCH THIS REGISTER METHOD EVER
+        //IT WORKS NOW AND I REALLY DON'T WANT TO HAVE TO TOUCH IT AGAIN
         [HttpPost("Register")]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
@@ -45,8 +48,6 @@ namespace XBCAD.Controllers
             {
                 try
                 {
-                    
-
                     var userRecord = await this.auth.CreateUserAsync(new UserRecordArgs
                     {
                         Email = model.Username,
@@ -56,7 +57,12 @@ namespace XBCAD.Controllers
                     });
 
                     // Prepare data to be saved in RTDB
-                    var data = new { role = "admin" };
+                    var data = new
+                    {
+                        firstName = model.FirstName,
+                        lastName = model.LastName,
+                        role = "client"
+                    };
                     var json = JsonSerializer.Serialize(data);
                     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
@@ -72,7 +78,7 @@ namespace XBCAD.Controllers
                     }
                     else
                     {
-                        throw new Exception("Failed to save user role to database.");
+                        throw new Exception("Failed to save user data to database.");
                     }
                 }
                 catch (Exception ex)
@@ -83,6 +89,7 @@ namespace XBCAD.Controllers
             }
             return View(model);
         }
+
 
         public IActionResult Login()
         {
@@ -110,7 +117,6 @@ namespace XBCAD.Controllers
         {
             if (!ModelState.IsValid)
             {
-                // Perhaps add more user-friendly error messages or specific logging here
                 return View(model);
             }
 
@@ -120,11 +126,18 @@ namespace XBCAD.Controllers
                 var decodedToken = await auth.VerifyIdTokenAsync(model.Token);
                 var uid = decodedToken.Uid;
 
-                // Fetch user role from Firebase RTDB
+                // Fetch user data from Firebase RTDB
                 var url = $"https://alleysway-310a8-default-rtdb.firebaseio.com/users/{uid}.json";
                 var response = await httpClient.GetStringAsync(url);
                 var data = JObject.Parse(response);
+
+                var firstName = data["firstName"]?.ToString();
+                var lastName = data["lastName"]?.ToString();
                 var role = data["role"]?.ToString();
+
+                // Store the name and surname in TempData to pass to the next view
+                TempData["FirstName"] = firstName;
+                TempData["LastName"] = lastName;
 
                 // Redirect based on role
                 return role switch
