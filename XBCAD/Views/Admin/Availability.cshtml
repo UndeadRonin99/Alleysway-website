@@ -11,68 +11,39 @@
             <h3 class="section-title">General Availability</h3>
         </div>
         <div class="availability-table">
-            @for (int dayIndex = 0; dayIndex < Model.Days.Count; dayIndex++)
-            {
-                var day = Model.Days[dayIndex];
-                <div class="day-row">
-                    <div class="day-name">@day.Day</div>
-                    <div class="time-slots" data-day="@day.Day">
-                        @if (day.TimeSlots != null && day.TimeSlots.Count > 0)
-                        {
-                            @for (int i = 0; i < day.TimeSlots.Count; i++)
-                            {
-                                <div class="time-slot d-flex align-items-center">
-                                    <input type="text" class="form-control me-2 timepicker" value="@day.TimeSlots[i].StartTime" placeholder="Start Time" readonly>
-                                    <span class="me-2">until</span>
-                                    <input type="text" class="form-control me-2 timepicker" value="@day.TimeSlots[i].EndTime" placeholder="End Time" readonly>
-                                    <button type="button" class="btn btn-danger me-2" onclick="removeTimeSlot(this, '@day.Day', '@day.TimeSlots[i].StartTime', '@day.TimeSlots[i].EndTime')">&#x1F5D1;</button>
-                                </div>
-                            }
-                        }
-                    </div>
-                    <button type="button" class="btn btn-primary mt-2" onclick="addTimeSlot(this, '@day.Day')">+ Add Time</button>
-                </div>
-            }
-        </div>
-    </div>
-</div>
-
-
-    <!-- Block to display saved availability -->
-    <div class="mt-5">
-        <div class="mt-5">
-            <h4>Current Availability</h4>
-            <div class="saved-availability">
+            <div id="availabilityTable">
                 @foreach (var day in Model.Days)
                 {
-                    <div class="card mb-3">
-                        <div class="card-header custom-header">
-                            <!-- Custom header color -->
-                            <strong>@day.Day</strong>
-                        </div>
-                        <div class="card-body custom-body">
-                            <!-- Custom body color -->
+                    <div class="day-row">
+                        <div class="day-name">@day.Day</div>
+                        <div class="time-slots" data-day="@day.Day">
                             @if (day.TimeSlots != null && day.TimeSlots.Any())
                             {
-                                <ul class="list-group">
-                                    @foreach (var slot in day.TimeSlots)
-                                    {
-                                        <li class="list-group-item custom-list-item">@slot.StartTime - @slot.EndTime</li> <!-- Custom list item color -->
-                                    }
-                                </ul>
+                                @foreach (var slot in day.TimeSlots)
+                                {
+                                    <div class="time-slot d-flex align-items-center">
+                                        <input type="text" class="form-control me-2 timepicker" value="@slot.StartTime" placeholder="Start Time" readonly>
+                                        <span class="me-2">until</span>
+                                        <input type="text" class="form-control me-2 timepicker" value="@slot.EndTime" placeholder="End Time" readonly>
+                                        <button type="button" class="btn btn-danger me-2" onclick="removeTimeSlot(this, '@day.Day', '@slot.StartTime', '@slot.EndTime')">🗑️</button>
+                                    </div>
+                                }
                             }
                             else
                             {
                                 <p class="text-muted">No availability set for this day.</p>
                             }
                         </div>
+                        <button type="button" class="btn btn-primary mt-2" onclick="addTimeSlot(this, '@day.Day')">+ Add Time</button>
                     </div>
                 }
             </div>
         </div>
-
+    </div>
+</div>
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
         function initializeTimePickers() {
             $(".timepicker").flatpickr({
@@ -83,54 +54,93 @@
             });
         }
 
-        initializeTimePickers();
-            function addTimeSlot(button, day) {
-                var container = $(button).closest('.day-row').find('.time-slots');
-                var timeSlotCount = container.children('.time-slot').length;
+        // Load updated availability via AJAX
+        function loadAvailability() {
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetAvailabilityPartial", "Admin")',
+                success: function (html) {
+                    $('#availabilityTable').html(html); // Update the content of the availability table
+                    initializeTimePickers(); // Reinitialize timepickers for updated content
+                }
+            });
+        }
 
-                var newSlot = $('<div class="time-slot d-flex align-items-center">' +
-                    '<input type="text" class="form-control me-2 timepicker" placeholder="Start Time">' +
-                    '<span class="me-2">until</span>' +
-                    '<input type="text" class="form-control me-2 timepicker" placeholder="End Time">' +
-                    '<button type="button" class="btn btn-danger me-2" onclick="removeTimeSlot(this, \'' + day + '\', \'\', \'\')">&#x1F5D1;</button>' +
-                    '</div>');
+        $(document).ready(function () {
+            initializeTimePickers();
+        });
 
-                // Insert the new time slot before the "Add Time" button
-                $(button).before(newSlot);
-                initializeTimePickers();
+        function addTimeSlot(button, day) {
+            var container = $(button).closest('.day-row').find('.time-slots');
+            var startTimeInput = $('<input type="text" class="form-control me-2 timepicker" placeholder="Start Time">');
+            var endTimeInput = $('<input type="text" class="form-control me-2 timepicker" placeholder="End Time">');
+            var saveButton = $('<button type="button" class="btn btn-success me-2">Save</button>');
 
-                newSlot.find('.timepicker').change(function () {
-                    var startTime = newSlot.find('.timepicker').eq(0).val();
-                    var endTime = newSlot.find('.timepicker').eq(1).val();
+            var newSlot = $('<div class="time-slot d-flex align-items-center"></div>')
+                .append(startTimeInput)
+                .append('<span class="me-2">until</span>')
+                .append(endTimeInput)
+                .append(saveButton)
+                .append('<button type="button" class="btn btn-danger me-2" onclick="removeTimeSlot(this)">🗑️</button>');
 
-                    if (startTime && endTime) {
-                        $.ajax({
-                            type: "POST",
-                            url: '@Url.Action("SaveTimeSlot", "Admin")',
-                            data: { day: day, startTime: startTime, endTime: endTime },
-                            success: function () {
-                                location.reload(); // Reload page to reflect saved availability
+            $(button).before(newSlot);
+            initializeTimePickers();
+
+            saveButton.click(function () {
+                var startTime = startTimeInput.val();
+                var endTime = endTimeInput.val();
+
+                if (startTime && endTime) {
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("SaveTimeSlot", "Admin")',
+                        data: { day: day, startTime: startTime, endTime: endTime },
+                        success: function (response) {
+                            if (response.success) {
+                                // After saving, disable the inputs
+                                startTimeInput.prop('disabled', true);
+                                endTimeInput.prop('disabled', true);
+                                saveButton.remove(); // Remove the save button after saving
+                            } else {
+                                alert('Failed to save time slot: ' + response.message);
                             }
-                        });
-                    }
-                });
+                        },
+                        error: function () {
+                            alert('Error occurred while saving time slot.');
+                        }
+                    });
+                } else {
+                    alert('Please enter both start and end times before saving.');
+                }
+            });
+        }
+
+
+
+        // Handle removal of time slots
+        function removeTimeSlot(button, day = null, startTime = null, endTime = null) {
+            // Check if the time slot is unsaved (i.e., no start and end times) and remove directly from the DOM
+            if (!startTime && !endTime) {
+                $(button).closest('.time-slot').remove();
+                return;
             }
 
-
-        function removeTimeSlot(button, day, startTime, endTime) {
-            var slot = $(button).closest('.time-slot');
-            slot.remove();
-
-            if (startTime && endTime) {
-                $.ajax({
-                    type: "POST",
-                    url: '@Url.Action("RemoveTimeSlot", "Admin")',
-                    data: { day: day, startTime: startTime, endTime: endTime },
-                    success: function () {
-                        location.reload(); // Reload page to reflect removed availability
+            // Otherwise, handle removing from the database
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("RemoveTimeSlot", "Admin")',
+                data: { day: day, startTime: startTime, endTime: endTime },
+                success: function (response) {
+                    if (response.success) {
+                        loadAvailability(); // Reload the table to reflect the removal
+                    } else {
+                        alert('Failed to remove time slot.');
                     }
-                });
-            }
+                },
+                error: function () {
+                    alert('Error occurred while removing time slot.');
+                }
+            });
         }
     </script>
 }

@@ -10,6 +10,7 @@ namespace XBCAD
     {
         public static void Main(string[] args)
         {
+
             var builder = WebApplication.CreateBuilder(args);
             var credential = GoogleCredential.FromFile("path/to/alleysway-310a8-firebase-adminsdk-n95a3-2b1da73f9e.json");
             if (FirebaseApp.DefaultInstance == null)
@@ -19,6 +20,8 @@ namespace XBCAD
                     Credential = credential
                 });
             }
+
+
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
@@ -43,7 +46,7 @@ namespace XBCAD
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            
+
             app.UseRouting();
             app.UseSession();
             app.UseAuthorization();
@@ -56,4 +59,5 @@ namespace XBCAD
             app.Run();
         }
     }
+
 }
