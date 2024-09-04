@@ -1,0 +1,201 @@
+﻿body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+#wrapper {
+    display: flex;
+    min-height: 100vh; /* Full height of the viewport */
+    height: auto;
+}
+
+#sidebar-wrapper {
+    position: sticky; /* Make the sidebar sticky */
+    top: 0; /* Stick to the top of the viewport */
+    min-width: 250px;
+    max-width: 250px;
+    background-color: #1a1a1a;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+    height: 100vh; /* Make the sidebar take the full height of the viewport */
+    overflow-y: auto; /* Allows for scrolling if content exceeds height */
+}
+
+.sidebar-heading {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.sidebar-logo {
+    width: 300px;
+    height: auto;
+    border-radius: 10px;
+}
+
+.sidebar-user-info {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+    .sidebar-user-info p {
+        margin: 0;
+        color: #ccc;
+    }
+
+    .sidebar-user-info .user-name {
+        font-weight: bold;
+    }
+
+.list-group-item {
+    width: 100%;
+    padding: 15px;
+    text-align: left;
+    font-size: 16px;
+    border: none;
+    position: relative;
+    overflow: hidden;
+    transition: color 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .list-group-item i {
+        margin-right: 10px;
+    }
+
+    .list-group-item:hover, .list-group-item.active {
+        background-color: #FF7900;
+        color: white;
+    }
+
+    .list-group-item::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background-color: rgba(255, 121, 0, 0.3); /* Orange with transparency */
+        transition: width 0.3s ease, height 0.3s ease, top 0.3s ease, left 0.3s ease;
+        z-index: 0;
+    }
+
+    .list-group-item:hover::before {
+        width: 200%;
+        height: 400%;
+        top: -100%;
+        left: -50%;
+    }
+
+    .list-group-item:hover {
+        color: #FC670B; /* Orange text color on hover */
+        box-shadow: 0px 0px 10px rgba(255, 121, 0, 0.8); /* Orange glow around the item */
+    }
+
+    .list-group-item .bi {
+        z-index: 1; /* Keep the icons above the bubble */
+        position: relative;
+    }
+
+    .list-group-item .text-white {
+        z-index: 1; /* Keep the text above the bubble */
+        position: relative;
+    }
+
+.sidebar-divider {
+    width: 100%;
+    border-top: 4px solid #B15F2C;
+    margin: 20px 0;
+}
+
+#page-content-wrapper {
+    flex: 1;
+    background-color: #f8f9fa;
+    padding: 20px;
+}
+
+.container {
+    margin-top: 20px;
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.section-header {
+    margin-bottom: 10px;
+}
+
+.section-title {
+    color: #FF7900;
+    font-size: 1.25rem;
+    margin-bottom: 10px;
+}
+
+.availability-table {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.day-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.day-name {
+    width: 100px;
+    font-weight: bold;
+}
+
+.time-slots {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.time-slot {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+    .time-slot input {
+        margin-right: 5px;
+    }
+
+.btn-primary {
+    background-color: #FF7900;
+    border-color: #FF7900;
+}
+
+.btn-danger {
+    color: white;
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+/* Custom styles for saved availability blocks */
+.custom-header {
+    background-color: #27262C; /* Orange header for saved availability */
+    color: white;
+}
+
+.custom-body {
+    background-color: #f8f9fa; /* Light gray body for saved availability */
+}
+
+.custom-list-item {
+    background-color: #d4edda; /* Light green background for list items */
+    transition: none; /* Remove hover transitions */
+    box-shadow: none; /* Remove box-shadow */
+}
+
+    .custom-list-item:hover {
+        color: inherit; /* Maintain the original text color */
+        background-color: #d4edda; /* Keep the same background color */
+        box-shadow: none; /* Prevent any glow or shadow */
+    }

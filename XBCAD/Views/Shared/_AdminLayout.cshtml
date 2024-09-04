@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Admin</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/admin.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+</head>
+
+<body>
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar -->
+        <div class="bg-dark border-right" id="sidebar-wrapper">
+            <div class="sidebar-heading">
+                <img src="~/images/NavPic.png" alt="AlleySway" class="img-fluid sidebar-logo">
+            </div>
+            <div class="list-group list-group-flush">
+                <div class="sidebar-user-info">
+                    <p>Signed in as:</p>
+                    <p class="user-name">Nicholas Malan</p>
+                </div>
+                <a href="#" class="list-group-item list-group-item-action bg-dark text-white active">
+                    <i class="bi bi-calendar"></i> Calendar
+                </a>
+                <a href="#" class="list-group-item list-group-item-action bg-dark text-white">
+                    <i class="bi bi-person"></i> Clients
+                </a>
+                <a href="@Url.Action("Availability", "Admin")" class="list-group-item list-group-item-action bg-dark text-white">
+                    <i class="bi bi-clock"></i> Availability
+                </a>
+
+
+
+                <a href="#" class="list-group-item list-group-item-action bg-dark text-white">
+                    <i class="bi bi-currency-dollar"></i> Income
+                </a>
+                <a href="#" class="list-group-item list-group-item-action bg-dark text-white">
+                    <i class="bi bi-gear"></i> Settings
+                </a>
+                <hr class="sidebar-divider">
+                <a href="@Url.Action("Logout", "Account")" class="list-group-item list-group-item-action bg-dark text-white">
+                    <i class="bi bi-box-arrow-right"></i> Log out
+                </a>
+            </div>
+        </div>
+        <!-- /#sidebar-wrapper -->
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <div class="container-fluid">
+                @RenderBody()
+            </div>
+        </div>
+        <!-- /#page-content-wrapper -->
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,92 @@
+﻿body {
+    background-color: #27262C;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;
+    background-image: url('/images/HalfCircle.jpeg'), url('/images/Cut.jpeg'), url('/images/Triangle.jpeg');
+    background-repeat: no-repeat;
+    background-position: left bottom, right top, right bottom;
+    background-size: 400px, 400px, 400px;
+}
+
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.login-form {
+    padding: 2.5rem;
+    max-width: 400px;
+    width: 100%;
+    text-align: left;
+    margin: 0 auto;
+}
+
+    .login-form h1 {
+        font-size: 4rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+        color: #FFF;
+        text-align: left;
+    }
+
+    .login-form h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        color: #FFF;
+        text-align: left;
+    }
+
+.form-group {
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+    .form-group label {
+        color: #FFF;
+    }
+
+.form-control {
+    width: 100%;
+    padding: 1rem;
+    margin-top: 0.5rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: #555;
+    color: #fff;
+}
+
+.btn {
+    padding: 0.75rem;
+    width: 100%;
+    border-radius: 5px;
+    background-color: #FFF;
+    color: #333;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 1rem;
+}
+
+    .btn:hover {
+        background-color: #ddd;
+    }
+
+p {
+    color: #FFF;
+    text-align: center;
+    margin-top: 1rem;
+}
+
+    p a {
+        color: #FF7900;
+        text-decoration: none;
+    }
+
+        p a:hover {
+            text-decoration: underline;
+        }
