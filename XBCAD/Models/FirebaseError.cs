@@ -1,4 +1,5 @@
-﻿namespace XBCAD.Models
+﻿
+namespace XBCAD.Models
 {
     public class FirebaseError
     {
