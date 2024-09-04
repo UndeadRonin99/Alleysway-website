@@ -1,2 +1,1 @@
-# Readme
-## why did you change my read me Reece
+# For all the funky ass files that will give kak when trying to push/pull always accept local and never accept incoming as it changes the path directory of your files. Please do not make this mistake 
