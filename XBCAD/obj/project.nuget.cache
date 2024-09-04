@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "AAQcv2W0FHhXYXpVPFGpRcCFlaS8zgWro9qH7WUn8OCpCy9CExFwL446u5HgzfB2IaHcm13LxOdm8Ta5DDQ7MA==",
+  "dgSpecHash": "oSjMT1fxZSkobq6EpYekLTm8wKuAq6GnUXyKmopsuiWqSkklXgziuCZOlprC1pu6kbq4pdvXUpHPD/nEhE9jVQ==",
   "success": true,
-  "projectFilePath": "C:\\Users\\lab_services_student\\source\\repos\\Alleysway-website\\XBCAD\\XBCAD.csproj",
+  "projectFilePath": "C:\\Users\\lab_services_student\\Source\\Repos\\Alleysway-website\\XBCAD\\XBCAD.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\lab_services_student\\.nuget\\packages\\firebase.auth\\1.0.0\\firebase.auth.1.0.0.nupkg.sha512",
     "C:\\Users\\lab_services_student\\.nuget\\packages\\firebaseadmin\\3.0.0\\firebaseadmin.3.0.0.nupkg.sha512",

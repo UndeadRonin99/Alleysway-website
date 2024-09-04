@@ -1,0 +1,27 @@
+﻿@model XBCAD.ViewModels.AvailabilityViewModel
+
+@foreach (var day in Model.Days)
+{
+    <div class="day-row">
+        <div class="day-name">@day.Day</div>
+        <div class="time-slots" data-day="@day.Day">
+            @if (day.TimeSlots != null && day.TimeSlots.Any())
+            {
+                @foreach (var slot in day.TimeSlots)
+                {
+                    <div class="time-slot d-flex align-items-center">
+                        <input type="text" class="form-control me-2 timepicker" value="@slot.StartTime" placeholder="Start Time" readonly>
+                        <span class="me-2">until</span>
+                        <input type="text" class="form-control me-2 timepicker" value="@slot.EndTime" placeholder="End Time" readonly>
+                        <button type="button" class="btn btn-danger me-2" onclick="removeTimeSlot(this, '@day.Day', '@slot.StartTime', '@slot.EndTime')">🗑️</button>
+                    </div>
+                }
+            }
+            else
+            {
+                <p class="text-muted">No availability set for this day.</p>
+            }
+        </div>
+        <button type="button" class="btn btn-primary mt-2" onclick="addTimeSlot(this, '@day.Day')">+ Add Time</button>
+    </div>
+}
