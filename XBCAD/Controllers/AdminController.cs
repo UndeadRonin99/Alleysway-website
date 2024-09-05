@@ -11,8 +11,8 @@ namespace XBCAD.Controllers
         public IActionResult Dashboard()
         {
             ViewData["Title"] = "Admin Dashboard";
-            ViewBag.FirstName = TempData["FirstName"]?.ToString();
-            ViewBag.LastName = TempData["LastName"]?.ToString();
+            var Name = User.FindFirstValue(ClaimTypes.Name); //Retrieve Name
+            ViewBag.Name = Name;
             return View();
         }
 
@@ -32,6 +32,8 @@ namespace XBCAD.Controllers
         public async Task<IActionResult> Availability()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var Name = User.FindFirstValue(ClaimTypes.Name); //Retrieve Name
+            ViewBag.Name = Name;
 
             if (string.IsNullOrEmpty(userId))
             {
@@ -48,6 +50,8 @@ namespace XBCAD.Controllers
         public async Task<IActionResult> GetAvailabilityPartial()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var Name = User.FindFirstValue(ClaimTypes.Name); //Retrieve Name
+            ViewBag.Name = Name;
 
             if (string.IsNullOrEmpty(userId))
             {
@@ -64,6 +68,8 @@ namespace XBCAD.Controllers
         public async Task<IActionResult> SaveTimeSlot(string day, string startTime, string endTime)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var Name = User.FindFirstValue(ClaimTypes.Name); //Retrieve Name
+            ViewBag.Name = Name;
 
             if (string.IsNullOrEmpty(userId))
             {
@@ -78,6 +84,8 @@ namespace XBCAD.Controllers
         public async Task<IActionResult> RemoveTimeSlot(string day, string startTime, string endTime)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var Name = User.FindFirstValue(ClaimTypes.Name); //Retrieve Name
+            ViewBag.Name = Name;
 
             if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(day) || string.IsNullOrEmpty(startTime) || string.IsNullOrEmpty(endTime))
             {

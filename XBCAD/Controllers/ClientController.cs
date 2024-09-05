@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace XBCAD.Controllers
 {
@@ -6,9 +7,10 @@ namespace XBCAD.Controllers
     {
         public IActionResult Dashboard()
         {
-            ViewData["Title"] = "Client Dashboard";
-            ViewBag.FirstName = TempData["FirstName"]?.ToString();
-            ViewBag.LastName = TempData["LastName"]?.ToString();
+            ViewData["Title"] = "Client Dashboard"; 
+            //var userID = User.FindFirstValue(ClaimTypes.NameIdentifier); //Retrieve uid
+            var Name = User.FindFirstValue(ClaimTypes.Name); //Retrieve Name
+            ViewBag.Name = Name;
             return View();
         }
 
