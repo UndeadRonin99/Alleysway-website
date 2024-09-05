@@ -31,17 +31,16 @@ namespace XBCAD.Controllers
 
         public async Task<IActionResult> Availability()
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); 
-            
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             if (string.IsNullOrEmpty(userId))
             {
-                // Handle the case where userId is not found in the session
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction("Login", "Account"); // Redirect to login if the user ID is not found
             }
 
             var model = await firebaseService.GetAvailabilityAsync(userId);
             model.UserId = userId;
-            return View(model);
+            return View(model); // Pass the availability data to the view
         }
 
 

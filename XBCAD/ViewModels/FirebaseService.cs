@@ -17,7 +17,6 @@ public class FirebaseService
 
     public async Task<AvailabilityViewModel> GetAvailabilityAsync(string userId)
     {
-        // Initialize the model with default days (Monday to Sunday)
         var model = new AvailabilityViewModel
         {
             Days = new List<DayAvailability>
@@ -34,28 +33,31 @@ public class FirebaseService
 
         try
         {
-            // Fetch data from Firebase specific to the user
             var daysSnapshot = await firebase
                 .Child("users")
                 .Child(userId)
                 .Child("Days")
-                .OnceAsync<Dictionary<string, List<TimeSlot>>>();
+                .OnceAsync<Dictionary<string, Dictionary<string, TimeSlot>>>();
 
-            // If there is data, update the corresponding days in the model
             foreach (var dayEntry in daysSnapshot)
             {
                 var dayAvailability = model.Days.FirstOrDefault(d => d.Day == dayEntry.Key);
                 if (dayAvailability != null && dayEntry.Object != null)
                 {
-                    // Flattening the dictionary of lists into a single list of TimeSlot
-                    dayAvailability.TimeSlots = dayEntry.Object.Values
-                        .SelectMany(list => list)
-                        .ToList();
+                    // Flatten all TimeSlot dictionaries into a single list
+                    var timeSlots = new List<TimeSlot>();
+                    foreach (var slotDict in dayEntry.Object.Values)
+                    {
+                        timeSlots.AddRange(slotDict.Values);
+                    }
+                    dayAvailability.TimeSlots = timeSlots;
                 }
             }
+
         }
-        catch
+        catch (Exception ex)
         {
+            Console.WriteLine($"Error fetching availability: {ex.Message}");
             // Handle any exceptions and just return the default days with no time slots
         }
 
@@ -79,28 +81,41 @@ public class FirebaseService
 
     public async Task RemoveTimeSlotAsync(string day, string startTime, string endTime, string userId)
     {
-        var slots = await firebase
-            .Child("users")
-            .Child(userId)
-            .Child("Days")
-            .Child(day)
-            .Child("TimeSlots")
-            .OnceAsync<TimeSlot>();
-
-        var slotToRemove = slots.FirstOrDefault(ts => ts.Object.StartTime == startTime && ts.Object.EndTime == endTime);
-
-        if (slotToRemove != null)
+        try
         {
-            await firebase
+            var slots = await firebase
                 .Child("users")
                 .Child(userId)
                 .Child("Days")
                 .Child(day)
                 .Child("TimeSlots")
-                .Child(slotToRemove.Key)
-                .DeleteAsync();
+                .OnceAsync<TimeSlot>();
+
+            var slotToRemove = slots.FirstOrDefault(ts => ts.Object.StartTime == startTime && ts.Object.EndTime == endTime);
+
+            if (slotToRemove != null)
+            {
+                Console.WriteLine("Deleting slot with Key: " + slotToRemove.Key);  // Log key to debug
+                await firebase
+                    .Child("users")
+                    .Child(userId)
+                    .Child("Days")
+                    .Child(day)
+                    .Child("TimeSlots")
+                    .Child(slotToRemove.Key)
+                    .DeleteAsync();
+            }
+            else
+            {
+                Console.WriteLine("Slot not found or already deleted");  // Log if not found
+                throw new Exception("Time slot not found or already deleted.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error removing time slot: {ex.Message}");  // Log detailed error
+            throw; // Re-throwing the exception to be caught by the calling method
         }
     }
-
 
 }

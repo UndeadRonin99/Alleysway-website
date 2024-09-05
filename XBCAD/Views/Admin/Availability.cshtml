@@ -6,7 +6,6 @@
 
 <div class="container mt-4">
     <h2>Default Availability</h2>
-
     <div class="availability-section">
         <div class="section-header">
             <h3 class="section-title">General Availability</h3>
@@ -18,7 +17,7 @@
                     <div class="day-row mb-4">
                         <div class="day-name"><strong>@day.Day</strong></div>
                         <div class="time-slots" data-day="@day.Day">
-                            @if (day.TimeSlots != null && day.TimeSlots.Any())
+                            @if (day.TimeSlots.Any())
                             {
                                 foreach (var slot in day.TimeSlots)
                                 {
@@ -27,17 +26,17 @@
                                             <input type="text" class="form-control me-2 timepicker" value="@slot.StartTime" placeholder="Start Time" readonly>
                                             <span class="me-2">until</span>
                                             <input type="text" class="form-control me-2 timepicker" value="@slot.EndTime" placeholder="End Time" readonly>
-                                            <button type="button" class="btn btn-danger me-2" onclick="removeTimeSlot(this, '@day.Day', '@slot.StartTime', '@slot.EndTime', '@Model.UserId')">🗑️</button>
+                                            <button type="button" class="btn btn-danger me-2" onclick="removeTimeSlot(this, '@day.Day', '@slot.StartTime', '@slot.EndTime', '@userId')">🗑️</button>
                                         </div>
                                     </div>
                                 }
                             }
                             else
                             {
-                            <p class="text-muted">No availability set for this day.</p>
+                                <p class="text-muted">No availability set for this day.</p>
                             }
                         </div>
-                        <button type="button" class="btn btn-primary mt-2" onclick="addTimeSlot(this, '@day.Day', '@Model.UserId')">+ Add Time</button>
+                        <button type="button" class="btn btn-primary mt-2" onclick="addTimeSlot(this, '@day.Day', '@userId')">+ Add Time</button>
                     </div>
                 }
             </div>
@@ -45,10 +44,11 @@
     </div>
 </div>
 
-
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
+        var userId = '@userId';  // Correctly scoped variable
+
         function initializeTimePickers() {
             $(".timepicker").flatpickr({
                 enableTime: true,
@@ -61,9 +61,8 @@
         function loadAvailability() {
             $.ajax({
                 type: "GET",
-                url: '@Url.Action("GetAvailabilityPartial", "Admin", new { userId = Model.UserId, _ = new Random().Next() })',
+                url: '@Url.Action("GetAvailabilityPartial", "Admin", new { userId = userId, _ = new Random().Next() })',
                 success: function (html) {
-                    console.log("Partial view loaded");
                     $('#availabilityTable').html(html);
                     initializeTimePickers(); // Ensure this runs after content is replaced
                 },
@@ -78,19 +77,19 @@
         });
 
         function addTimeSlot(button, day, userId) {
-            console.log("fucking hate this poes");
             var container = $(button).closest('.day-row').find('.time-slots');
-            var startTimeInput = $('<input type="text" class="form-control me-2 timepicker" placeholder="Start Time">');
-            var endTimeInput = $('<input type="text" class="form-control me-2 timepicker" placeholder="End Time">');
+            var startTimeInput = $('<input type="text" class="form-control me-2 timepicker start-time" placeholder="Start Time">');
+            var endTimeInput = $('<input type="text" class="form-control me-2 timepicker end-time" placeholder="End Time">');
             var saveButton = $('<button type="button" class="btn btn-success me-2">Save</button>');
-            console.log("poes");
+
             var newSlot = $('<div class="time-slot-row mb-3"></div>')
                 .append($('<div class="time-slot d-flex align-items-center"></div>')
                     .append(startTimeInput)
                     .append('<span class="me-2">until</span>')
                     .append(endTimeInput)
                     .append(saveButton)
-                    .append('<button type="button" class="btn btn-danger me-2" onclick="removeTimeSlot(this, null, null, null, userId)">🗑️</button>'));
+                    .append('<button type="button" class="btn btn-danger me-2" onclick="removeTimeSlot(this, \'' + day + '\', $(this).closest(\'.time-slot-row\').find(\'.start-time\').val(), $(this).closest(\'.time-slot-row\').find(\'.end-time\').val(), \'' + userId + '\')">🗑️</button>'));
+            console.log(userId);
 
             // Remove "No availability set for this day." message if present
             container.find('.no-availability-message').remove();
@@ -124,7 +123,6 @@
                     alert('Please enter both start and end times before saving.');
                 }
             });
-            console.log(userId)
         }
 
         function removeTimeSlot(button, day, startTime, endTime, userId) {
