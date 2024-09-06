@@ -370,3 +370,4 @@ C:\Users\Mateo\Source\Repos\Alleysway-website\XBCAD\obj\Debug\net8.0\refint\XBCA
 C:\Users\Mateo\Source\Repos\Alleysway-website\XBCAD\obj\Debug\net8.0\XBCAD.pdb
 C:\Users\Mateo\Source\Repos\Alleysway-website\XBCAD\obj\Debug\net8.0\XBCAD.genruntimeconfig.cache
 C:\Users\Mateo\Source\Repos\Alleysway-website\XBCAD\obj\Debug\net8.0\ref\XBCAD.dll
+C:\Users\thema\source\repos\Alleysway-website\XBCAD\bin\Debug\net8.0\Firebase.Storage.dll

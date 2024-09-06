@@ -10,8 +10,6 @@ namespace XBCAD.Controllers
         public string userId;
         public IActionResult Dashboard()
         {
-            //testing pull/push for matteo
-
             ViewData["Title"] = "Admin Dashboard";
             var Name = User.FindFirstValue(ClaimTypes.Name); //Retrieve Name
             ViewBag.Name = Name;
@@ -29,6 +27,65 @@ namespace XBCAD.Controllers
         public AdminController()
         {
             firebaseService = new FirebaseService();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveProfile(IFormFile photo, string rate)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            try
+            {
+                string imageUrl = null;
+
+
+                // If a photo was uploaded, upload it to Firebase Storage
+                if (photo != null && photo.Length > 0)
+                {
+                    imageUrl = await firebaseService.UploadProfileImageAsync(userId, photo);
+
+                    
+                    // Save the image URL to Firebase Realtime Database
+                    await firebaseService.SaveProfileImageUrlAsync(userId, imageUrl);
+                }
+
+                // Save the rate to Firebase Realtime Database
+                await firebaseService.SaveRateAsync(userId, rate);
+
+
+                TempData["SuccessMessage"] = "Profile updated successfully.";
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Profile update failed: {ex.Message}");
+            }
+
+            return RedirectToAction("Settings");
+        }
+
+
+        
+
+        public async Task<IActionResult> Settings()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var email = User.FindFirstValue(ClaimTypes.Email);
+            var Name = User.FindFirstValue(ClaimTypes.Name); //Retrieve Name
+            ViewBag.Name = Name;
+            ViewBag.Email = email;
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return RedirectToAction("Login", "Account"); // Redirect to login if the user ID is not found
+            }
+
+            // Get the profile image URL from Firebase Realtime Database
+            var profileImageUrl = await firebaseService.GetProfileImageUrlAsync(userId);
+            ViewBag.ProfileImageUrl = profileImageUrl;
+
+            var model = await firebaseService.GetAvailabilityAsync(userId);
+            model.UserId = userId;
+            return View(model); // Pass the availability data to the view
         }
 
         public async Task<IActionResult> Availability()

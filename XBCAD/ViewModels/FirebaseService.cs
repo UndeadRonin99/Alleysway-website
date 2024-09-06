@@ -1,5 +1,6 @@
 ﻿using Firebase.Database;
 using Firebase.Database.Query;
+using Firebase.Storage;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,12 +9,90 @@ using XBCAD.ViewModels;
 public class FirebaseService
 {
     private readonly FirebaseClient firebase;
+    private readonly FirebaseStorage storage;
+
 
     public FirebaseService()
     {
         // Ensure this URL is correct and points to your Firebase Realtime Database
         firebase = new FirebaseClient("https://alleysway-310a8-default-rtdb.firebaseio.com/");
+
+        // Initialize Firebase Storage 
+        storage = new FirebaseStorage("alleysway-310a8.appspot.com");
     }
+
+    public async Task SaveRateAsync(string userId, string rate)
+    {
+        await firebase
+            .Child("users")
+            .Child(userId)
+            .Child("rate")
+            .PutAsync<string>(rate);
+    }
+
+    // Method to upload profile image and return its URL
+    public async Task<string> UploadProfileImageAsync(string userId, IFormFile photo)
+    {
+        // Generate a unique file name
+        var fileName = $"{userId}/profile-image.{photo.ContentType.Split('/')[1]}";
+
+        // Upload the image to Firebase Storage
+        var stream = photo.OpenReadStream();
+        var imageUrl = await storage.Child("users").Child(fileName).PutAsync(stream);
+
+        // Return the image URL
+        return imageUrl;
+    }
+
+    // Method to save profile image URL to Firebase Realtime Database
+    public async Task SaveProfileImageUrlAsync(string userId, string imageUrl)
+    {
+        try
+        {
+            // Ensure imageUrl is a valid string
+            if (string.IsNullOrEmpty(imageUrl))
+            {
+                throw new ArgumentException("Image URL cannot be null or empty.");
+            }
+
+            // Log the URL for debugging purposes
+            Console.WriteLine($"Saving profile image URL: {imageUrl}");
+
+            // Save the image URL under the specified userId
+            await firebase
+                .Child("users")
+                .Child(userId)
+                .Child("profileImageUrl")
+                .PutAsync<string>(imageUrl);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error saving profile image URL: {ex.Message}");
+            throw;
+        }
+    }
+
+
+    // Method to get the profile image URL for a user
+    public async Task<string> GetProfileImageUrlAsync(string userId)
+    {
+        try
+        {
+            var imageUrl = await firebase
+                .Child("users")
+                .Child(userId)
+                .Child("profileImageUrl")
+                .OnceSingleAsync<string>();
+
+            return imageUrl;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching profile image URL: {ex.Message}");
+            return null; // or you can return a default image URL if needed
+        }
+    }
+
 
     public async Task<AvailabilityViewModel> GetAvailabilityAsync(string userId)
     {

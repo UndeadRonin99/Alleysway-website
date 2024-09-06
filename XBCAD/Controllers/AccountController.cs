@@ -14,7 +14,6 @@ namespace XBCAD.Controllers
 {
     public class AccountController : Controller
     { 
-        //testing pull/push for matteo
         private readonly FirebaseAuth auth;
         private readonly HttpClient httpClient;
 
@@ -143,6 +142,7 @@ namespace XBCAD.Controllers
                     {
                         new Claim(ClaimTypes.NameIdentifier, uid),
                         new Claim(ClaimTypes.Name, $"{firstName} {lastName}"),
+                        new Claim(ClaimTypes.Email, model.Username),  // Add Username as Email claim
                         new Claim(ClaimTypes.Role, role)
                             // Add other claims as needed
                     };
