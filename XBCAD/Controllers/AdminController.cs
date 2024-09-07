@@ -2,12 +2,21 @@
 using XBCAD.ViewModels;
 using System.Collections.Generic;
 using System.Security.Claims;
+using FirebaseAdmin.Auth;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
+using System.Text.Json;
+using System.Text;
 
 namespace XBCAD.Controllers
 {
     public class AdminController : Controller
     {
         public string userId;
+        private readonly FirebaseAuth auth;
+        private readonly HttpClient httpClient;
+
+
         public IActionResult Dashboard()
         {
             ViewData["Title"] = "Admin Dashboard";
@@ -24,14 +33,90 @@ namespace XBCAD.Controllers
 
         private readonly FirebaseService firebaseService;
 
-        public AdminController()
+        public AdminController(IHttpClientFactory httpClientFactory)
         {
             firebaseService = new FirebaseService();
+            this.httpClient = httpClientFactory.CreateClient();
+
+            if (FirebaseApp.DefaultInstance == null)
+            {
+                FirebaseApp.Create(new AppOptions
+                {
+                    Credential = GoogleCredential.GetApplicationDefault(),
+                });
+            }
+
+            this.auth = FirebaseAuth.DefaultInstance;
         }
+
+        [HttpPost]
+        public async Task<IActionResult> AddNewPT(string ptName, string ptEmail, string ptPassword, string ptConfirmPassword, string ptRate)
+        {
+            TempData["ActiveTab"] = "addPT"; // Set the active tab to "addPT"
+
+            if (ptPassword != ptConfirmPassword)
+            {
+                ModelState.AddModelError("", "Password and Confirm Password do not match.");
+                return RedirectToAction("Settings");
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    // Create the new user in Firebase Authentication
+                    var userRecord = await this.auth.CreateUserAsync(new UserRecordArgs
+                    {
+                        Email = ptEmail,
+                        Password = ptPassword,
+                        DisplayName = ptName,
+                        Disabled = false,
+                    });
+
+                    // Prepare data to be saved in RTDB
+                    var data = new
+                    {
+                        Name = ptName,
+                        Email = ptEmail,
+                        Rate = ptRate,
+                        Role = "admin"
+                    };
+                    var json = JsonSerializer.Serialize(data);
+                    var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                    // Construct the URL to Firebase RTDB
+                    var url = $"https://alleysway-310a8-default-rtdb.firebaseio.com/users/{userRecord.Uid}.json";
+
+                    // Send data to Firebase RTDB
+                    var response = await httpClient.PutAsync(url, content);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        TempData["SuccessMessage"] = "New PT added successfully.";
+                        return RedirectToAction("Settings");
+                    }
+                    else
+                    {
+                        throw new Exception("Failed to save user data to database.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", $"Error adding new PT: {ex.Message}");
+                    return RedirectToAction("Settings");
+                }
+            }
+
+            return RedirectToAction("Settings");
+        }
+
+
 
         [HttpPost]
         public async Task<IActionResult> SaveProfile(IFormFile photo, string rate)
         {
+            TempData["ActiveTab"] = "editProfile"; // Set the active tab to "addPT"
+
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             try

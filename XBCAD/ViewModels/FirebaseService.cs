@@ -1,6 +1,8 @@
 ﻿using Firebase.Database;
 using Firebase.Database.Query;
 using Firebase.Storage;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,6 +21,8 @@ public class FirebaseService
 
         // Initialize Firebase Storage 
         storage = new FirebaseStorage("alleysway-310a8.appspot.com");
+
+        
     }
 
     public async Task SaveRateAsync(string userId, string rate)

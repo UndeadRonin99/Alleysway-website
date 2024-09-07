@@ -1,6 +1,7 @@
 ﻿@{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = "Settings";
+    var activeTab = TempData["ActiveTab"]?.ToString() ?? "editProfile"; // Default to "editProfile" if no tab is specified
 }
 
 <!DOCTYPE html>
@@ -24,19 +25,19 @@
 
                 <ul class="nav nav-tabs">
                     <li class="nav-item">
-                        <a class="nav-link active" href="#editProfile" data-bs-toggle="tab">Edit profile</a>
+                        <a class="nav-link @(activeTab == "editProfile" ? "active" : "")" href="#editProfile" data-bs-toggle="tab">Edit profile</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#addPT" data-bs-toggle="tab">Add new PT</a>
+                        <a class="nav-link @(activeTab == "addPT" ? "active" : "")" href="#addPT" data-bs-toggle="tab">Add new PT</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-danger" href="#deleteProfile" data-bs-toggle="tab">Delete profile</a>
+                        <a class="nav-link @(activeTab == "deleteProfile" ? "active" : "") text-danger" href="#deleteProfile" data-bs-toggle="tab">Delete profile</a>
                     </li>
                 </ul>
 
                 <div class="tab-content mt-3">
                     <!-- Edit Profile Tab -->
-                    <div class="tab-pane fade show active" id="editProfile">
+                    <div class="tab-pane fade @(activeTab == "editProfile" ? "show active" : "")" id="editProfile">
                         <div class="card">
                             <div class="card-header bg-primary text-white">
                                 Edit Profile
@@ -90,45 +91,60 @@
                     </div>
 
                     <!-- Add New PT Tab -->
-                    <div class="tab-pane fade" id="addPT">
+                    <div class="tab-pane fade @(activeTab == "addPT" ? "show active" : "")" id="addPT">
                         <div class="card">
                             <div class="card-header bg-warning text-white">
                                 Add New PT
                             </div>
                             <div class="card-body">
-                                <form>
+                                <form id="addPTForm" method="post" action="/Admin/AddNewPT">
                                     <div class="row mb-3">
-                                        <label for="ptFirstName" class="col-sm-2 col-form-label">PT First Name</label>
+                                        <label for="ptName" class="col-sm-2 col-form-label">PT Name</label>
                                         <div class="col-sm-10">
-                                            <input type="text" class="form-control" id="ptFirstName" />
+                                            <input type="text" class="form-control" id="ptName" name="ptName" required />
                                         </div>
                                     </div>
                                     <div class="row mb-3">
-                                        <label for="ptLastName" class="col-sm-2 col-form-label">PT Last Name</label>
+                                        <label for="ptEmail" class="col-sm-2 col-form-label">PT Email</label>
                                         <div class="col-sm-10">
-                                            <input type="text" class="form-control" id="ptLastName" />
+                                            <input type="email" class="form-control" id="ptEmail" name="ptEmail" required />
                                         </div>
                                     </div>
                                     <div class="row mb-3">
-                                        <label for="ptEmail" class="col-sm-2 col-form-label">Email</label>
+                                        <label for="ptPassword" class="col-sm-2 col-form-label">Password</label>
                                         <div class="col-sm-10">
-                                            <input type="email" class="form-control" id="ptEmail" />
+                                            <input type="password" class="form-control" id="ptPassword" name="ptPassword" required />
                                         </div>
                                     </div>
                                     <div class="row mb-3">
-                                        <label for="ptSpecialty" class="col-sm-2 col-form-label">Specialty</label>
+                                        <label for="ptConfirmPassword" class="col-sm-2 col-form-label">Confirm Password</label>
                                         <div class="col-sm-10">
-                                            <input type="text" class="form-control" id="ptSpecialty" />
+                                            <input type="password" class="form-control" id="ptConfirmPassword" name="ptConfirmPassword" required />
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <label for="ptRate" class="col-sm-2 col-form-label">PT Rate</label>
+                                        <div class="col-sm-10">
+                                            <input type="text" class="form-control" id="ptRate" name="ptRate" required />
                                         </div>
                                     </div>
                                     <button type="submit" class="btn btn-warning">Add</button>
                                 </form>
+                                <!-- Success Popup -->
+                                @if (TempData["SuccessMessage"] != null)
+                                {
+                                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                        @TempData["SuccessMessage"]
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>
 
+
                     <!-- Delete Profile Tab -->
-                    <div class="tab-pane fade" id="deleteProfile">
+                    <div class="tab-pane fade @(activeTab == "deleteProfile" ? "show active" : "")" id="deleteProfile">
                         <div class="card">
                             <div class="card-header bg-danger text-white">
                                 Delete Profile
