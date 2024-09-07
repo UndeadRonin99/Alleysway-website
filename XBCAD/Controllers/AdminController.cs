@@ -7,6 +7,8 @@ using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using System.Text.Json;
 using System.Text;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 
 namespace XBCAD.Controllers
 {
@@ -48,6 +50,38 @@ namespace XBCAD.Controllers
 
             this.auth = FirebaseAuth.DefaultInstance;
         }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteProfile()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            try
+            {
+                // Delete the user from Firebase Authentication
+                await FirebaseAuth.DefaultInstance.DeleteUserAsync(userId);
+
+                // Optionally, you could also remove user data from the Realtime Database
+                await firebaseService.DeleteUserDataAsync(userId);
+
+                // Sign out the user after deletion
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+                TempData["SuccessMessage"] = "Your profile has been deleted successfully.";
+                return RedirectToAction("Login", "Account");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Profile deletion failed: {ex.Message}");
+                return RedirectToAction("Settings");
+            }
+        }
+
 
         [HttpPost]
         public async Task<IActionResult> AddNewPT(string ptName, string ptEmail, string ptPassword, string ptConfirmPassword, string ptRate)

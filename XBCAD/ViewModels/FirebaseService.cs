@@ -25,6 +25,23 @@ public class FirebaseService
         
     }
 
+    public async Task DeleteUserDataAsync(string userId)
+    {
+        try
+        {
+            await firebase
+                .Child("users")
+                .Child(userId)
+                .DeleteAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting user data: {ex.Message}");
+            throw;
+        }
+    }
+
+
     public async Task SaveRateAsync(string userId, string rate)
     {
         await firebase

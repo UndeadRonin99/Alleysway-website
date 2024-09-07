@@ -31,6 +31,9 @@
                         <a class="nav-link @(activeTab == "addPT" ? "active" : "")" href="#addPT" data-bs-toggle="tab">Add new PT</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link @(activeTab == "changePassword" ? "active" : "") text-danger" href="#changePassword" data-bs-toggle="tab">Change Password</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link @(activeTab == "deleteProfile" ? "active" : "") text-danger" href="#deleteProfile" data-bs-toggle="tab">Delete profile</a>
                     </li>
                 </ul>
@@ -142,9 +145,53 @@
                         </div>
                     </div>
 
-
                     <!-- Delete Profile Tab -->
                     <div class="tab-pane fade @(activeTab == "deleteProfile" ? "show active" : "")" id="deleteProfile">
+                        <div class="card">
+                            <div class="card-header bg-danger text-white">
+                                Delete Profile
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-danger" role="alert">
+                                    Are you sure you want to delete your profile? This action cannot be undone.
+                                </div>
+                                <!-- Button to trigger the modal -->
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
+                                    Delete Profile
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Confirmation Modal -->
+                    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header bg-danger text-white">
+                                    <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Account Deletion</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you absolutely sure you want to delete your profile? This action cannot be undone.
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <!-- Button to confirm deletion -->
+                                    <button type="button" class="btn btn-danger" onclick="document.getElementById('deleteProfileForm').submit();">
+                                        Yes, Delete My Profile
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hidden Form to Submit Deletion -->
+                    <form id="deleteProfileForm" method="post" action="/Admin/DeleteProfile">
+                        @* The form could be empty since you're handling deletion on the server-side. *@
+                    </form>
+
+                    <!-- Delete Profile Tab -->
+                    <div class="tab-pane fade @(activeTab == "changePassword" ? "show active" : "")" id="changePassword">
                         <div class="card">
                             <div class="card-header bg-danger text-white">
                                 Delete Profile
