@@ -163,14 +163,17 @@ namespace XBCAD.Controllers
                         Disabled = false,
                     });
 
-                    // Prepare data to be saved in RTDB
-                    var data = new
-                    {
-                        Name = ptName,
-                        Email = ptEmail,
-                        Rate = ptRate,
-                        Role = "admin"
-                    };
+                    string[] name = ptName.Split(" ");
+string fName = name[0];
+string sName = name[1];
+// Prepare data to be saved in RTDB
+var data = new
+{
+    firstName = fName,
+    lastName = sName,
+    rate = ptRate,
+    role = "admin"
+};
                     var json = JsonSerializer.Serialize(data);
                     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
