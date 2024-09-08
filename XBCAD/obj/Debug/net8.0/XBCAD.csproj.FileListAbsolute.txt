@@ -370,5 +370,4 @@ C:\Users\Mateo\Source\Repos\Alleysway-website\XBCAD\obj\Debug\net8.0\XBCAD.genru
 C:\Users\Mateo\Source\Repos\Alleysway-website\XBCAD\obj\Debug\net8.0\ref\XBCAD.dll
 C:\Users\thema\source\repos\Alleysway-website\XBCAD\bin\Debug\net8.0\Firebase.Storage.dll
 C:\Users\lab_services_student\Source\Repos\Alleysway-website\XBCAD\bin\Debug\net8.0\Firebase.Storage.dll
-C:\Users\lab_services_student\source\repos\Alleysway-website\XBCAD\bin\Debug\net8.0\path\to\alleysway-310a8-firebase-adminsdk-n95a3-aecccacac4.json
 C:\Users\thema\source\repos\Alleysway-website\XBCAD\bin\Debug\net8.0\path\to\alleysway-310a8-firebase-adminsdk-n95a3-af1016f422.json
