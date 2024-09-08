@@ -28,25 +28,37 @@ public class FirebaseService
     {
         var trainers = new List<Trainer>();
 
+        // Fetch all users from Firebase
         var users = await firebase
             .Child("users")
-            .OnceAsync<dynamic>(); // Fetch all users dynamically
+            .OnceAsync<dynamic>();
 
+        // Set the default image path for trainers without an image
+        string defaultImageUrl = "/images/default.jpg";
+
+        // Filter users who are admins (trainers)
         foreach (var user in users)
         {
-            if (user.Object.role == "admin") // Filter users with the role "admin"
+            string profileImageUrl = user.Object.profileImageUrl;
+
+            // Use the default image if profileImageUrl is null or empty
+            if (string.IsNullOrEmpty(profileImageUrl))
             {
-                trainers.Add(new Trainer
-                {
-                    Name = $"{user.Object.firstName} {user.Object.lastName}",
-                    ProfilePictureUrl = user.Object.profileImageUrl,
-                    HourlyRate = user.Object.rate
-                });
+                profileImageUrl = defaultImageUrl;
             }
+
+            trainers.Add(new Trainer
+            {
+                Name = $"{user.Object.firstName}\n {user.Object.lastName}",
+                ProfilePictureUrl = profileImageUrl,
+                HourlyRate = user.Object.rate
+            });
         }
 
-        return trainers;
+        return trainers; // Return the list of trainers
     }
+
+
 
 
     public async Task DeleteUserDataAsync(string userId)

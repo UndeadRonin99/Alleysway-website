@@ -5,24 +5,20 @@
     Layout = "~/Views/Shared/_ClientLayout.cshtml";
 }
 
-<div class="container">
-    <h2>Select a Trainer to Book</h2>
-    <div class="row">
+<div class="trainer-selection-container">
+    <h2>Book session with a Trainer</h2>
+    <p>Select a trainer to work with</p>
+    <div class="trainer-list">
         @foreach (var trainer in Model)
         {
-            <div class="col-md-3 text-center">
-                <img src="@trainer.ProfilePictureUrl" alt="@trainer.Name" class="rounded-circle trainer-image" />
-                <h4>@trainer.Name</h4>
-                <p>@trainer.HourlyRate/hour</p>
-                <button class="btn btn-primary">Book Trainer</button>
+            <div class="trainer-card">
+                <img src="@trainer.ProfilePictureUrl" alt="@trainer.Name" class="trainer-image" />
+                <div class="trainer-info">
+                    <h4>@trainer.Name</h4>
+                    <p>@trainer.HourlyRate/hour</p>
+                </div>
             </div>
         }
     </div>
+    <button class="btn btn-select">Trainer Selected</button>
 </div>
-
-<style>
-    .trainer-image {
-        width: 100px;
-        height: 100px;
-    }
-</style>
