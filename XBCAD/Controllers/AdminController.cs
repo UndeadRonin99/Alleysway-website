@@ -82,6 +82,62 @@ namespace XBCAD.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(string oldPassword, string newPassword, string confirmNewPassword)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userEmail = User.FindFirstValue(ClaimTypes.Email);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            if (newPassword != confirmNewPassword)
+            {
+                TempData["ErrorMessage"] = "New password and confirmation password do not match.";
+                TempData["ActiveTab"] = "changePassword";
+                return RedirectToAction("Settings");
+            }
+
+            try
+            {
+                // Re-authenticate the user with the old password
+                var authRequest = new HttpRequestMessage(HttpMethod.Post, $"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDX4j_urjkjhoxeN5AHFxcOW1viBqsicWA");
+                var payload = new
+                {
+                    email = userEmail,
+                    password = oldPassword,
+                    returnSecureToken = true
+                };
+
+                authRequest.Content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+                var response = await httpClient.SendAsync(authRequest);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    TempData["ErrorMessage"] = "Old password is incorrect.";
+                    TempData["ActiveTab"] = "changePassword";
+                    return RedirectToAction("Settings");
+                }
+
+                // Update the password in Firebase Authentication
+                await FirebaseAuth.DefaultInstance.UpdateUserAsync(new UserRecordArgs
+                {
+                    Uid = userId,
+                    Password = newPassword
+                });
+
+                TempData["SuccessMessage"] = "Password updated successfully.";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Password change failed: {ex.Message}";
+            }
+
+            TempData["ActiveTab"] = "changePassword";
+            return RedirectToAction("Settings");
+        }
 
         [HttpPost]
         public async Task<IActionResult> AddNewPT(string ptName, string ptEmail, string ptPassword, string ptConfirmPassword, string ptRate)
@@ -201,6 +257,10 @@ namespace XBCAD.Controllers
             // Get the profile image URL from Firebase Realtime Database
             var profileImageUrl = await firebaseService.GetProfileImageUrlAsync(userId);
             ViewBag.ProfileImageUrl = profileImageUrl;
+
+            // Get the rate from Firebase Realtime Database
+            var rate = await firebaseService.GetRateAsync(userId);
+            ViewBag.Rate = rate;
 
             var model = await firebaseService.GetAvailabilityAsync(userId);
             model.UserId = userId;
