@@ -65,6 +65,24 @@ public class FirebaseService
         }
     }
 
+    public async Task<string> GetRateAsync(string userId)
+    {
+        try
+        {
+            var rate = await firebase
+                .Child("users")
+                .Child(userId)
+                .Child("rate")
+                .OnceSingleAsync<string>();
+
+            return rate;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching rate: {ex.Message}");
+            return null; // or handle the error as needed
+        }
+    }
 
     public async Task SaveRateAsync(string userId, string rate)
     {
