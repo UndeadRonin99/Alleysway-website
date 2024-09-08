@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "o/jJ4mfTCCBIAUa4tsay+pcWXHfrawW3rgd7OMnBwCo=",
+  "Hash": "ZojxWTDRu2BBR9JpIYM6hZe3ZpJhG/hNMChT094Z5qA=",
   "Source": "XBCAD",
   "BasePath": "_content/XBCAD",
   "Mode": "Default",
@@ -167,6 +167,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\images\\Cut.jpeg"
+    },
+    {
+      "Identity": "C:\\Users\\thema\\source\\repos\\Alleysway-website\\XBCAD\\wwwroot\\images\\default.jpg",
+      "SourceId": "XBCAD",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\thema\\source\\repos\\Alleysway-website\\XBCAD\\wwwroot\\",
+      "BasePath": "_content/XBCAD",
+      "RelativePath": "images/default.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\images\\default.jpg"
     },
     {
       "Identity": "C:\\Users\\thema\\source\\repos\\Alleysway-website\\XBCAD\\wwwroot\\images\\HalfCircle.jpeg",

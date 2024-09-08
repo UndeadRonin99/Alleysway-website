@@ -41,6 +41,10 @@
       "PackagePath": "staticwebassets\\images\\Triangle.jpeg"
     },
     {
+      "Id": "C:\\Users\\thema\\source\\repos\\Alleysway-website\\XBCAD\\wwwroot\\images\\default.jpg",
+      "PackagePath": "staticwebassets\\images\\default.jpg"
+    },
+    {
       "Id": "C:\\Users\\thema\\source\\repos\\Alleysway-website\\XBCAD\\wwwroot\\js\\site.js",
       "PackagePath": "staticwebassets\\js\\site.js"
     },
