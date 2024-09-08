@@ -33,9 +33,10 @@ namespace XBCAD.Controllers
         // Action to show list of trainers for booking
         public async Task<IActionResult> BookTrainer()
         {
+            // Fetch all trainers' data from Firebase
             var trainers = await _firebaseService.GetAllTrainersAsync();
-            return View(trainers); // This should automatically look for BookTrainer.cshtml
+            return View(trainers); // Pass the trainer data to the view
         }
-
     }
+
 }
