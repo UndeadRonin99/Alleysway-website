@@ -24,6 +24,30 @@ public class FirebaseService
 
         
     }
+    public async Task<List<Trainer>> GetAllTrainersAsync()
+    {
+        var trainers = new List<Trainer>();
+
+        var users = await firebase
+            .Child("users")
+            .OnceAsync<dynamic>(); // Fetch all users dynamically
+
+        foreach (var user in users)
+        {
+            if (user.Object.role == "admin") // Filter users with the role "admin"
+            {
+                trainers.Add(new Trainer
+                {
+                    Name = $"{user.Object.firstName} {user.Object.lastName}",
+                    ProfilePictureUrl = user.Object.profileImageUrl,
+                    HourlyRate = user.Object.rate
+                });
+            }
+        }
+
+        return trainers;
+    }
+
 
     public async Task DeleteUserDataAsync(string userId)
     {

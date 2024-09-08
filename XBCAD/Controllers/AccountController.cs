@@ -13,7 +13,7 @@ using XBCAD.ViewModels;
 namespace XBCAD.Controllers
 {
     public class AccountController : Controller
-    { 
+    {
         private readonly FirebaseAuth auth;
         private readonly HttpClient httpClient;
 

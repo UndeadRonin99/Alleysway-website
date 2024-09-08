@@ -1,0 +1,28 @@
+﻿@model IEnumerable<XBCAD.ViewModels.Trainer>
+
+@{
+    ViewData["Title"] = "Book a Trainer";
+    Layout = "~/Views/Shared/_ClientLayout.cshtml";
+}
+
+<div class="container">
+    <h2>Select a Trainer to Book</h2>
+    <div class="row">
+        @foreach (var trainer in Model)
+        {
+            <div class="col-md-3 text-center">
+                <img src="@trainer.ProfilePictureUrl" alt="@trainer.Name" class="rounded-circle trainer-image" />
+                <h4>@trainer.Name</h4>
+                <p>@trainer.HourlyRate/hour</p>
+                <button class="btn btn-primary">Book Trainer</button>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .trainer-image {
+        width: 100px;
+        height: 100px;
+    }
+</style>
