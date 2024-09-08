@@ -2,15 +2,18 @@
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
+    background-color: #e0e0e0; /* Light gray background */
 }
 
 #wrapper {
     display: flex;
-    width: 100%;
-    height: 100vh;
+    min-height: 100vh; /* Full height of the viewport */
+    height: auto;
 }
 
 #sidebar-wrapper {
+    position: sticky; /* Make the sidebar sticky */
+    top: 0; /* Stick to the top of the viewport */
     min-width: 250px;
     max-width: 250px;
     background-color: #1a1a1a;
@@ -19,6 +22,8 @@
     flex-direction: column;
     align-items: center;
     padding-top: 20px;
+    height: 100vh; /* Make the sidebar take the full height of the viewport */
+    overflow-y: auto; /* Allows for scrolling if content exceeds height */
 }
 
 .sidebar-heading {
@@ -59,8 +64,11 @@
 
     .list-group-item i {
         margin-right: 10px;
-        z-index: 1; /* Keep the icons above the bubble */
-        position: relative;
+    }
+
+    .list-group-item:hover, .list-group-item.active {
+        background-color: #FF7900;
+        color: white;
     }
 
     .list-group-item::before {
@@ -84,8 +92,18 @@
     }
 
     .list-group-item:hover {
-        color: #FF7900; /* Orange text color on hover */
+        color: #FC670B; /* Orange text color on hover */
         box-shadow: 0px 0px 10px rgba(255, 121, 0, 0.8); /* Orange glow around the item */
+    }
+
+    .list-group-item .bi {
+        z-index: 1; /* Keep the icons above the bubble */
+        position: relative;
+    }
+
+    .list-group-item .text-white {
+        z-index: 1; /* Keep the text above the bubble */
+        position: relative;
     }
 
 .sidebar-divider {
@@ -99,3 +117,88 @@
     background-color: #f8f9fa;
     padding: 20px;
 }
+
+/* Trainer Selection Container */
+.trainer-selection-container {
+    background-color: #ffffff;
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 800px;
+    margin: 60px auto; /* Center the container */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    text-align: center;
+}
+
+/* Header Styling */
+h2 {
+    font-size: 50px;
+    font-weight: bold;
+    color: #333333;
+    margin-bottom: 10px;
+}
+
+p {
+    font-size: 30px;
+    color: #666666;
+    margin-bottom: 30px;
+}
+
+/* Trainer List Styling */
+.trainer-list {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 40px;
+}
+
+/* Trainer Card Styling */
+.trainer-card {
+    text-align: center;
+    width: 100px;
+    cursor: pointer;
+}
+
+/* Trainer Image Styling */
+.trainer-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%; /* Circular images */
+    object-fit: cover;
+    border: 3px solid #e0e0e0; /* Border around the image */
+    margin-bottom: 10px;
+    transition: transform 0.3s ease; /* Zoom effect on hover */
+}
+
+.trainer-card:hover .trainer-image {
+    transform: scale(1.1); /* Slight zoom on hover */
+}
+
+/* Trainer Information */
+.trainer-info h4 {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333333;
+    margin: 0;
+}
+
+.trainer-info p {
+    font-size: 12px;
+    color: #999999;
+    margin: 5px 0;
+}
+
+/* Button Styling */
+.btn-select {
+    background-color: black;
+    border: none;
+    padding: 10px 20px;
+    font-size: 14px;
+    color: white;
+    border-radius: 5px;
+    margin-top: 30px;
+    cursor: pointer;
+}
+
+    .btn-select:hover {
+        background-color: #FF7900; /* Change color to orange on hover */
+    }
