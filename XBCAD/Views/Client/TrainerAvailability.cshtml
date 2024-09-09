@@ -4,8 +4,8 @@
     ViewData["Title"] = $"Book Session with {Model.Trainer.Name}";
     Layout = "~/Views/Shared/_ClientLayout.cshtml";
 }
-
 <h2>Book session with @Model.Trainer.Name</h2>
+
 <div class="trainer-details">
     <div class="rate-info">
         <strong>Name:</strong> @Model.Trainer.Name
@@ -22,18 +22,19 @@
         {
             <div class="day">
                 <h4>@day.Day</h4>
-                @if (day.TimeSlots != null && day.TimeSlots.Any())
-                {
-                    @* Directly display each available time slot *@
-                    @foreach (var slot in day.TimeSlots)
+                <div class="time-slot-container">
+                    @if (day.TimeSlots != null && day.TimeSlots.Any())
                     {
-                        <button class="time-slot">@slot.StartTime - @slot.EndTime</button>
+                        @foreach (var slot in day.TimeSlots)
+                        {
+                            <button class="time-slot">@slot.StartTime - @slot.EndTime</button>
+                        }
                     }
-                }
-                else
-                {
-                    <p>No available slots for @day.Day</p>
-                }
+                    else
+                    {
+                        <p>No available slots for @day.Day</p>
+                    }
+                </div>
             </div>
         }
     }
@@ -46,7 +47,6 @@
 <div class="booking-summary">
     <button class="btn-book">Book now</button>
 </div>
-
 <style>
     .availability-container {
         margin-top: 20px;
@@ -56,35 +56,63 @@
     }
 
     .day {
-        margin-bottom: 20px;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .time-slot-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
     }
 
     .time-slot {
-        background-color: orange;
-        padding: 10px;
-        margin: 5px;
-        border-radius: 50px;
-        color: white;
-        border: none;
+        background-color: white;
+        color: #FF7900;
+        padding: 10px 20px;
+        border-radius: 30px;
+        border: 2px solid #FF7900;
         cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+        width: 70px;
+        text-align: center;
+        transition: all 0.3s ease;
     }
 
         .time-slot.selected {
-            background-color: red;
+            background-color: #FF7900;
+            color: white;
+        }
+
+        .time-slot:hover {
+            background-color: #FF7900;
+            color: white;
         }
 
     .btn-book {
         padding: 15px;
-        background-color: green;
+        background-color: #FF7900;
         color: white;
         border: none;
         border-radius: 5px;
         cursor: pointer;
         margin-top: 20px;
+        font-size: 16px;
     }
 
     .booking-summary {
         text-align: center;
+    }
+
+    h2 {
+        text-align: center;
+    }
+
+    h4 {
+        font-size: 18px;
+        color: #333;
     }
 </style>
 

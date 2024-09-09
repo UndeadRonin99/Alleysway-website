@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("XBCAD")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f8fe0a6ca949b1efb1088a907dcd89889b27fafa")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+db177801397c4cb6286a9d9e111a3c215e34ed6a")]
 [assembly: System.Reflection.AssemblyProductAttribute("XBCAD")]
 [assembly: System.Reflection.AssemblyTitleAttribute("XBCAD")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

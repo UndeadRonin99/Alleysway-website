@@ -50,15 +50,19 @@ namespace XBCAD.Controllers
                 return NotFound("Trainer not found.");
             }
 
-            var availability = await _firebaseService.GetAvailabilityAsyncClient(id); // Fetch availability
+            // Step 1: Fetch raw availability
+            var rawAvailability = await _firebaseService.GetRawAvailabilityAsync(id);
+
+            // Step 2: Convert to hourly segments
+            var hourlyAvailability = _firebaseService.ConvertToHourlySegments(rawAvailability);
 
             var viewModel = new TrainerAvailabilityViewModel
             {
                 Trainer = trainer,
-                Availability = availability
+                Availability = hourlyAvailability // Pass the converted availability
             };
 
-            return View(viewModel);  // Pass the TrainerAvailabilityViewModel to the view
+            return View(viewModel);
         }
 
 

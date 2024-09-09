@@ -25,7 +25,7 @@ public class FirebaseService
 
 
     }
-    public async Task<AvailabilityViewModel> GetAvailabilityAsyncClient(string userId)
+    public async Task<AvailabilityViewModel> GetRawAvailabilityAsync(string userId)
     {
         var model = new AvailabilityViewModel
         {
@@ -76,10 +76,56 @@ public class FirebaseService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error fetching availability: {ex.Message}");
+            Console.WriteLine($"Error fetching raw availability: {ex.Message}");
         }
 
         return model;
+    }
+
+
+    public AvailabilityViewModel ConvertToHourlySegments(AvailabilityViewModel rawAvailability)
+    {
+        var hourlyAvailability = new AvailabilityViewModel
+        {
+            Days = rawAvailability.Days.Select(day => new DayAvailability
+            {
+                Day = day.Day,
+                TimeSlots = new List<TimeSlot>()
+            }).ToList()
+        };
+
+        foreach (var day in rawAvailability.Days)
+        {
+            var dayAvailability = hourlyAvailability.Days.FirstOrDefault(d => d.Day == day.Day);
+
+            if (dayAvailability != null && day.TimeSlots != null)
+            {
+                foreach (var slot in day.TimeSlots)
+                {
+                    // Parse StartTime and EndTime
+                    var startTime = DateTime.Parse(slot.StartTime);
+                    var endTime = DateTime.Parse(slot.EndTime);
+
+                    // Create hourly slots from startTime to endTime
+                    while (startTime < endTime)
+                    {
+                        var nextHour = startTime.AddHours(1);
+                        if (nextHour > endTime)
+                            nextHour = endTime;
+
+                        dayAvailability.TimeSlots.Add(new TimeSlot
+                        {
+                            StartTime = startTime.ToString("HH:mm"),
+                            EndTime = nextHour.ToString("HH:mm")
+                        });
+
+                        startTime = nextHour; // Move to the next hour
+                    }
+                }
+            }
+        }
+
+        return hourlyAvailability;
     }
 
 
