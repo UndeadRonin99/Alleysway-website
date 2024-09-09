@@ -22,8 +22,29 @@ public class FirebaseService
         // Initialize Firebase Storage 
         storage = new FirebaseStorage("alleysway-310a8.appspot.com");
 
-        
+
     }
+    public async Task<Trainer> GetTrainerByIdAsync(string userId)
+    {
+        var user = await firebase
+            .Child("users")
+            .Child(userId)
+            .OnceSingleAsync<dynamic>();
+
+        if (user == null)
+        {
+            return null;
+        }
+
+        return new Trainer
+        {
+            Id = userId,
+            Name = $"{user.firstName} {user.lastName}",
+            ProfilePictureUrl = user.profileImageUrl,
+            HourlyRate = user.rate
+        };
+    }
+
     public async Task<List<Trainer>> GetAllTrainersAsync()
     {
         var trainers = new List<Trainer>();
@@ -33,29 +54,21 @@ public class FirebaseService
             .Child("users")
             .OnceAsync<dynamic>();
 
-        // Set the default image path for trainers without an image
-        string defaultImageUrl = "/images/default.jpg";
-
         // Filter users who are admins (trainers)
         foreach (var user in users)
         {
-            string profileImageUrl = user.Object.profileImageUrl;
-
-            // Use the default image if profileImageUrl is null or empty
-            if (string.IsNullOrEmpty(profileImageUrl))
-            {
-                profileImageUrl = defaultImageUrl;
-            }
+            string profileImageUrl = user.Object.profileImageUrl ?? "/images/default.jpg";
 
             trainers.Add(new Trainer
             {
-                Name = $"{user.Object.firstName}\n {user.Object.lastName}",
+                Id = user.Key,  // Set the trainer's Firebase ID
+                Name = $"{user.Object.firstName} {user.Object.lastName}",
                 ProfilePictureUrl = profileImageUrl,
                 HourlyRate = user.Object.rate
             });
         }
 
-        return trainers; // Return the list of trainers
+        return trainers;
     }
 
 

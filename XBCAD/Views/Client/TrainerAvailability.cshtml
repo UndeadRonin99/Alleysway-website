@@ -1,0 +1,28 @@
+﻿@model XBCAD.ViewModels.Trainer
+
+@{
+    ViewData["Title"] = $"Book Session with {Model.Name}";
+    Layout = "~/Views/Shared/_ClientLayout.cshtml";
+}
+
+<h2>Book session with @Model.Name</h2>
+<div class="trainer-details">
+    <div class="rate-info">
+        <strong>Name:</strong> @Model.Name
+        <br>
+        <strong>Hourly Rate:</strong> @Model.HourlyRate
+    </div>
+</div>
+<style>
+    .trainer-details {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #f0f0f0;
+        border-radius: 8px;
+    }
+
+    .rate-info {
+        font-size: 18px;
+        color: #333;
+    }
+</style>

@@ -37,6 +37,26 @@ namespace XBCAD.Controllers
             var trainers = await _firebaseService.GetAllTrainersAsync();
             return View(trainers); // Pass the trainer data to the view
         }
+        public async Task<IActionResult> TrainerAvailability(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                return BadRequest("Trainer ID is required.");
+            }
+
+            var trainer = await _firebaseService.GetTrainerByIdAsync(id);  // Fetch trainer details using the ID
+            if (trainer == null)
+            {
+                return NotFound("Trainer not found.");
+            }
+
+            return View(trainer);  // Pass the Trainer model to the view
+        }
+
+
+
+
+
     }
 
 }
