@@ -17,9 +17,108 @@
                     <h4>@trainer.Name</h4>
                     <p>@trainer.HourlyRate/hour</p>
                     <!-- Pass the trainer's ID in the button's link -->
-                    <a href="@Url.Action("TrainerAvailability", "Client", new { id = trainer.Id })" class="btn btn-primary">View Availability</a>
+                    <a href="@Url.Action("TrainerAvailability", "Client", new { id = trainer.Id })" class="btn btn-select">View Availability</a>
                 </div>
             </div>
         }
     </div>
 </div>
+
+<style>
+    /* Trainer Selection Container */
+    .trainer-selection-container {
+        background-color: #ffffff;
+        border-radius: 20px;
+        padding: 40px;
+        max-width: 1000px;
+        margin: 60px auto;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    /* Header Styling */
+    h2 {
+        font-size: 36px;
+        font-weight: bold;
+        color: #333333;
+        margin-bottom: 10px;
+    }
+
+    p {
+        font-size: 18px;
+        color: #666666;
+        margin-bottom: 30px;
+    }
+
+    /* Trainer List Styling */
+    .trainer-list {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    /* Trainer Card Styling */
+    .trainer-card {
+        text-align: center;
+        width: 200px;
+        cursor: pointer;
+        background-color: #f9f9f9;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .trainer-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+    /* Trainer Image Styling */
+    .trainer-image {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #e0e0e0;
+        margin-bottom: 15px;
+        transition: transform 0.3s ease;
+    }
+
+    .trainer-card:hover .trainer-image {
+        transform: scale(1.1);
+    }
+
+    /* Trainer Information */
+    .trainer-info h4 {
+        font-size: 20px;
+        font-weight: bold;
+        color: #333333;
+        margin: 0;
+    }
+
+    .trainer-info p {
+        font-size: 16px;
+        color: #999999;
+        margin: 5px 0;
+    }
+
+    /* Button Styling */
+    .btn-select {
+        background-color: #FF7900;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        color: white;
+        border-radius: 5px;
+        margin-top: 10px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .btn-select:hover {
+            background-color: #FC670B;
+            box-shadow: 0px 0px 15px rgba(255, 121, 0, 0.5);
+        }
+</style>
