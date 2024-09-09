@@ -8,12 +8,10 @@
         public string HourlyRate { get; set; }
         public string Role { get; set; }
     }
-    public class PersonalTrainer
+    public class TrainerAvailabilityViewModel
     {
-        public string Id { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string ProfilePictureUrl { get; set; }
-        public string HourlyRate { get; set; }
+        public Trainer Trainer { get; set; } = default!;  // The selected trainer
+        public AvailabilityViewModel Availability { get; set; } = default!;  // Their availability
     }
+
 }

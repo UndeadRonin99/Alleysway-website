@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using XBCAD.ViewModels;
 
+
 public class FirebaseService
 {
     private readonly FirebaseClient firebase;
@@ -24,6 +25,65 @@ public class FirebaseService
 
 
     }
+    public async Task<AvailabilityViewModel> GetAvailabilityAsyncClient(string userId)
+    {
+        var model = new AvailabilityViewModel
+        {
+            Days = new List<DayAvailability>
+        {
+            new DayAvailability { Day = "Monday", TimeSlots = new List<TimeSlot>() },
+            new DayAvailability { Day = "Tuesday", TimeSlots = new List<TimeSlot>() },
+            new DayAvailability { Day = "Wednesday", TimeSlots = new List<TimeSlot>() },
+            new DayAvailability { Day = "Thursday", TimeSlots = new List<TimeSlot>() },
+            new DayAvailability { Day = "Friday", TimeSlots = new List<TimeSlot>() },
+            new DayAvailability { Day = "Saturday", TimeSlots = new List<TimeSlot>() },
+            new DayAvailability { Day = "Sunday", TimeSlots = new List<TimeSlot>() }
+        }
+        };
+
+        try
+        {
+            var daysSnapshot = await firebase
+                .Child("users")
+                .Child(userId)
+                .Child("Days")
+                .OnceAsync<Dictionary<string, dynamic>>();
+
+            foreach (var dayEntry in daysSnapshot)
+            {
+                var dayName = dayEntry.Key;
+                var timeSlotsForDay = dayEntry.Object["TimeSlots"];
+
+                var dayAvailability = model.Days.FirstOrDefault(d => d.Day == dayName);
+
+                if (dayAvailability != null && timeSlotsForDay != null)
+                {
+                    foreach (var timeSlotEntry in timeSlotsForDay)
+                    {
+                        var timeSlot = timeSlotEntry.Value;
+
+                        if (timeSlot.ContainsKey("StartTime") && timeSlot.ContainsKey("EndTime"))
+                        {
+                            dayAvailability.TimeSlots.Add(new TimeSlot
+                            {
+                                StartTime = timeSlot["StartTime"],
+                                EndTime = timeSlot["EndTime"]
+                            });
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching availability: {ex.Message}");
+        }
+
+        return model;
+    }
+
+
+
     public async Task<Trainer> GetTrainerByIdAsync(string userId)
     {
         var user = await firebase

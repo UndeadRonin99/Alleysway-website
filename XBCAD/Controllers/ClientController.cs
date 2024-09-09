@@ -44,14 +44,24 @@ namespace XBCAD.Controllers
                 return BadRequest("Trainer ID is required.");
             }
 
-            var trainer = await _firebaseService.GetTrainerByIdAsync(id);  // Fetch trainer details using the ID
+            var trainer = await _firebaseService.GetTrainerByIdAsync(id);
             if (trainer == null)
             {
                 return NotFound("Trainer not found.");
             }
 
-            return View(trainer);  // Pass the Trainer model to the view
+            var availability = await _firebaseService.GetAvailabilityAsyncClient(id); // Fetch availability
+
+            var viewModel = new TrainerAvailabilityViewModel
+            {
+                Trainer = trainer,
+                Availability = availability
+            };
+
+            return View(viewModel);  // Pass the TrainerAvailabilityViewModel to the view
         }
+
+
 
 
 

@@ -1,28 +1,98 @@
-﻿@model XBCAD.ViewModels.Trainer
+﻿@model XBCAD.ViewModels.TrainerAvailabilityViewModel
 
 @{
-    ViewData["Title"] = $"Book Session with {Model.Name}";
+    ViewData["Title"] = $"Book Session with {Model.Trainer.Name}";
     Layout = "~/Views/Shared/_ClientLayout.cshtml";
 }
 
-<h2>Book session with @Model.Name</h2>
+<h2>Book session with @Model.Trainer.Name</h2>
 <div class="trainer-details">
     <div class="rate-info">
-        <strong>Name:</strong> @Model.Name
+        <strong>Name:</strong> @Model.Trainer.Name
         <br>
-        <strong>Hourly Rate:</strong> @Model.HourlyRate
+        <strong>Hourly Rate:</strong> @Model.Trainer.HourlyRate
     </div>
 </div>
+
+<div class="availability-container">
+    <h3>Choose Date and Time to work with @Model.Trainer.Name</h3>
+    @if (Model.Availability != null && Model.Availability.Days != null)
+    {
+        foreach (var day in Model.Availability.Days)
+        {
+            <div class="day">
+                <h4>@day.Day</h4>
+                @if (day.TimeSlots != null && day.TimeSlots.Any())
+                {
+                    @* Directly display each available time slot *@
+                    @foreach (var slot in day.TimeSlots)
+                    {
+                        <button class="time-slot">@slot.StartTime - @slot.EndTime</button>
+                    }
+                }
+                else
+                {
+                    <p>No available slots for @day.Day</p>
+                }
+            </div>
+        }
+    }
+    else
+    {
+        <p>No availability data found</p>
+    }
+</div>
+
+<div class="booking-summary">
+    <button class="btn-book">Book now</button>
+</div>
+
 <style>
-    .trainer-details {
+    .availability-container {
         margin-top: 20px;
-        padding: 15px;
-        background-color: #f0f0f0;
-        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 
-    .rate-info {
-        font-size: 18px;
-        color: #333;
+    .day {
+        margin-bottom: 20px;
+    }
+
+    .time-slot {
+        background-color: orange;
+        padding: 10px;
+        margin: 5px;
+        border-radius: 50px;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+
+        .time-slot.selected {
+            background-color: red;
+        }
+
+    .btn-book {
+        padding: 15px;
+        background-color: green;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+
+    .booking-summary {
+        text-align: center;
     }
 </style>
+
+<script>
+    document.querySelectorAll('.time-slot').forEach(button => {
+        button.addEventListener('click', function () {
+            document.querySelectorAll('.time-slot').forEach(btn => btn.classList.remove('selected'));
+            this.classList.add('selected');
+        });
+    });
+</script>
