@@ -35,3 +35,10 @@
 /XBCAD/obj/project.nuget.cache
 /XBCAD/obj/XBCAD.csproj.nuget.dgspec.json
 /XBCAD/obj/XBCAD.csproj.nuget.g.props
+/XBCAD/bin/Debug/net8.0/runtimes/win/lib/net7.0
+/XBCAD/bin/Debug/net8.0
+/XBCAD/obj/Debug/net8.0/scopedcss/bundle
+/XBCAD/obj/Debug/net8.0/scopedcss/projectbundle
+/XBCAD/obj/Debug/net8.0/scopedcss/Views/Shared
+/XBCAD/obj/Debug/net8.0/staticwebassets
+/XBCAD/obj/Debug/net8.0
