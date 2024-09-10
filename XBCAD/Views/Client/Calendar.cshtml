@@ -1,0 +1,16 @@
+﻿@{
+    ViewData["Title"] = "Client Calendar";
+    Layout = "~/Views/Shared/_ClientLayout.cshtml"; // Ensure this is your actual layout file for clients.
+}
+
+<h2>Client Calendar</h2>
+
+@if (!string.IsNullOrEmpty(ViewBag.CalendarEmbedLink))
+{
+    <iframe src="@ViewBag.CalendarEmbedLink" style="border: 0" width="800" height="600" frameborder="0" scrolling="no"></iframe>
+}
+else
+{
+    <p>Unable to load Google Calendar. Please sign in to view your calendar.</p>
+    <a href="@Url.Action("GoogleLogin", "Client")" class="btn btn-primary">Sign in to Google Calendar</a>
+}

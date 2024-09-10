@@ -16,7 +16,7 @@ namespace XBCAD.ViewModels
                 ApplicationName = "Alleyway gym",
             });
 
-            // Use the primary calendar for now.
+            // Use the primary calendar for the user.
             string calendarId = "primary";
 
             // Create the embed URL for the user's calendar.
