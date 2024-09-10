@@ -32,6 +32,8 @@ namespace XBCAD.Controllers
 
         public async Task<IActionResult> BookTrainer()
         {
+            var Name = User.FindFirstValue(ClaimTypes.Name); //Retrieve Name
+            ViewBag.Name = Name;
             // Fetch all trainers' data from Firebase (admins only)
             var trainers = await _firebaseService.GetAllTrainersAsync();
             return View(trainers); // Pass the trainer data to the view
@@ -39,6 +41,8 @@ namespace XBCAD.Controllers
 
         public async Task<IActionResult> TrainerAvailability(string id)
         {
+            var Name = User.FindFirstValue(ClaimTypes.Name); //Retrieve Name
+            ViewBag.Name = Name;
             if (string.IsNullOrEmpty(id))
             {
                 return BadRequest("Trainer ID is required.");
