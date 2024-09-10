@@ -7352,23 +7352,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Mateo\\.nuget\\packages\\": {},
+    "C:\\Users\\thema\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Mateo\\Desktop\\University\\Modules\\XBCAD7311\\Alleysway-website\\XBCAD\\XBCAD.csproj",
+      "projectUniqueName": "C:\\Users\\thema\\Source\\Repos\\Alleysway-website\\XBCAD\\XBCAD.csproj",
       "projectName": "XBCAD",
-      "projectPath": "C:\\Users\\Mateo\\Desktop\\University\\Modules\\XBCAD7311\\Alleysway-website\\XBCAD\\XBCAD.csproj",
-      "packagesPath": "C:\\Users\\Mateo\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Mateo\\Desktop\\University\\Modules\\XBCAD7311\\Alleysway-website\\XBCAD\\obj\\",
+      "projectPath": "C:\\Users\\thema\\Source\\Repos\\Alleysway-website\\XBCAD\\XBCAD.csproj",
+      "packagesPath": "C:\\Users\\thema\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\thema\\Source\\Repos\\Alleysway-website\\XBCAD\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\Mateo\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\thema\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
