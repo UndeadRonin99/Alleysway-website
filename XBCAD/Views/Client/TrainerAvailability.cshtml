@@ -186,12 +186,21 @@
             background-color: #333;
         }
 </style>
-
 <script>
     document.querySelectorAll('.time-slot').forEach(button => {
         button.addEventListener('click', function () {
-            document.querySelectorAll('.time-slot').forEach(btn => btn.classList.remove('selected'));
-            this.classList.add('selected');
+            this.classList.toggle('selected');
+            updateSelectedSlots(); // Update the list of selected slots
         });
     });
+
+    function updateSelectedSlots() {
+        const selectedSlotsList = document.getElementById('selected-slots-list');
+        selectedSlotsList.innerHTML = ''; // Clear previous entries
+        document.querySelectorAll('.time-slot.selected').forEach(slot => {
+            const li = document.createElement('li');
+            li.textContent = slot.innerText;
+            selectedSlotsList.appendChild(li);
+        });
+    }
 </script>
