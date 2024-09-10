@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "dHrd2jEiTy0=",
+  "dgSpecHash": "mSpZM6WfJ74=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Mateo\\Source\\Repos\\Alleysway-website\\XBCAD\\XBCAD.csproj",
+  "projectFilePath": "C:\\Users\\Mateo\\Desktop\\University\\Modules\\XBCAD7311\\Alleysway-website\\XBCAD\\XBCAD.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Mateo\\.nuget\\packages\\firebase.auth\\1.0.0\\firebase.auth.1.0.0.nupkg.sha512",
     "C:\\Users\\Mateo\\.nuget\\packages\\firebaseadmin\\3.0.0\\firebaseadmin.3.0.0.nupkg.sha512",
