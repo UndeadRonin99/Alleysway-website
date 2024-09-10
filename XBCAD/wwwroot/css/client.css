@@ -2,7 +2,6 @@
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
-    background-color: #D7D8DC; /* Light gray background */
 }
 
 #wrapper {
@@ -25,18 +24,6 @@
     height: 100vh; /* Make the sidebar take the full height of the viewport */
     overflow-y: auto; /* Allows for scrolling if content exceeds height */
 }
-<style>
-    .trainer-details {
-        margin-top: 20px;
-        padding: 15px;
-        background-color: #f0f0f0;
-        border-radius: 8px;
-    }
-    .rate-info {
-        font-size: 18px;
-        color: #333;
-    }
-</style>
 
 .sidebar-heading {
     text-align: center;
@@ -130,92 +117,85 @@
     padding: 20px;
 }
 
-/* Trainer Selection Container */
-.trainer-selection-container {
-    background-color: #ffffff;
-    border-radius: 20px;
-    padding: 40px;
-    max-width: 800px;
-    margin: 60px auto; /* Center the container */
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-    text-align: center;
+.container {
+    margin-top: 20px;
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
 }
 
-/* Header Styling */
-h2 {
-    font-size: 50px;
-    font-weight: bold;
-    color: #333333;
+.section-header {
     margin-bottom: 10px;
-    text-align: center; /* Ensure the heading is centered */
 }
 
-p {
-    font-size: 30px;
-    color: #666666;
-    margin-bottom: 30px;
-    text-align: center; /* Ensure the heading is centered */
+.section-title {
+    color: #FF7900;
+    font-size: 1.25rem;
+    margin-bottom: 10px;
 }
 
-/* Trainer List Styling */
-.trainer-list {
+.availability-table {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.day-row {
     display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 40px;
-}
-
-/* Trainer Card Styling */
-.trainer-card {
-    text-align: center;
-    width: 100px;
-    cursor: pointer;
-}
-
-/* Trainer Image Styling */
-.trainer-image {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%; /* Circular images */
-    object-fit: cover;
-    border: 3px solid #e0e0e0; /* Border around the image */
+    align-items: center;
     margin-bottom: 10px;
-    transition: transform 0.3s ease; /* Zoom effect on hover */
 }
 
-.trainer-card:hover .trainer-image {
-    transform: scale(1.1); /* Slight zoom on hover */
-}
-
-/* Trainer Information */
-.trainer-info h4 {
-    font-size: 20px;
+.day-name {
+    width: 100px;
     font-weight: bold;
-    color: #333333;
-    margin: 0;
 }
 
-.trainer-info p {
-    font-size: 12px;
-    color: #999999;
-    margin: 5px 0;
+.time-slots {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
 }
 
-/* Button Styling */
-.btn-select {
-    background-color: black;
-    border: none;
-    padding: 10px 20px;
-    font-size: 14px;
+.time-slot {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+    .time-slot input {
+        margin-right: 5px;
+    }
+
+.btn-primary {
+    background-color: #FF7900;
+    border-color: #FF7900;
+}
+
+.btn-danger {
     color: white;
-    border-radius: 5px;
-    margin-top: 30px;
-    cursor: pointer;
+    background-color: #dc3545;
+    border-color: #dc3545;
 }
 
+/* Custom styles for saved availability blocks */
+.custom-header {
+    background-color: #27262C; /* Orange header for saved availability */
+    color: white;
+}
 
+.custom-body {
+    background-color: #f8f9fa; /* Light gray body for saved availability */
+}
 
+.custom-list-item {
+    background-color: #d4edda; /* Light green background for list items */
+    transition: none; /* Remove hover transitions */
+    box-shadow: none; /* Remove box-shadow */
+}
 
-    .btn-select:hover {
-        background-color: #FF7900; /* Change color to orange on hover */
+    .custom-list-item:hover {
+        color: inherit; /* Maintain the original text color */
+        background-color: #d4edda; /* Keep the same background color */
+        box-shadow: none; /* Prevent any glow or shadow */
     }
