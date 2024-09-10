@@ -29,7 +29,7 @@
                         {
                             @foreach (var slot in day.TimeSlots)
                             {
-                                <button class="time-slot">@slot.StartTime</button>
+                                <button class="time-slot">@slot.StartTime - @slot.EndTime</button>
                             }
                         }
                         else
