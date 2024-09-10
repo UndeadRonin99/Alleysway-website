@@ -3,6 +3,7 @@ using FirebaseAdmin.Auth;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies; // For JSON parsing
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using System.Security.Claims;
@@ -16,6 +17,7 @@ namespace XBCAD.Controllers
     {
         private readonly FirebaseAuth auth;
         private readonly HttpClient httpClient;
+
 
         public AccountController(IHttpClientFactory httpClientFactory)
         {
@@ -60,7 +62,7 @@ namespace XBCAD.Controllers
                     {
                         firstName = model.FirstName,
                         lastName = model.LastName,
-                        role = "client"
+                        role = "admin"
                     };
                     var json = JsonSerializer.Serialize(data);
                     var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -166,6 +168,23 @@ namespace XBCAD.Controllers
                 ModelState.AddModelError("", $"Login failed: {ex.Message}");
                 return View(model);
             }
+        }
+        [HttpGet]
+        public IActionResult GoogleLogin(string returnUrl = "/Admin/Calendar")
+        {
+            var properties = new AuthenticationProperties { RedirectUri = returnUrl };
+            return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+        }
+
+        [HttpGet("signin-google")]
+        public async Task<IActionResult> GoogleResponse(string returnUrl = "/Admin/Calendar")
+        {
+            var authenticateResult = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            if (!authenticateResult.Succeeded)
+                return BadRequest("Error while authenticating with Google.");
+
+            return LocalRedirect(returnUrl);  // Redirect to the calendar page after Google sign-in
         }
 
 

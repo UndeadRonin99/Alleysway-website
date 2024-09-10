@@ -1,6 +1,7 @@
 ﻿using FirebaseAdmin;
 using FirebaseAdmin.Auth;
 using Google.Apis.Auth.OAuth2;
+using Google.Apis.Calendar.v3;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +17,23 @@ namespace XBCAD.Controllers
         public string userId;
         private readonly FirebaseAuth auth;
         private readonly HttpClient httpClient;
+
+        public async Task<IActionResult> Calendar()
+        {
+            var accessToken = await HttpContext.GetTokenAsync("access_token");
+
+            if (!string.IsNullOrEmpty(accessToken))
+            {
+                var embedLink = await googleCalendarService.GetCalendarEmbedLinkAsync(accessToken);
+                ViewBag.CalendarEmbedLink = embedLink;
+            }
+            else
+            {
+                ViewBag.CalendarEmbedLink = null;
+            }
+
+            return View();
+        }
 
 
         public IActionResult Dashboard()
@@ -33,10 +51,12 @@ namespace XBCAD.Controllers
         }
 
         private readonly FirebaseService firebaseService;
+        private readonly GoogleCalendarService googleCalendarService;
 
-        public AdminController(IHttpClientFactory httpClientFactory)
+        public AdminController(IHttpClientFactory httpClientFactory, GoogleCalendarService calendarService)
         {
             firebaseService = new FirebaseService();
+            googleCalendarService = calendarService;
             this.httpClient = httpClientFactory.CreateClient();
 
             if (FirebaseApp.DefaultInstance == null)
@@ -319,6 +339,7 @@ namespace XBCAD.Controllers
             await firebaseService.SaveTimeSlotAsync(day, startTime, endTime, userId);
             return Json(new { success = true });
         }
+
 
         [HttpPost]
         public async Task<IActionResult> RemoveTimeSlot(string day, string startTime, string endTime)

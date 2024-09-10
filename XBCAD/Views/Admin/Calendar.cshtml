@@ -1,0 +1,16 @@
+﻿@{
+    ViewData["Title"] = "Admin Calendar";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Admin Calendar</h2>
+
+@if (!string.IsNullOrEmpty(ViewBag.CalendarEmbedLink))
+{
+    <iframe src="@ViewBag.CalendarEmbedLink" style="border: 0" width="800" height="600" frameborder="0" scrolling="no"></iframe>
+}
+else
+{
+    <p>Unable to load Google Calendar. Please log in to view your calendar.</p>
+    <a href="@Url.Action("GoogleLogin", "Account")" class="btn btn-primary">Sign in to Google Calendar</a>
+}

@@ -1,9 +1,8 @@
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
-using Google.Cloud.Firestore.V1;
-using Google.Cloud.Firestore;
-using Google.Api;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
+using XBCAD.ViewModels; // Make sure you're referencing your ViewModels
 
 namespace XBCAD
 {
@@ -12,6 +11,8 @@ namespace XBCAD
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            // Initialize Firebase Admin SDK with credentials
             var credential = GoogleCredential.FromFile("path/to/alleysway-310a8-firebase-adminsdk-n95a3-af1016f422.json");
             if (FirebaseApp.DefaultInstance == null)
             {
@@ -21,54 +22,71 @@ namespace XBCAD
                 });
             }
 
-            // Add services to the container.
+            // Add services to the container
             builder.Services.AddControllersWithViews();
             builder.Services.AddHttpClient();
-            builder.Services.AddSingleton<FirebaseService>(); // Register FirebaseService
+            builder.Services.AddSingleton<FirebaseService>();
+            builder.Services.AddSingleton<GoogleCalendarService>(); // Register GoogleCalendarService
 
-            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(options =>
-                {
-                    options.LoginPath = "/Account/Login"; // Path to login page
-                    options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // You can set a reasonable expiration time
-                    options.SlidingExpiration = true; // Reset the expiration time if the user is active
-                    options.Cookie.HttpOnly = true;
-                    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-                });
+            // Add memory cache to store session data
+            builder.Services.AddDistributedMemoryCache();
 
-            builder.Services.AddAuthorization();
-
-            //Add sessions
+            // Add session configuration
             builder.Services.AddSession(options =>
             {
-                options.IdleTimeout = TimeSpan.FromSeconds(10);
-                options.Cookie.HttpOnly = true;
-                options.Cookie.IsEssential = true;
+                options.IdleTimeout = TimeSpan.FromMinutes(30); // Session timeout
+                options.Cookie.HttpOnly = true; // Secure cookies
+                options.Cookie.IsEssential = true; // Always send cookies
             });
+
+            // Add Authentication
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            })
+            .AddCookie(options =>
+            {
+                options.LoginPath = "/Account/Login"; // Customize your login path
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // Sliding expiration for cookie
+                options.SlidingExpiration = true;
+                options.Cookie.HttpOnly = true; // Secure cookie
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Use HTTPS for cookies
+            })
+            .AddGoogle(googleOptions =>
+            {
+                googleOptions.ClientId = "1073270743918-s6b88etdi7v3v3dbisl1cs7fljgekgn8.apps.googleusercontent.com"; // Replace with your client ID
+                googleOptions.ClientSecret = "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"; // Replace with your client secret
+                googleOptions.CallbackPath = "/signin-google"; // Ensure this matches the redirect URI in Google Developer Console
+                googleOptions.SaveTokens = true; // Save Google tokens
+
+                // Add Google Calendar OAuth scope
+                googleOptions.Scope.Add("https://www.googleapis.com/auth/calendar.readonly");
+            });
+
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            // Configure the HTTP request pipeline
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
+            app.UseHttpsRedirection(); // Ensure HTTPS redirection
+            app.UseStaticFiles(); // Serve static files
 
-            app.UseRouting();
-            app.UseSession();
+            app.UseRouting(); // Enable routing
+
+            app.UseSession(); // Enable session support
             app.UseAuthentication(); // Enable authentication
-            app.UseAuthorization();  // Enable authorization
+            app.UseAuthorization(); // Enable authorization
 
+            // Configure route mapping
             app.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Account}/{action=Login}/{id?}");
+               name: "default",
+               pattern: "{controller=Account}/{action=Login}/{id?}");
 
-
-            app.Run();
+            app.Run(); // Start the app
         }
     }
 }

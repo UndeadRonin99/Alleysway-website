@@ -22,9 +22,10 @@
                     <p>Signed in as:</p>
                     <p>@ViewBag.Name</p>
                 </div>
-                <a href="#" class="list-group-item list-group-item-action bg-dark text-white active">
+                <a href="@Url.Action("Calendar", "Admin")" class="list-group-item list-group-item-action bg-dark text-white">
                     <i class="bi bi-calendar"></i> Calendar
                 </a>
+
                 <a href="#" class="list-group-item list-group-item-action bg-dark text-white">
                     <i class="bi bi-person"></i> Clients
                 </a>
