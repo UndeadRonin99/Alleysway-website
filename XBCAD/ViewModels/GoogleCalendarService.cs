@@ -19,8 +19,8 @@ namespace XBCAD.ViewModels
             // Use the primary calendar for the user.
             string calendarId = "primary";
 
-            // Create the embed URL for the user's calendar.
-            string calendarEmbedUrl = $"https://calendar.google.com/calendar/embed?src={calendarId}&ctz=America%2FNew_York";
+            // Set the timezone to Africa/Johannesburg (South Africa timezone)
+            string calendarEmbedUrl = $"https://calendar.google.com/calendar/embed?src={calendarId}&ctz=Africa/Johannesburg";
             return calendarEmbedUrl;
         }
     }
