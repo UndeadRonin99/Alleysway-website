@@ -6,11 +6,13 @@
 
 #wrapper {
     display: flex;
-    width: 100%;
-    height: 100vh;
+    min-height: 100vh; /* Full height of the viewport */
+    height: auto;
 }
 
 #sidebar-wrapper {
+    position: sticky; /* Make the sidebar sticky */
+    top: 0; /* Stick to the top of the viewport */
     min-width: 250px;
     max-width: 250px;
     background-color: #1a1a1a;
@@ -19,6 +21,8 @@
     flex-direction: column;
     align-items: center;
     padding-top: 20px;
+    height: 100vh; /* Make the sidebar take the full height of the viewport */
+    overflow-y: auto; /* Allows for scrolling if content exceeds height */
 }
 
 .sidebar-heading {
@@ -59,8 +63,11 @@
 
     .list-group-item i {
         margin-right: 10px;
-        z-index: 1; /* Keep the icons above the bubble */
-        position: relative;
+    }
+
+    .list-group-item:hover, .list-group-item.active {
+        background-color: #FF7900;
+        color: white;
     }
 
     .list-group-item::before {
@@ -84,8 +91,18 @@
     }
 
     .list-group-item:hover {
-        color: #FF7900; /* Orange text color on hover */
+        color: #FC670B; /* Orange text color on hover */
         box-shadow: 0px 0px 10px rgba(255, 121, 0, 0.8); /* Orange glow around the item */
+    }
+
+    .list-group-item .bi {
+        z-index: 1; /* Keep the icons above the bubble */
+        position: relative;
+    }
+
+    .list-group-item .text-white {
+        z-index: 1; /* Keep the text above the bubble */
+        position: relative;
     }
 
 .sidebar-divider {
@@ -99,3 +116,86 @@
     background-color: #f8f9fa;
     padding: 20px;
 }
+
+.container {
+    margin-top: 20px;
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.section-header {
+    margin-bottom: 10px;
+}
+
+.section-title {
+    color: #FF7900;
+    font-size: 1.25rem;
+    margin-bottom: 10px;
+}
+
+.availability-table {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.day-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.day-name {
+    width: 100px;
+    font-weight: bold;
+}
+
+.time-slots {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.time-slot {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+    .time-slot input {
+        margin-right: 5px;
+    }
+
+.btn-primary {
+    background-color: #FF7900;
+    border-color: #FF7900;
+}
+
+.btn-danger {
+    color: white;
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+/* Custom styles for saved availability blocks */
+.custom-header {
+    background-color: #27262C; /* Orange header for saved availability */
+    color: white;
+}
+
+.custom-body {
+    background-color: #f8f9fa; /* Light gray body for saved availability */
+}
+
+.custom-list-item {
+    background-color: #d4edda; /* Light green background for list items */
+    transition: none; /* Remove hover transitions */
+    box-shadow: none; /* Remove box-shadow */
+}
+
+    .custom-list-item:hover {
+        color: inherit; /* Maintain the original text color */
+        background-color: #d4edda; /* Keep the same background color */
+        box-shadow: none; /* Prevent any glow or shadow */
+    }

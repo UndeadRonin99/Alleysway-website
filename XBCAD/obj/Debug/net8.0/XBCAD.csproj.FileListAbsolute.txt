@@ -162,7 +162,6 @@ C:\Users\thema\Downloads\XBCAD7319_Alleyway-899ae47bb6f81690ae5c9f70e47a7dbd9847
 C:\Users\thema\Downloads\XBCAD7319_Alleyway-899ae47bb6f81690ae5c9f70e47a7dbd9847da67\XBCAD7319_Alleyway-899ae47bb6f81690ae5c9f70e47a7dbd9847da67\XBCAD\obj\Debug\net8.0\ref\XBCAD.dll
 C:\Users\lab_services_student\Source\Repos\Alleysway-website\XBCAD\bin\Debug\net8.0\appsettings.Development.json
 C:\Users\lab_services_student\Source\Repos\Alleysway-website\XBCAD\bin\Debug\net8.0\appsettings.json
-C:\Users\lab_services_student\Source\Repos\Alleysway-website\XBCAD\bin\Debug\net8.0\path\to\alleysway-310a8-firebase-adminsdk-n95a3-2b1da73f9e.json
 C:\Users\lab_services_student\Source\Repos\Alleysway-website\XBCAD\bin\Debug\net8.0\XBCAD.staticwebassets.runtime.json
 C:\Users\lab_services_student\Source\Repos\Alleysway-website\XBCAD\bin\Debug\net8.0\XBCAD.exe
 C:\Users\lab_services_student\Source\Repos\Alleysway-website\XBCAD\bin\Debug\net8.0\XBCAD.deps.json
@@ -297,7 +296,6 @@ C:\Users\thema\Source\Repos\Alleysway-website\XBCAD\obj\Debug\net8.0\refint\XBCA
 C:\Users\thema\Source\Repos\Alleysway-website\XBCAD\obj\Debug\net8.0\XBCAD.pdb
 C:\Users\thema\Source\Repos\Alleysway-website\XBCAD\obj\Debug\net8.0\XBCAD.genruntimeconfig.cache
 C:\Users\thema\Source\Repos\Alleysway-website\XBCAD\obj\Debug\net8.0\ref\XBCAD.dll
-C:\Users\thema\Source\Repos\Alleysway-website\XBCAD\bin\Debug\net8.0\path\to\alleysway-310a8-firebase-adminsdk-n95a3-f5245dd000.json
 C:\Users\thema\Source\Repos\Alleysway-website\XBCAD\obj\Debug\net8.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
 C:\Users\thema\Source\Repos\Alleysway-website\XBCAD\obj\Debug\net8.0\scopedcss\projectbundle\XBCAD.bundle.scp.css
 C:\Users\Mateo\Source\Repos\Alleysway-website\XBCAD\bin\Debug\net8.0\appsettings.Development.json
@@ -370,3 +368,7 @@ C:\Users\Mateo\Source\Repos\Alleysway-website\XBCAD\obj\Debug\net8.0\refint\XBCA
 C:\Users\Mateo\Source\Repos\Alleysway-website\XBCAD\obj\Debug\net8.0\XBCAD.pdb
 C:\Users\Mateo\Source\Repos\Alleysway-website\XBCAD\obj\Debug\net8.0\XBCAD.genruntimeconfig.cache
 C:\Users\Mateo\Source\Repos\Alleysway-website\XBCAD\obj\Debug\net8.0\ref\XBCAD.dll
+C:\Users\thema\source\repos\Alleysway-website\XBCAD\bin\Debug\net8.0\Firebase.Storage.dll
+C:\Users\lab_services_student\Source\Repos\Alleysway-website\XBCAD\bin\Debug\net8.0\Firebase.Storage.dll
+C:\Users\thema\source\repos\Alleysway-website\XBCAD\bin\Debug\net8.0\path\to\alleysway-310a8-firebase-adminsdk-n95a3-af1016f422.json
+C:\Users\lab_services_student\source\repos\Alleysway-website\XBCAD\bin\Debug\net8.0\path\to\alleysway-310a8-firebase-adminsdk-n95a3-af1016f422.json

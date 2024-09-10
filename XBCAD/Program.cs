@@ -12,7 +12,7 @@ namespace XBCAD
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            var credential = GoogleCredential.FromFile("path/to/alleysway-310a8-firebase-adminsdk-n95a3-f5245dd000.json");
+            var credential = GoogleCredential.FromFile("path/to/alleysway-310a8-firebase-adminsdk-n95a3-af1016f422.json");
             if (FirebaseApp.DefaultInstance == null)
             {
                 FirebaseApp.Create(new AppOptions()
@@ -24,6 +24,8 @@ namespace XBCAD
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             builder.Services.AddHttpClient();
+            builder.Services.AddSingleton<FirebaseService>(); // Register FirebaseService
+
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
                 {

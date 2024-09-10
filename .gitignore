@@ -1,3 +1,5 @@
 .vs/
 /XBCAD/obj/Debug/net8.0/XBCAD.sourcelink.json
 /XBCAD/obj/Debug/net8.0/XBCAD.sourcelink.json
+/XBCAD/path/to/alleysway-310a8-firebase-adminsdk-n95a3-aecccacac4.json
+*.json

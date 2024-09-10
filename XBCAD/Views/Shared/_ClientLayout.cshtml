@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Client</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/client.css" />
+    <link rel="stylesheet" href="~/css/admin.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
+
 <body>
     <div class="d-flex" id="wrapper">
         <!-- Sidebar -->
@@ -18,7 +20,7 @@
             <div class="list-group list-group-flush">
                 <div class="sidebar-user-info">
                     <p>Signed in as:</p>
-                    <p>@ViewBag.FirstName @ViewBag.LastName</p>
+                    <p>@ViewBag.Name</p>
                 </div>
                 <a href="#" class="list-group-item list-group-item-action bg-dark text-white active">
                     <i class="bi bi-calendar"></i> Calendar
@@ -26,9 +28,10 @@
                 <a href="#" class="list-group-item list-group-item-action bg-dark text-white">
                     <i class="bi bi-chat-dots"></i> Messages
                 </a>
-                <a href="#" class="list-group-item list-group-item-action bg-dark text-white">
-                    <i class="bi bi-calendar-check"></i> Book a session
+                <a href="@Url.Action("BookTrainer", "Client")" class="list-group-item list-group-item-action bg-dark text-white">
+                    <i class="bi bi-clock"></i> Book a session
                 </a>
+
                 <a href="#" class="list-group-item list-group-item-action bg-dark text-white">
                     <i class="bi bi-gear"></i> Settings
                 </a>

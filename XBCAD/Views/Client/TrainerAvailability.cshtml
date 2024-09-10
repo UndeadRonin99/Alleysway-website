@@ -1,0 +1,197 @@
+﻿@model XBCAD.ViewModels.TrainerAvailabilityViewModel
+
+@{
+    ViewData["Title"] = $"Book Session with {Model.Trainer.Name}";
+    Layout = "~/Views/Shared/_ClientLayout.cshtml";
+}
+
+<h2 class="page-title">Book session with @Model.Trainer.Name</h2>
+
+<div class="availability-page">
+    <div class="trainer-details">
+        <div class="rate-info">
+            <div class="rate-card">
+                <span>Hourly Rate: @Model.Trainer.HourlyRate</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="availability-container">
+        <h3>Choose Date and Time to work with @Model.Trainer.Name</h3>
+        @if (Model.Availability != null && Model.Availability.Days != null)
+        {
+            foreach (var day in Model.Availability.Days)
+            {
+                <div class="day">
+                    <h4>@day.Day</h4>
+                    <div class="time-slot-container">
+                        @if (day.TimeSlots != null && day.TimeSlots.Any())
+                        {
+                            @foreach (var slot in day.TimeSlots)
+                            {
+                                <button class="time-slot">@slot.StartTime</button>
+                            }
+                        }
+                        else
+                        {
+                            <p>No available slots for @day.Day</p>
+                        }
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <p>No availability data found</p>
+        }
+    </div>
+
+    <div class="booking-summary">
+        <div class="price-summary">
+          
+        </div>
+        <button class="btn-book">Book now</button>
+    </div>
+</div>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #D7D8DC;
+        margin: 0;
+        padding: 0;
+    }
+
+    .page-title {
+        text-align: center;
+        font-size: 32px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .availability-page {
+        max-width: 1500px;
+        margin: 100px auto;
+        background-color: white;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        position: relative; /* Position relative for absolute rate card */
+        text-align: center;
+    }
+
+    .trainer-details {
+        position: absolute;
+        top: -10px;
+        left: 20px;
+    }
+
+    .rate-card {
+        position: absolute;
+        top: 50px; /* Adjust this value to move the rate card down more */
+        left: 20px;
+        background-color: black;
+        color: white;
+        padding: 15px 30px; /* Increase padding for a bigger look */
+        border-radius: 20px; /* Larger border-radius for a rounded look */
+        font-size: 15px; /* Larger font size */
+        font-weight: bold;
+        width: 200px; /* Control width */
+        text-align: center;
+    }
+    h3 {
+        font-size: 20px;
+        font-weight: normal;
+        color: #666666;
+        margin-bottom: 30px;
+    }
+
+    .availability-container {
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .day {
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .time-slot-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .time-slot {
+        background-color: white;
+        color: #FF7900;
+        padding: 10px 20px;
+        border-radius: 30px;
+        border: 2px solid #FF7900;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+        width: 70px;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+        .time-slot.selected {
+            background-color: #FF7900;
+            color: white;
+        }
+
+        .time-slot:hover {
+            background-color: #FF7900;
+            color: white;
+        }
+
+    .booking-summary {
+        margin-top: 30px;
+    }
+
+    .price-summary {
+        margin-bottom: 20px;
+    }
+
+    .price-tag {
+        background-color: #FF7900;
+        color: white;
+        font-size: 24px;
+        padding: 15px;
+        border-radius: 10px;
+        border: none;
+        cursor: default;
+        display: block;
+        width: 150px;
+        margin: 0 auto;
+    }
+
+    .btn-book {
+        padding: 15px;
+        background-color: black;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 18px;
+        width: 200px;
+    }
+
+        .btn-book:hover {
+            background-color: #333;
+        }
+</style>
+
+<script>
+    document.querySelectorAll('.time-slot').forEach(button => {
+        button.addEventListener('click', function () {
+            document.querySelectorAll('.time-slot').forEach(btn => btn.classList.remove('selected'));
+            this.classList.add('selected');
+        });
+    });
+</script>
