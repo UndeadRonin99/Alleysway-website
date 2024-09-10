@@ -13,7 +13,7 @@ namespace XBCAD.ViewModels
             var service = new CalendarService(new BaseClientService.Initializer()
             {
                 HttpClientInitializer = credential,
-                ApplicationName = "Your Application Name",
+                ApplicationName = "Alleyway gym",
             });
 
             // Use the primary calendar for now.
