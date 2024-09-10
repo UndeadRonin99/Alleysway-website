@@ -176,7 +176,7 @@ namespace XBCAD.Controllers
             return Challenge(properties, GoogleDefaults.AuthenticationScheme);
         }
 
-        [HttpGet("signin-google")]
+        [HttpGet("signin-google-admin")]
         public async Task<IActionResult> GoogleResponse(string returnUrl = "/Admin/Calendar")
         {
             var authenticateResult = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
@@ -186,6 +186,7 @@ namespace XBCAD.Controllers
 
             return LocalRedirect(returnUrl);  // Redirect to the calendar page after Google sign-in
         }
+
 
 
         public IActionResult Logout()

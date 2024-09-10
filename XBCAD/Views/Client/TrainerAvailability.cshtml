@@ -1,8 +1,17 @@
 ﻿@model XBCAD.ViewModels.TrainerAvailabilityViewModel
-
 @{
     ViewData["Title"] = $"Book Session with {Model.Trainer.Name}";
     Layout = "~/Views/Shared/_ClientLayout.cshtml";
+
+    // Current date (today)
+    DateTime today = DateTime.Now.Date;  // Ensuring we're only comparing the date part
+
+    // Days of the week in order
+    var daysOfWeek = new List<string> { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
+
+    // Adjust to make Monday the first day of the week
+    int currentDayIndex = (int)today.DayOfWeek;
+    currentDayIndex = currentDayIndex == 0 ? 7 : currentDayIndex; // Adjust for Sunday being 0 in .NET, make it 7 for easier calculation
 }
 
 <h2 class="page-title">Book session with @Model.Trainer.Name</h2>
@@ -20,24 +29,41 @@
         <h3>Choose Date and Time to work with @Model.Trainer.Name</h3>
         @if (Model.Availability != null && Model.Availability.Days != null)
         {
-            foreach (var day in Model.Availability.Days)
+            for (int i = 0; i < Model.Availability.Days.Count; i++)
             {
-                <div class="day">
-                    <h4>@day.Day</h4>
-                    <div class="time-slot-container">
-                        @if (day.TimeSlots != null && day.TimeSlots.Any())
-                        {
-                            @foreach (var slot in day.TimeSlots)
+                var day = Model.Availability.Days[i];
+
+                // Calculate the correct date for each day, considering the current day
+                DateTime dayDate;
+                if (daysOfWeek[i] == day.Day)
+                {
+                    dayDate = today.AddDays(i - (currentDayIndex - 1)); // Adjust based on the current day of the week
+                }
+                else
+                {
+                    dayDate = today.AddDays(i);
+                }
+
+                // Check if the calculated dayDate is in the future or today
+                if (dayDate >= today)
+                {
+                    <div class="day">
+                        <h4>@day.Day (@dayDate.ToString("dd MMMM yyyy"))</h4>
+                        <div class="time-slot-container">
+                            @if (day.TimeSlots != null && day.TimeSlots.Any())
                             {
-                                <button class="time-slot">@slot.StartTime - @slot.EndTime</button>
+                                @foreach (var slot in day.TimeSlots)
+                                {
+                                    <button class="time-slot">@slot.StartTime - @slot.EndTime</button>
+                                }
                             }
-                        }
-                        else
-                        {
-                            <p>No available slots for @day.Day</p>
-                        }
+                            else
+                            {
+                                <p>No available slots for @day.Day</p>
+                            }
+                        </div>
                     </div>
-                </div>
+                }
             }
         }
         else
@@ -48,11 +74,13 @@
 
     <div class="booking-summary">
         <div class="price-summary">
-          
         </div>
         <button class="btn-book">Book now</button>
     </div>
 </div>
+
+</div>
+
 
 <style>
     body {
@@ -100,6 +128,7 @@
         width: 200px; /* Control width */
         text-align: center;
     }
+
     h3 {
         font-size: 20px;
         font-weight: normal;

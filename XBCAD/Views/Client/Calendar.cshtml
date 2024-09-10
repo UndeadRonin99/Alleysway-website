@@ -1,12 +1,12 @@
 ﻿@{
-    ViewData["Title"] = "Admin Calendar";
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Client Calendar";
+    Layout = "~/Views/Shared/_ClientLayout.cshtml"; // Ensure this is your actual layout file for clients.
 }
 
 <div class="container py-5">
     <div class="card shadow-sm">
         <div class="card-body">
-            <h2 class="card-title text-center mb-4" style="font-size: 2rem; font-weight: 600;">Admin Calendar</h2>
+            <h2 class="card-title text-center mb-4" style="font-size: 2rem; font-weight: 600;">Client Calendar</h2>
 
             @if (!string.IsNullOrEmpty(ViewBag.CalendarEmbedLink))
             {
@@ -16,9 +16,9 @@
             }
             else
             {
-                <div class="alert alert-warning text-center" role="alert">
-                    <p class="mb-2">Unable to load Google Calendar. Please log in to view your calendar.</p>
-                    <a href="@Url.Action("GoogleLogin", "Account")" class="btn btn-warning btn-lg">Sign in to Google Calendar</a>
+                <div class="alert alert-info text-center" role="alert">
+                    <p class="mb-2">Unable to load Google Calendar. Please sign in to view your calendar.</p>
+                    <a href="@Url.Action("GoogleLogin", "Client")" class="btn btn-info btn-lg">Sign in to Google Calendar</a>
                 </div>
             }
         </div>
