@@ -1,14 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using XBCAD.ViewModels;
-using System.Collections.Generic;
-using System.Security.Claims;
+﻿using FirebaseAdmin;
 using FirebaseAdmin.Auth;
-using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
-using System.Text.Json;
-using System.Text;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using System.Text;
+using System.Text.Json;
+using XBCAD.ViewModels;
 
 namespace XBCAD.Controllers
 {
@@ -164,16 +163,16 @@ namespace XBCAD.Controllers
                     });
 
                     string[] name = ptName.Split(" ");
-string fName = name[0];
-string sName = name[1];
-// Prepare data to be saved in RTDB
-var data = new
-{
-    firstName = fName,
-    lastName = sName,
-    rate = ptRate,
-    role = "admin"
-};
+                    string fName = name[0];
+                    string sName = name[1];
+                    // Prepare data to be saved in RTDB
+                    var data = new
+                    {
+                        firstName = fName,
+                        lastName = sName,
+                        rate = ptRate,
+                        role = "admin"
+                    };
                     var json = JsonSerializer.Serialize(data);
                     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
@@ -222,7 +221,7 @@ var data = new
                 {
                     imageUrl = await firebaseService.UploadProfileImageAsync(userId, photo);
 
-                    
+
                     // Save the image URL to Firebase Realtime Database
                     await firebaseService.SaveProfileImageUrlAsync(userId, imageUrl);
                 }
@@ -242,7 +241,7 @@ var data = new
         }
 
 
-        
+
 
         public async Task<IActionResult> Settings()
         {
