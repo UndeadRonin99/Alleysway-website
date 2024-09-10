@@ -25,6 +25,18 @@
     height: 100vh; /* Make the sidebar take the full height of the viewport */
     overflow-y: auto; /* Allows for scrolling if content exceeds height */
 }
+<style>
+    .trainer-details {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #f0f0f0;
+        border-radius: 8px;
+    }
+    .rate-info {
+        font-size: 18px;
+        color: #333;
+    }
+</style>
 
 .sidebar-heading {
     text-align: center;
