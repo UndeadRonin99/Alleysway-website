@@ -25,7 +25,7 @@ namespace XBCAD.Controllers
             ViewBag.Name = Name;
             return View();
         }
-
+        //testing to see if i have to revert
         public IActionResult Users()
         {
             ViewData["Title"] = "Manage Users";
