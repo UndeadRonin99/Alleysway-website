@@ -4,7 +4,7 @@
     Layout = "~/Views/Shared/_ClientLayout.cshtml";
 
     // Current date (today)
-    DateTime today = DateTime.Now;
+    DateTime today = DateTime.Now.Date;  // Ensuring we're only comparing the date part
 
     // Days of the week in order
     var daysOfWeek = new List<string> { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
@@ -44,22 +44,26 @@
                     dayDate = today.AddDays(i);
                 }
 
-                <div class="day">
-                    <h4>@day.Day (@dayDate.ToString("dd MMMM yyyy"))</h4>
-                    <div class="time-slot-container">
-                        @if (day.TimeSlots != null && day.TimeSlots.Any())
-                        {
-                            @foreach (var slot in day.TimeSlots)
+                // Check if the calculated dayDate is in the future or today
+                if (dayDate >= today)
+                {
+                    <div class="day">
+                        <h4>@day.Day (@dayDate.ToString("dd MMMM yyyy"))</h4>
+                        <div class="time-slot-container">
+                            @if (day.TimeSlots != null && day.TimeSlots.Any())
                             {
-                                <button class="time-slot">@slot.StartTime - @slot.EndTime</button>
+                                @foreach (var slot in day.TimeSlots)
+                                {
+                                    <button class="time-slot">@slot.StartTime - @slot.EndTime</button>
+                                }
                             }
-                        }
-                        else
-                        {
-                            <p>No available slots for @day.Day</p>
-                        }
+                            else
+                            {
+                                <p>No available slots for @day.Day</p>
+                            }
+                        </div>
                     </div>
-                </div>
+                }
             }
         }
         else
@@ -76,7 +80,6 @@
 </div>
 
 </div>
-
 
 <style>
     body {
