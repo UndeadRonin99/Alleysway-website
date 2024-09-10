@@ -21,6 +21,8 @@ namespace XBCAD.Controllers
         public async Task<IActionResult> Calendar()
         {
             var accessToken = await HttpContext.GetTokenAsync("access_token");
+            var Name = User.FindFirstValue(ClaimTypes.Name); //Retrieve Name
+            ViewBag.Name = Name;
 
             if (!string.IsNullOrEmpty(accessToken))
             {

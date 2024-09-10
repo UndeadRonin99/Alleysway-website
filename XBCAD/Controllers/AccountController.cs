@@ -62,7 +62,7 @@ namespace XBCAD.Controllers
                     {
                         firstName = model.FirstName,
                         lastName = model.LastName,
-                        role = "admin"
+                        role = "client"
                     };
                     var json = JsonSerializer.Serialize(data);
                     var content = new StringContent(json, Encoding.UTF8, "application/json");
