@@ -163,19 +163,23 @@ public class FirebaseService
         // Filter users who are admins (trainers)
         foreach (var user in users)
         {
-            string profileImageUrl = user.Object.profileImageUrl ?? "/images/default.jpg";
-
-            trainers.Add(new Trainer
+            if (user.Object.role == "admin") // Only add users with "admin" role
             {
-                Id = user.Key,  // Set the trainer's Firebase ID
-                Name = $"{user.Object.firstName} {user.Object.lastName}",
-                ProfilePictureUrl = profileImageUrl,
-                HourlyRate = user.Object.rate
-            });
+                string profileImageUrl = user.Object.profileImageUrl ?? "/images/default.jpg";
+
+                trainers.Add(new Trainer
+                {
+                    Id = user.Key,  // Set the trainer's Firebase ID
+                    Name = $"{user.Object.firstName} {user.Object.lastName}",
+                    ProfilePictureUrl = profileImageUrl,
+                    HourlyRate = user.Object.rate
+                });
+            }
         }
 
         return trainers;
     }
+
 
 
 

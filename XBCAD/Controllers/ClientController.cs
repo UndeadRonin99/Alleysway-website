@@ -30,13 +30,13 @@ namespace XBCAD.Controllers
             return View();
         }
 
-        // Action to show list of trainers for booking
         public async Task<IActionResult> BookTrainer()
         {
-            // Fetch all trainers' data from Firebase
+            // Fetch all trainers' data from Firebase (admins only)
             var trainers = await _firebaseService.GetAllTrainersAsync();
             return View(trainers); // Pass the trainer data to the view
         }
+
         public async Task<IActionResult> TrainerAvailability(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -64,12 +64,6 @@ namespace XBCAD.Controllers
 
             return View(viewModel);
         }
-
-
-
-
-
-
 
     }
 
