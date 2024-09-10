@@ -67,7 +67,7 @@ namespace XBCAD.Controllers
             return View(trainers); // Pass the trainer data to the view
         }
 
-     
+
 
         [HttpGet]
         public IActionResult GoogleLogin(string returnUrl = "/Client/Calendar")
@@ -76,7 +76,7 @@ namespace XBCAD.Controllers
             return Challenge(properties, GoogleDefaults.AuthenticationScheme);
         }
 
-        [HttpGet("signin-google")]
+        [HttpGet("signin-google-client")]
         public async Task<IActionResult> GoogleResponse(string returnUrl = "/Client/Calendar")
         {
             var authenticateResult = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
@@ -86,6 +86,7 @@ namespace XBCAD.Controllers
 
             return LocalRedirect(returnUrl);  // Redirect to the calendar page after Google sign-in
         }
+
 
         public async Task<IActionResult> TrainerAvailability(string id)
         {
