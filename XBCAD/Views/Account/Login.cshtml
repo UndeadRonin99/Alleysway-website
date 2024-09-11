@@ -10,6 +10,99 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewData["Title"]</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #27262C;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+            background-image: url('/images/HalfCircle.jpeg'), url('/images/Cut.jpeg'), url('/images/Triangle.jpeg');
+            background-repeat: no-repeat;
+            background-position: left bottom, right top, right bottom;
+            background-size: 400px, 400px, 400px;
+        }
+
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .login-form {
+            padding: 2.5rem;
+            max-width: 400px;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+            .login-form h1 {
+                font-size: 3rem;
+                font-weight: bold;
+                margin-bottom: 1rem;
+                color: #FFF;
+            }
+
+            .login-form h2 {
+                font-size: 1.5rem;
+                margin-bottom: 1.5rem;
+                color: #FFF;
+            }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+            .form-group label {
+                color: #FFF;
+            }
+
+        .form-control {
+            width: 100%;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background-color: #555;
+            color: #fff;
+        }
+
+        .btn {
+            padding: 0.75rem;
+            width: 100%;
+            border-radius: 5px;
+            background-color: #FFF;
+            color: #333;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+            .btn:hover {
+                background-color: #ddd;
+            }
+
+        p {
+            color: #FFF;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+            p a {
+                color: #FF7900;
+                text-decoration: none;
+            }
+
+                p a:hover {
+                    text-decoration: underline;
+                }
+    </style>
     <!-- Firebase App (compatibility) -->
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <!-- Firebase Auth (compatibility) -->
@@ -17,9 +110,12 @@
 </head>
 <body>
     <div class="login-container">
-        <div class="alert alert-warning text-center" role="alert">
-            <p class="mb-2">Unable to load Google Calendar. Please log in to view your calendar.</p>
-            <a href="@Url.Action("GoogleLogin", "Account")" class="btn btn-warning btn-lg">Sign in to Google Calendar</a>
+        <div class="login-form">
+            <h1>Login</h1>
+            <h2>Access your account</h2>
+            <div class="form-group text-center">
+                <a href="@Url.Action("GoogleLogin", "Account")" class="btn btn-warning btn-lg btn-block">Sign in with Google</a>
+            </div>
         </div>
     </div>
 
@@ -45,21 +141,19 @@
             const email = document.getElementById('Username').value;
             const password = document.getElementById('Password').value;
 
-            console.log("Attempting to sign in with:", email); // Log the email attempt
+            console.log("Attempting to sign in with:", email);
 
             auth.signInWithEmailAndPassword(email, password)
                 .then((userCredential) => {
-                    console.log("Signed in successfully, retrieving token..."); // Log successful sign-in
+                    console.log("Signed in successfully, retrieving token...");
                     userCredential.user.getIdToken().then(token => {
-                        console.log("Token retrieved:", token); // Log the retrieved token
-                        document.getElementById('Token').value = token; // Set the token
-                        console.log("Form about to be submitted programmatically...");
+                        console.log("Token retrieved:", token);
+                        document.getElementById('Token').value = token;
                         this.submit(); // Submit the form programmatically
                     });
                 })
                 .catch((error) => {
-                    console.error("Login failed:", error.message); // Log any errors
-                    // Optionally display error messages on the UI
+                    console.error("Login failed:", error.message);
                 });
         });
     </script>
