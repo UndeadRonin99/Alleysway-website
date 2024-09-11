@@ -1,10 +1,13 @@
-﻿using FirebaseAdmin;
+﻿using Firebase.Auth;
+using FirebaseAdmin;
 using FirebaseAdmin.Auth;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Calendar.v3;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
@@ -15,8 +18,9 @@ namespace XBCAD.Controllers
     public class AdminController : Controller
     {
         public string userId;
-        private readonly FirebaseAuth auth;
+        private readonly FirebaseAdmin.Auth.FirebaseAuth auth;
         private readonly HttpClient httpClient;
+        public string uid;
 
         public async Task<IActionResult> Calendar()
         {
@@ -38,13 +42,88 @@ namespace XBCAD.Controllers
         }
 
 
-        public IActionResult Dashboard()
+        public async Task<IActionResult> Dashboard()
         {
             ViewData["Title"] = "Admin Dashboard";
-            var Name = User.FindFirstValue(ClaimTypes.Name); //Retrieve Name
-            ViewBag.Name = Name;
+            var authenticateResult = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
+
+            if (!authenticateResult.Succeeded)
+            {
+                return BadRequest("Google authentication failed.");
+            }
+
+            // Extract user info from Google authentication result
+            var email = authenticateResult.Principal.FindFirst(ClaimTypes.Email)?.Value;
+            var firstName = authenticateResult.Principal.FindFirst(ClaimTypes.GivenName)?.Value;
+            var lastName = authenticateResult.Principal.FindFirst(ClaimTypes.Surname)?.Value;
+            var googleUid = authenticateResult.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;  // Google UID
+
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName) || string.IsNullOrWhiteSpace(googleUid))
+            {
+                return BadRequest("Required user information is missing from Google account.");
+            }
+
+            try
+            {
+                UserRecord userRecord = null;
+
+                // Check if user already exists in Firebase Auth using the Google UID
+                try
+                {
+                    userRecord = await this.auth.GetUserAsync(googleUid);
+                }
+                catch (FirebaseAdmin.Auth.FirebaseAuthException ex)
+                {
+                    if (ex.AuthErrorCode == AuthErrorCode.UserNotFound)
+                    {
+                        // Create only if the user does not exist
+                        userRecord = await this.auth.CreateUserAsync(new UserRecordArgs
+                        {
+                            Uid = googleUid,  // Set Firebase UID to Google UID
+                            Email = email,
+                            DisplayName = $"{firstName} {lastName}",
+                            Disabled = false
+                        });
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
+                // Prepare data to be saved in RTDB
+                var data = new
+                {
+                    firstName = firstName,
+                    lastName = lastName,
+                    role = "admin"
+                };
+                var json = JsonSerializer.Serialize(data);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                // Construct the URL to Firebase RTDB
+                var url = $"https://alleysway-310a8-default-rtdb.firebaseio.com/users/{googleUid}.json";  // Use Google UID
+
+                // Send data to Firebase RTDB
+                var response = await httpClient.PutAsync(url, content);
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception("Failed to save user data to database.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Failed to register user in Firebase: {ex.Message}");
+            }
+
+            var name = User.FindFirstValue(ClaimTypes.Name); //Retrieve Name
+            ViewBag.Name = name;
             return View();
         }
+
+
+
+
         //testing to see if i have to revert
         public IActionResult Users()
         {
@@ -69,7 +148,7 @@ namespace XBCAD.Controllers
                 });
             }
 
-            this.auth = FirebaseAuth.DefaultInstance;
+            this.auth = FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance;
         }
 
         [HttpPost]
@@ -85,7 +164,7 @@ namespace XBCAD.Controllers
             try
             {
                 // Delete the user from Firebase Authentication
-                await FirebaseAuth.DefaultInstance.DeleteUserAsync(userId);
+                await FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance.DeleteUserAsync(userId);
 
                 // Optionally, you could also remove user data from the Realtime Database
                 await firebaseService.DeleteUserDataAsync(userId);
@@ -143,7 +222,7 @@ namespace XBCAD.Controllers
                 }
 
                 // Update the password in Firebase Authentication
-                await FirebaseAuth.DefaultInstance.UpdateUserAsync(new UserRecordArgs
+                await FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance.UpdateUserAsync(new UserRecordArgs
                 {
                     Uid = userId,
                     Password = newPassword
@@ -268,6 +347,7 @@ namespace XBCAD.Controllers
         public async Task<IActionResult> Settings()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            Debug.WriteLine(userId);
             var email = User.FindFirstValue(ClaimTypes.Email);
             var Name = User.FindFirstValue(ClaimTypes.Name); //Retrieve Name
             ViewBag.Name = Name;

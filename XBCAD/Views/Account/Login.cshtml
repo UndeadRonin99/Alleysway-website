@@ -17,26 +17,9 @@
 </head>
 <body>
     <div class="login-container">
-        <div class="login-form">
-            <h1>LOGIN</h1>
-            <h2>Account Login</h2>
-            <form asp-action="Login" method="post" id="loginForm">
-                <div class="form-group">
-                    <label for="Username">Username</label>
-                    <input type="text" class="form-control" id="Username" name="Username" placeholder="Username" required>
-                </div>
-                <div class="form-group">
-                    <label for="Password">Password</label>
-                    <input type="password" class="form-control" id="Password" name="Password" placeholder="Password" required>
-                </div>
-                <input type="hidden" id="Token" name="Token">
-                <div class="form-group">
-                    <input type="checkbox" id="RememberMe" name="RememberMe">
-                    <label for="RememberMe">Remember me</label>
-                </div>
-                <button type="submit" class="btn btn-primary btn-block">Log In</button>
-            </form>
-            <p>Don't have an account? <a asp-action="Register" asp-controller="Account">Sign up here</a></p>
+        <div class="alert alert-warning text-center" role="alert">
+            <p class="mb-2">Unable to load Google Calendar. Please log in to view your calendar.</p>
+            <a href="@Url.Action("GoogleLogin", "Account")" class="btn btn-warning btn-lg">Sign in to Google Calendar</a>
         </div>
     </div>
 

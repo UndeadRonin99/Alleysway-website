@@ -18,7 +18,6 @@ namespace XBCAD.Controllers
         private readonly FirebaseAuth auth;
         private readonly HttpClient httpClient;
 
-
         public AccountController(IHttpClientFactory httpClientFactory)
         {
             this.httpClient = httpClientFactory.CreateClient();
@@ -62,7 +61,7 @@ namespace XBCAD.Controllers
                     {
                         firstName = model.FirstName,
                         lastName = model.LastName,
-                        role = "client"
+                        role = "admin"
                     };
                     var json = JsonSerializer.Serialize(data);
                     var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -169,23 +168,27 @@ namespace XBCAD.Controllers
                 return View(model);
             }
         }
+
         [HttpGet]
-        public IActionResult GoogleLogin(string returnUrl = "/Admin/Calendar")
+        public IActionResult GoogleLogin(string returnUrl = "/Admin/Dashboard")
         {
             var properties = new AuthenticationProperties { RedirectUri = returnUrl };
             return Challenge(properties, GoogleDefaults.AuthenticationScheme);
         }
 
         [HttpGet("signin-google-admin")]
-        public async Task<IActionResult> GoogleResponse(string returnUrl = "/Admin/Calendar")
+        public async Task<IActionResult> GoogleResponse(string returnUrl = "/Admin/Dashboard")
         {
-            var authenticateResult = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            var authenticateResult = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
 
             if (!authenticateResult.Succeeded)
                 return BadRequest("Error while authenticating with Google.");
 
-            return LocalRedirect(returnUrl);  // Redirect to the calendar page after Google sign-in
+
+            // Perform local sign-in as necessary or redirect
+            return LocalRedirect(returnUrl);
         }
+
 
 
 

@@ -54,8 +54,8 @@ namespace XBCAD
             })
             .AddGoogle(googleOptions =>
             {
-                googleOptions.ClientId = "890106355046-hl7rb9o7495ogp2lakgt75scjpdjuirg.apps.googleusercontent.com"; // Replace with your client ID
-                googleOptions.ClientSecret = "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"; // Replace with your client secret
+                googleOptions.ClientId = "890106355046-i4t8lqblco7om7cc9sf3hq9k57f5k62e.apps.googleusercontent.com"; // Replace with your client ID
+                googleOptions.ClientSecret = "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"; // Replace with your client secret
                 googleOptions.CallbackPath = "/signin-google"; // Ensure this matches the redirect URI in Google Developer Console
                 googleOptions.SaveTokens = true; // Save Google tokens
 
