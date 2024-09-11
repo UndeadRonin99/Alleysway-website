@@ -12,6 +12,8 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using XBCAD.ViewModels;
+using System.Net.Http.Headers;
+
 
 namespace XBCAD.Controllers
 {
@@ -84,6 +86,7 @@ namespace XBCAD.Controllers
                             DisplayName = $"{firstName} {lastName}",
                             Disabled = false
                         });
+
                     }
                     else
                     {
@@ -91,29 +94,44 @@ namespace XBCAD.Controllers
                     }
                 }
 
-                // Prepare data to be saved in RTDB
+                // Fetch existing user data from Firebase RTDB
+                var url = $"https://alleysway-310a8-default-rtdb.firebaseio.com/users/{googleUid}.json";  // Use Google UID
+                var existingDataResponse = await httpClient.GetStringAsync(url);
+
+                // Use Dictionary instead of anonymous type to handle existing data
+                var existingData = string.IsNullOrEmpty(existingDataResponse) || existingDataResponse == "null"
+                    ? new Dictionary<string, dynamic>()  // Initialize empty dictionary
+                    : JsonSerializer.Deserialize<Dictionary<string, dynamic>>(existingDataResponse);
+
+                // Prepare new user data
                 var data = new
                 {
                     firstName = firstName,
                     lastName = lastName,
                     role = "admin"
                 };
-                var json = JsonSerializer.Serialize(data);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                // Construct the URL to Firebase RTDB
-                var url = $"https://alleysway-310a8-default-rtdb.firebaseio.com/users/{googleUid}.json";  // Use Google UID
+                // Merge new user data with existing data (preserving `Days` and other fields)
+                foreach (var entry in data.GetType().GetProperties())
+                {
+                    existingData[entry.Name] = entry.GetValue(data);  // Update the existing data with new fields
+                }
 
-                // Send data to Firebase RTDB
+                // Serialize merged data and send to Firebase RTDB
+                var json = JsonSerializer.Serialize(existingData);
+                var content = new StringContent(json, Encoding.UTF8);
+                content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
                 var response = await httpClient.PutAsync(url, content);
                 if (!response.IsSuccessStatusCode)
                 {
-                    throw new Exception("Failed to save user data to database.");
+                    throw new Exception("Failed to update user data in the database.");
                 }
+
             }
             catch (Exception ex)
             {
-                return BadRequest($"Failed to register user in Firebase: {ex.Message}");
+                return BadRequest($"Failed to update user in Firebase: {ex.Message}");
             }
 
             var name = User.FindFirstValue(ClaimTypes.Name); //Retrieve Name
