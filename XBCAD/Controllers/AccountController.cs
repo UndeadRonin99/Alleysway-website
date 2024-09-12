@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.Cookies; // For JSON parsing
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
+using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
@@ -30,6 +31,87 @@ namespace XBCAD.Controllers
                 });
             }
             this.auth = FirebaseAuth.DefaultInstance;
+        }
+
+        [HttpGet("Intermediate")]
+        public async Task<IActionResult> IntermediatePage()
+        {
+            var authenticateResult = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
+            if (!authenticateResult.Succeeded)
+            {
+                return BadRequest("Google authentication failed.");
+            }
+
+            var googleUid = authenticateResult.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var email = authenticateResult.Principal.FindFirst(ClaimTypes.Email)?.Value;
+            var firstName = authenticateResult.Principal.FindFirst(ClaimTypes.GivenName)?.Value;
+            var lastName = authenticateResult.Principal.FindFirst(ClaimTypes.Surname)?.Value;
+
+            if (string.IsNullOrWhiteSpace(googleUid))
+            {
+                return BadRequest("Required Google UID is missing.");
+            }
+
+            UserRecord userRecord;
+            string role;
+
+            try
+            {
+                try
+                {
+                    userRecord = await auth.GetUserAsync(googleUid);
+                    // Fetch role from Firebase RTDB
+                    var url = $"https://alleysway-310a8-default-rtdb.firebaseio.com/users/{googleUid}/role.json";
+                    var roleResponse = await httpClient.GetStringAsync(url);
+                    role = JsonSerializer.Deserialize<string>(roleResponse);
+
+                    // Update name and other details if needed
+                    var updateUrl = $"https://alleysway-310a8-default-rtdb.firebaseio.com/users/{googleUid}.json";
+                    var updateData = new { firstName, lastName };
+                    var updateJson = JsonSerializer.Serialize(updateData);
+                    var updateContent = new StringContent(updateJson, Encoding.UTF8, "application/json");
+                    await httpClient.PatchAsync(updateUrl, updateContent);
+                }
+                catch (FirebaseAuthException ex)
+                {
+                    if (ex.AuthErrorCode == AuthErrorCode.UserNotFound)
+                    {
+                        // Default to client if not specified
+                        role = "client";
+                        userRecord = await auth.CreateUserAsync(new UserRecordArgs
+                        {
+                            Uid = googleUid,
+                            Email = email,
+                            Disabled = false
+                        });
+
+                        // Initialize default data in Firebase
+                        var data = new { role = role, firstName, lastName };
+                        var jsonData = JsonSerializer.Serialize(data);
+                        var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+                        var initUrl = $"https://alleysway-310a8-default-rtdb.firebaseio.com/users/{googleUid}.json";
+                        await httpClient.PutAsync(initUrl, content);
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Failed to process user data: {ex.Message}");
+            }
+
+            switch (role)
+            {
+                case "admin":
+                    return RedirectToAction("Dashboard", "Admin");
+                case "client":
+                    return RedirectToAction("Dashboard", "Client");
+                default:
+                    return BadRequest("User role is not defined properly.");
+            }
         }
 
         [HttpGet("Register")]
@@ -170,14 +252,14 @@ namespace XBCAD.Controllers
         }
 
         [HttpGet]
-        public IActionResult GoogleLogin(string returnUrl = "/Admin/Dashboard")
+        public IActionResult GoogleLogin(string returnUrl = "/Intermediate")
         {
             var properties = new AuthenticationProperties { RedirectUri = returnUrl };
             return Challenge(properties, GoogleDefaults.AuthenticationScheme);
         }
 
         [HttpGet("signin-google-admin")]
-        public async Task<IActionResult> GoogleResponse(string returnUrl = "/Admin/Dashboard")
+        public async Task<IActionResult> GoogleResponse(string returnUrl = "/Intermediate")
         {
             var authenticateResult = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
 
