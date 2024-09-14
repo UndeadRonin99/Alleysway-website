@@ -31,9 +31,6 @@
                         <a class="nav-link @(activeTab == "addPT" ? "active" : "")" href="#addPT" data-bs-toggle="tab">Add new PT</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link @(activeTab == "changePassword" ? "active" : "") text-danger" href="#changePassword" data-bs-toggle="tab">Change Password</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link @(activeTab == "deleteProfile" ? "active" : "") text-danger" href="#deleteProfile" data-bs-toggle="tab">Delete profile</a>
                     </li>
                 </ul>
@@ -88,7 +85,21 @@
                                     </div>
                                     <button type="submit" class="btn btn-primary">Save</button>
                                 </form>
-
+                                <!-- Progress Popup -->
+                                @if (TempData["FailMessage"] != null)
+                                {
+                                    <div class="alert alert-error alert-dismissible fade show" role="alert">
+                                        @TempData["FailMessage"]
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                }
+                                @if (TempData["SuccessMessage"] != null)
+                                {
+                                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                        @TempData["SuccessMessage"]
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>
@@ -114,18 +125,6 @@
                                         </div>
                                     </div>
                                     <div class="row mb-3">
-                                        <label for="ptPassword" class="col-sm-2 col-form-label">Password</label>
-                                        <div class="col-sm-10">
-                                            <input type="password" class="form-control" id="ptPassword" name="ptPassword" required />
-                                        </div>
-                                    </div>
-                                    <div class="row mb-3">
-                                        <label for="ptConfirmPassword" class="col-sm-2 col-form-label">Confirm Password</label>
-                                        <div class="col-sm-10">
-                                            <input type="password" class="form-control" id="ptConfirmPassword" name="ptConfirmPassword" required />
-                                        </div>
-                                    </div>
-                                    <div class="row mb-3">
                                         <label for="ptRate" class="col-sm-2 col-form-label">PT Rate</label>
                                         <div class="col-sm-10">
                                             <input type="text" class="form-control" id="ptRate" name="ptRate" required />
@@ -133,7 +132,14 @@
                                     </div>
                                     <button type="submit" class="btn btn-warning">Add</button>
                                 </form>
-                                <!-- Success Popup -->
+                                <!-- Progress Popup -->
+                                @if (TempData["FailMessage"] != null)
+                                {
+                                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                        @TempData["FailMessage"]
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                }
                                 @if (TempData["SuccessMessage"] != null)
                                 {
                                     <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -189,54 +195,6 @@
                     <form id="deleteProfileForm" method="post" action="/Admin/DeleteProfile">
                         @* The form could be empty since you're handling deletion on the server-side. *@
                     </form>
-
-                    <!-- Change Password Tab -->
-                    <div class="tab-pane fade @(activeTab == "changePassword" ? "show active" : "")" id="changePassword">
-                        <div class="card">
-                            <div class="card-header bg-info text-white">
-                                Change Password
-                            </div>
-                            <div class="card-body">
-                                <form id="changePasswordForm" method="post" action="/Admin/ChangePassword">
-                                    <div class="row mb-3">
-                                        <label for="oldPassword" class="col-sm-2 col-form-label">Old Password</label>
-                                        <div class="col-sm-10">
-                                            <input type="password" class="form-control" id="oldPassword" name="oldPassword" required />
-                                        </div>
-                                    </div>
-                                    <div class="row mb-3">
-                                        <label for="newPassword" class="col-sm-2 col-form-label">New Password</label>
-                                        <div class="col-sm-10">
-                                            <input type="password" class="form-control" id="newPassword" name="newPassword" required />
-                                        </div>
-                                    </div>
-                                    <div class="row mb-3">
-                                        <label for="confirmNewPassword" class="col-sm-2 col-form-label">Confirm New Password</label>
-                                        <div class="col-sm-10">
-                                            <input type="password" class="form-control" id="confirmNewPassword" name="confirmNewPassword" required />
-                                        </div>
-                                    </div>
-                                    <button type="submit" class="btn btn-info">Change Password</button>
-                                </form>
-
-                                <!-- Success or Error Message -->
-                                @if (TempData["SuccessMessage"] != null)
-                                {
-                                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                        @TempData["SuccessMessage"]
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                    </div>
-                                }
-                                @if (TempData["ErrorMessage"] != null)
-                                {
-                                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                        @TempData["ErrorMessage"]
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                    </div>
-                                }
-                            </div>
-                        </div>
-                    </div>
 
                 </div>
             </div>

@@ -1,18 +1,17 @@
-﻿using Firebase.Auth;
-using FirebaseAdmin;
+﻿using FirebaseAdmin;
 using FirebaseAdmin.Auth;
 using Google.Apis.Auth.OAuth2;
-using Google.Apis.Calendar.v3;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
+using System.Web;
 using XBCAD.ViewModels;
-using System.Net.Http.Headers;
 
 
 namespace XBCAD.Controllers
@@ -60,7 +59,7 @@ namespace XBCAD.Controllers
             var lastName = authenticateResult.Principal.FindFirst(ClaimTypes.Surname)?.Value;
             var googleUid = authenticateResult.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;  // Google UID
 
-            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName) || string.IsNullOrWhiteSpace(googleUid))
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(googleUid))
             {
                 return BadRequest("Required user information is missing from Google account.");
             }
@@ -199,120 +198,53 @@ namespace XBCAD.Controllers
                 return RedirectToAction("Settings");
             }
         }
-
-        [HttpPost]
-        public async Task<IActionResult> ChangePassword(string oldPassword, string newPassword, string confirmNewPassword)
+        public string EncodeEmail(string email)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var userEmail = User.FindFirstValue(ClaimTypes.Email);
-
-            if (string.IsNullOrEmpty(userId))
-            {
-                return RedirectToAction("Login", "Account");
-            }
-
-            if (newPassword != confirmNewPassword)
-            {
-                TempData["ErrorMessage"] = "New password and confirmation password do not match.";
-                TempData["ActiveTab"] = "changePassword";
-                return RedirectToAction("Settings");
-            }
-
-            try
-            {
-                // Re-authenticate the user with the old password
-                var authRequest = new HttpRequestMessage(HttpMethod.Post, $"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDX4j_urjkjhoxeN5AHFxcOW1viBqsicWA");
-                var payload = new
-                {
-                    email = userEmail,
-                    password = oldPassword,
-                    returnSecureToken = true
-                };
-
-                authRequest.Content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
-                var response = await httpClient.SendAsync(authRequest);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    TempData["ErrorMessage"] = "Old password is incorrect.";
-                    TempData["ActiveTab"] = "changePassword";
-                    return RedirectToAction("Settings");
-                }
-
-                // Update the password in Firebase Authentication
-                await FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance.UpdateUserAsync(new UserRecordArgs
-                {
-                    Uid = userId,
-                    Password = newPassword
-                });
-
-                TempData["SuccessMessage"] = "Password updated successfully.";
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = $"Password change failed: {ex.Message}";
-            }
-
-            TempData["ActiveTab"] = "changePassword";
-            return RedirectToAction("Settings");
+            return email.Replace('.', ',');
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddNewPT(string ptName, string ptEmail, string ptPassword, string ptConfirmPassword, string ptRate)
+        public async Task<IActionResult> AddNewPT(string ptName, string ptEmail, string ptRate)
         {
             TempData["ActiveTab"] = "addPT"; // Set the active tab to "addPT"
-
-            if (ptPassword != ptConfirmPassword)
-            {
-                ModelState.AddModelError("", "Password and Confirm Password do not match.");
-                return RedirectToAction("Settings");
-            }
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    // Create the new user in Firebase Authentication
-                    var userRecord = await this.auth.CreateUserAsync(new UserRecordArgs
-                    {
-                        Email = ptEmail,
-                        Password = ptPassword,
-                        DisplayName = ptName,
-                        Disabled = false,
-                    });
+                    string[] nameParts = ptName.Split(' ');
+                    string firstName = nameParts[0];
+                    string lastName = nameParts.Length > 1 ? nameParts[1] : "";
 
-                    string[] name = ptName.Split(" ");
-                    string fName = name[0];
-                    string sName = name[1];
-                    // Prepare data to be saved in RTDB
                     var data = new
                     {
-                        firstName = fName,
-                        lastName = sName,
-                        rate = ptRate,
-                        role = "admin"
+                        firstName = firstName,
+                        lastName = lastName,
+                        role = "admin",
+                        ptRate = ptRate,
+                        status = "pending"
                     };
+
                     var json = JsonSerializer.Serialize(data);
                     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                    // Construct the URL to Firebase RTDB
-                    var url = $"https://alleysway-310a8-default-rtdb.firebaseio.com/users/{userRecord.Uid}.json";
-
-                    // Send data to Firebase RTDB
+                    var url = $"https://alleysway-310a8-default-rtdb.firebaseio.com/pending_users/{EncodeEmail(ptEmail)}.json";
                     var response = await httpClient.PutAsync(url, content);
 
                     if (response.IsSuccessStatusCode)
                     {
-                        TempData["SuccessMessage"] = "New PT added successfully.";
+                        TempData["SuccessMessage"] = "New PT setup initiated. Complete registration through Google login.";
                         return RedirectToAction("Settings");
                     }
                     else
                     {
-                        throw new Exception("Failed to save user data to database.");
+                        var responseBody = await response.Content.ReadAsStringAsync();
+                        throw new Exception($"Failed to initialize user setup in database. Response: {responseBody}");
                     }
                 }
                 catch (Exception ex)
                 {
+                    TempData["FailMessage"] = "PT setup failed please try again";
                     ModelState.AddModelError("", $"Error adding new PT: {ex.Message}");
                     return RedirectToAction("Settings");
                 }
@@ -320,6 +252,8 @@ namespace XBCAD.Controllers
 
             return RedirectToAction("Settings");
         }
+
+
 
 
 
