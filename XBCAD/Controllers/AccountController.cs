@@ -63,6 +63,7 @@ namespace XBCAD.Controllers
                     var pendingResponse = await httpClient.GetStringAsync(pendingUrl);
                     var userData = JsonSerializer.Deserialize<Dictionary<string, string>>(pendingResponse);
                     role = userData["role"];  // Use the role from pending setup
+                    var rate = userData["ptRate"];
 
                     if (userData != null && userData.ContainsKey("role"))
                     {
@@ -71,7 +72,7 @@ namespace XBCAD.Controllers
                             // Process pending user
 
 
-                            var finalData = new { firstName, lastName, role };
+                            var finalData = new { firstName, lastName, role, rate};
                             var finalJson = JsonSerializer.Serialize(finalData);
                             var finalContent = new StringContent(finalJson, Encoding.UTF8, "application/json");
                             var finalUrl = $"https://alleysway-310a8-default-rtdb.firebaseio.com/users/{googleUid}.json";
