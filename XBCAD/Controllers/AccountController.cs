@@ -70,8 +70,6 @@ namespace XBCAD.Controllers
                         try
                         {
                             // Process pending user
-
-
                             var finalData = new { firstName, lastName, role, rate};
                             var finalJson = JsonSerializer.Serialize(finalData);
                             var finalContent = new StringContent(finalJson, Encoding.UTF8, "application/json");

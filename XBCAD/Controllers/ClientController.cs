@@ -28,10 +28,11 @@ namespace XBCAD.Controllers
         public async Task<IActionResult> Calendar()
         {
             var accessToken = await HttpContext.GetTokenAsync("access_token");
+            var email = User.FindFirstValue(ClaimTypes.Email);
 
             if (!string.IsNullOrEmpty(accessToken))
             {
-                var embedLink = await googleCalendarService.GetCalendarEmbedLinkAsync(accessToken);
+                var embedLink = await googleCalendarService.GetCalendarEmbedLinkAsync(accessToken, email);
                 ViewBag.CalendarEmbedLink = embedLink;
             }
             else

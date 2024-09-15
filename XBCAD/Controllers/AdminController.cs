@@ -27,11 +27,12 @@ namespace XBCAD.Controllers
         {
             var accessToken = await HttpContext.GetTokenAsync("access_token");
             var Name = User.FindFirstValue(ClaimTypes.Name); //Retrieve Name
+            var email = User.FindFirstValue(ClaimTypes.Email);
             ViewBag.Name = Name;
 
             if (!string.IsNullOrEmpty(accessToken))
             {
-                var embedLink = await googleCalendarService.GetCalendarEmbedLinkAsync(accessToken);
+                var embedLink = await googleCalendarService.GetCalendarEmbedLinkAsync(accessToken, email);
                 ViewBag.CalendarEmbedLink = embedLink;
             }
             else
