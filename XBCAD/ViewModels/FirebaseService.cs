@@ -188,6 +188,13 @@ public class FirebaseService
                 .Child(trainerID)
                 .Child("messages")
                 .PostAsync(clientMessage);
+
+        await firebase
+            .Child("user_messages")
+            .Child(trainerID)
+            .Child(userID)
+            .Child("messages")
+            .PostAsync(clientMessage);
     }
 
     public async Task<AvailabilityViewModel> GetRawAvailabilityAsync(string userId)
