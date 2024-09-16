@@ -240,11 +240,11 @@ namespace XBCAD.Controllers
                     trainerID = trainer.Id,
                     clientID = User.FindFirstValue(ClaimTypes.NameIdentifier),
                     payed = false,
-                    totalAmount = model.SelectedTimeSlots.Count * trainer.HourlyRate,
+                    totalAmount = trainer.HourlyRate,
                     DateTime = startDateTime
                 };
 
-                await _firebaseService.putBookedSession(session, trainer.Id, User.FindFirstValue(ClaimTypes.NameIdentifier));
+                await _firebaseService.putBookedSession(session, trainer.Id, User.FindFirstValue(ClaimTypes.NameIdentifier), User.FindFirstValue(ClaimTypes.Name), startDateTime);
             }
 
             // Optional: Save booking details to Firebase or database

@@ -1,12 +1,7 @@
-﻿using Firebase.Auth;
-using Firebase.Database;
+﻿using Firebase.Database;
 using Firebase.Database.Query;
 using Firebase.Storage;
-using FirebaseAdmin;
-using Google.Apis.Auth.OAuth2;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Google.Cloud.Firestore;
 using XBCAD.ViewModels;
 
 
@@ -25,7 +20,7 @@ public class FirebaseService
         storage = new FirebaseStorage("alleysway-310a8.appspot.com");
     }
 
-    public async Task putBookedSession(BookedSession session, string trainerID, string userID)
+    public async Task putBookedSession(BookedSession session, string trainerID, string userID, string userName, DateTime dateTime)
     {
         await firebase
             .Child("users")
@@ -40,7 +35,24 @@ public class FirebaseService
             .Child("sessions")
             .Child("SessionID")
             .PostAsync(session);
+
+        Message clientMessage = new Message
+        {
+            senderId = userID,
+            receiverId = trainerID,
+            senderName = userName,
+            text = $"I've booked a session with you on {dateTime.Date.ToString("dd/MM/yyyy")} at {dateTime.TimeOfDay}",
+            timestamp = Timestamp.GetCurrentTimestamp()
+        };
+
+        await firebase
+                .Child("user_messages")
+                .Child(userID)
+                .Child(trainerID)
+                .Child("messages")
+                .PostAsync(clientMessage);
     }
+
 
     public async Task<AvailabilityViewModel> GetRawAvailabilityAsync(string userId)
     {
