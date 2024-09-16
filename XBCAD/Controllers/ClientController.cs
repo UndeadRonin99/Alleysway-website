@@ -245,6 +245,7 @@ namespace XBCAD.Controllers
         // Helper method to create a calendar event
         private async Task CreateCalendarEvent(string accessToken, string clientEmail, string trainerEmail, DateTime startDateTime, DateTime endDateTime, string trainerName)
         {
+            var clientName = User.FindFirstValue(ClaimTypes.Name);
             var credential = GoogleCredential.FromAccessToken(accessToken);
 
             var calendarService = new CalendarService(new BaseClientService.Initializer()
@@ -255,7 +256,7 @@ namespace XBCAD.Controllers
 
             var newEvent = new Event()
             {
-                Summary = $"Training session with {trainerName}",
+                Summary = $"Training session with {trainerName}. Booked by: {clientName}",
                 Start = new EventDateTime()
                 {
                     DateTime = startDateTime,
