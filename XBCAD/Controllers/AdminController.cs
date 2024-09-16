@@ -42,9 +42,72 @@ namespace XBCAD.Controllers
             this.auth = FirebaseAuth.DefaultInstance;
         }
 
+        [HttpPost]
+        public async Task<IActionResult> UpdateSessionPaymentStatus(string sessionId, bool isPaid, string clientId)
+        {
+            var trainerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(trainerId))
+            {
+                return Json(new { success = false, message = "User not authenticated" });
+            }
+
+            try
+            {
+                // Update the session for the trainer
+                await firebaseService.UpdateSessionPaymentStatusAsync(trainerId, sessionId, isPaid);
+
+                // Update the session for the client
+                await firebaseService.UpdateSessionPaymentStatusAsync(clientId, sessionId, isPaid);
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+
+        public async Task<IActionResult> Income2(string id) // 'id' is the clientId
+        {
+            var trainerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var name = User.FindFirstValue(ClaimTypes.Name);
+            ViewBag.Name = name;
+
+            if (string.IsNullOrEmpty(trainerId))
+            {
+                return RedirectToAction("Login", "Account"); // Redirect if user is not logged in
+            }
+
+            // Get client details
+            var clientData = await firebaseService.GetClientByIdAsync(id);
+
+            // Get sessions between the trainer and the client
+            var sessions = await firebaseService.GetSessionsBetweenTrainerAndClientAsync(trainerId, id);
+
+            // Calculate total amounts
+            decimal totalAmountDue = sessions.Where(s => !s.Paid).Sum(s => s.TotalAmount);
+            decimal totalAmountPaid = sessions.Where(s => s.Paid).Sum(s => s.TotalAmount);
+
+            // Prepare the ViewModel
+            var model = new ClientSessionsViewModel
+            {
+                Client = clientData,
+                Sessions = sessions,
+                TotalAmountDue = totalAmountDue,
+                TotalAmountPaid = totalAmountPaid
+            };
+
+            return View("Income2", model);
+        }
+
+
         public async Task<IActionResult> Income()
         {
             var trainerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var name = User.FindFirstValue(ClaimTypes.Name);
+            ViewBag.Name = name;
 
             if (string.IsNullOrEmpty(trainerId))
             {

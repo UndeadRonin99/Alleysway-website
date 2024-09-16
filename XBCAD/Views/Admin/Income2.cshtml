@@ -1,0 +1,112 @@
+﻿@using XBCAD.ViewModels
+@model ClientSessionsViewModel
+
+@{
+    ViewData["Title"] = "Client Details";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container">
+    <h1>Sessions with @Model.Client.Name</h1>
+
+    <div class="client-details">
+        <img src="@Model.Client.ProfileImageUrl" alt="Profile image of @Model.Client.Name">
+        <h2>@Model.Client.Name</h2>
+        <!-- You can add more client details here -->
+    </div>
+
+    <h3>Session History</h3>
+    <table class="session-table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Total Amount</th>
+                <th>Paid</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var session in Model.Sessions)
+            {
+                <tr>
+                    <td>@DateTime.Parse(session.StartDateTime).ToString("yyyy-MM-dd")</td>
+                    <td>@DateTime.Parse(session.StartDateTime).ToString("HH:mm")</td>
+                    <td>@DateTime.Parse(session.EndDateTime).ToString("HH:mm")</td>
+                    <td>@session.TotalAmount.ToString("C")</td>
+                    <td>
+                        <input type="checkbox" class="paid-checkbox" data-session-id="@session.SessionKey" @(session.Paid ? "checked" : "") />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h3>Totals</h3>
+    <p><strong>Total Amount Due:</strong> @Model.TotalAmountDue.ToString("C")</p>
+    <p><strong>Total Amount Paid:</strong> @Model.TotalAmountPaid.ToString("C")</p>
+</div>
+
+<style>
+    .client-details {
+        margin-bottom: 20px;
+    }
+
+        .client-details img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+        }
+
+    .session-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .session-table th, .session-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        .session-table th {
+            background-color: #f2f2f2;
+            text-align: left;
+        }
+</style>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('.paid-checkbox').change(function () {
+            var checkbox = $(this);
+            var sessionId = checkbox.data('session-id');
+            var isChecked = checkbox.is(':checked');
+
+            $.ajax({
+                url: '@Url.Action("UpdateSessionPaymentStatus", "Admin")',
+                type: 'POST',
+                data: {
+                    sessionId: sessionId,
+                    isPaid: isChecked,
+                    clientId: '@Model.Client.Id'
+                },
+                success: function (response) {
+                    if (response.success) {
+                        // Optionally update totals on the page
+                        location.reload(); // Reload the page to update totals
+                    } else {
+                        alert('Error updating payment status: ' + response.message);
+                        // Revert checkbox state
+                        checkbox.prop('checked', !isChecked);
+                    }
+                },
+                error: function () {
+                    alert('Error updating payment status.');
+                    // Revert checkbox state
+                    checkbox.prop('checked', !isChecked);
+                }
+            });
+        });
+    });
+</script>
+

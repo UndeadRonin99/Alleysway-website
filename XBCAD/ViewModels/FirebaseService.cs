@@ -20,6 +20,105 @@ public class FirebaseService
         storage = new FirebaseStorage("alleysway-310a8.appspot.com");
     }
 
+    public async Task<ClientPaymentSummaryViewModel> GetClientPaymentSummaryAsync(string clientId)
+    {
+        var payments = new List<TrainerPayment>();
+
+        var sessions = await firebase
+            .Child("users")
+            .Child(clientId)
+            .Child("sessions")
+            .Child("SessionID")
+            .OnceAsync<BookedSession>();
+
+        var paidSessions = sessions
+            .Where(s => s.Object.Paid)
+            .GroupBy(s => s.Object.TrainerID);
+
+        foreach (var group in paidSessions)
+        {
+            var trainerId = group.Key;
+            var totalAmountPaid = group.Sum(s => s.Object.TotalAmount);
+
+            // Get trainer name
+            var trainerData = await firebase
+                .Child("users")
+                .Child(trainerId)
+                .OnceSingleAsync<dynamic>();
+
+            string trainerName = $"{trainerData.firstName} {trainerData.lastName}";
+
+            payments.Add(new TrainerPayment
+            {
+                TrainerId = trainerId,
+                TrainerName = trainerName,
+                TotalAmountPaid = totalAmountPaid
+            });
+        }
+
+        return new ClientPaymentSummaryViewModel
+        {
+            Payments = payments
+        };
+    }
+
+
+    public async Task UpdateSessionPaymentStatusAsync(string userId, string sessionId, bool isPaid)
+    {
+        await firebase
+            .Child("users")
+            .Child(userId)
+            .Child("sessions")
+            .Child("SessionID")
+            .Child(sessionId)
+            .Child("Paid")
+            .PutAsync(isPaid);
+    }
+    public async Task<List<BookedSession>> GetSessionsBetweenTrainerAndClientAsync(string trainerId, string clientId)
+    {
+        var sessions = new List<BookedSession>();
+
+        var sessionNodes = await firebase
+            .Child("users")
+            .Child(trainerId)
+            .Child("sessions")
+            .Child("SessionID")
+            .OnceAsync<BookedSession>();
+
+        foreach (var sessionNode in sessionNodes)
+        {
+            var session = sessionNode.Object;
+            if (session.ClientID == clientId)
+            {
+                session.SessionKey = sessionNode.Key; // Store the key
+                sessions.Add(session);
+            }
+        }
+
+        return sessions;
+    }
+
+    public async Task<ClientViewModel> GetClientByIdAsync(string clientId)
+    {
+        var clientData = await firebase
+            .Child("users")
+            .Child(clientId)
+            .OnceSingleAsync<dynamic>();
+
+        if (clientData != null)
+        {
+            string profileImageUrl = clientData.profileImageUrl ?? "/images/default.jpg";
+            return new ClientViewModel
+            {
+                Id = clientId,
+                Name = $"{clientData.firstName} {clientData.lastName}",
+                ProfileImageUrl = profileImageUrl
+            };
+        }
+
+        return null;
+    }
+
     public async Task<List<ClientViewModel>> GetClientsForTrainerAsync(string trainerId)
     {
         var clients = new List<ClientViewModel>();

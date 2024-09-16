@@ -17,7 +17,7 @@
             <div class="client-card">
                 <img src="@client.ProfileImageUrl" alt="Profile image of @client.Name">
                 <h3>@client.Name</h3>
-                <a href="@Url.Action("ViewDetails", "Clients", new { id = client.Id })" class="view-button">View</a>
+                <a href="@Url.Action("Income2", "Admin", new { id = client.Id })" class="view-button">View</a>
             </div>
         }
     </div>
