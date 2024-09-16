@@ -235,20 +235,23 @@ namespace XBCAD.Controllers
                 // Create calendar event
                 await CreateCalendarEvent(accessToken, clientEmail, trainerEmail, startDateTime, endDateTime, trainer.Name);
 
+                // Create the BookedSession object
                 BookedSession session = new BookedSession
                 {
-                    trainerID = trainer.Id,
-                    clientID = User.FindFirstValue(ClaimTypes.NameIdentifier),
-                    payed = false,
-                    totalAmount = trainer.HourlyRate,
-                    DateTime = startDateTime
+                    TrainerID = trainer.Id,
+                    ClientID = User.FindFirstValue(ClaimTypes.NameIdentifier),
+                    Paid = false,
+                    TotalAmount = trainer.HourlyRate,
+                    StartDateTime = startDateTime.ToString("o"),  // Store as ISO 8601 string
+                    EndDateTime = endDateTime.ToString("o")
                 };
 
-                await _firebaseService.putBookedSession(session, trainer.Id, User.FindFirstValue(ClaimTypes.NameIdentifier), User.FindFirstValue(ClaimTypes.Name), startDateTime);
+                // Save the session to Firebase
+                await _firebaseService.PutBookedSession(session, trainer.Id, User.FindFirstValue(ClaimTypes.NameIdentifier), User.FindFirstValue(ClaimTypes.Name), startDateTime);
             }
 
             // Optional: Save booking details to Firebase or database
-            
+
 
             // Redirect to the calendar page or a confirmation page
             return RedirectToAction("Calendar");

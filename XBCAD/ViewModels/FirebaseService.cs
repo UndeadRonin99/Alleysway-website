@@ -20,7 +20,7 @@ public class FirebaseService
         storage = new FirebaseStorage("alleysway-310a8.appspot.com");
     }
 
-    public async Task putBookedSession(BookedSession session, string trainerID, string userID, string userName, DateTime dateTime)
+    public async Task PutBookedSession(BookedSession session, string trainerID, string userID, string userName, DateTime dateTime)
     {
         await firebase
             .Child("users")
