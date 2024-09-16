@@ -20,6 +20,44 @@ public class FirebaseService
         storage = new FirebaseStorage("alleysway-310a8.appspot.com");
     }
 
+    public async Task<List<ClientViewModel>> GetClientsForTrainerAsync(string trainerId)
+    {
+        var clients = new List<ClientViewModel>();
+
+        // Get the sessions for the trainer
+        var sessions = await firebase
+            .Child("users")
+            .Child(trainerId)
+            .Child("sessions")
+            .Child("SessionID")
+            .OnceAsync<BookedSession>();
+
+        // Extract unique client IDs
+        var clientIds = sessions.Select(s => s.Object.ClientID).Distinct();
+
+        foreach (var clientId in clientIds)
+        {
+            // Get client details
+            var clientData = await firebase
+                .Child("users")
+                .Child(clientId)
+                .OnceSingleAsync<dynamic>();
+
+            if (clientData != null)
+            {
+                string profileImageUrl = clientData.profileImageUrl ?? "/images/default.jpg";
+                clients.Add(new ClientViewModel
+                {
+                    Id = clientId,
+                    Name = $"{clientData.firstName} {clientData.lastName}",
+                    ProfileImageUrl = profileImageUrl
+                });
+            }
+        }
+
+        return clients;
+    }
+
     public async Task PutBookedSession(BookedSession session, string trainerID, string userID, string userName, DateTime dateTime)
     {
         await firebase

@@ -42,6 +42,20 @@ namespace XBCAD.Controllers
             this.auth = FirebaseAuth.DefaultInstance;
         }
 
+        public async Task<IActionResult> Income()
+        {
+            var trainerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(trainerId))
+            {
+                return RedirectToAction("Login", "Account"); // Redirect if user is not logged in
+            }
+
+            var clients = await firebaseService.GetClientsForTrainerAsync(trainerId);
+            ViewBag.Name = User.FindFirstValue(ClaimTypes.Name);
+            return View(clients);
+        }
+
         public async Task<IActionResult> Chat()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

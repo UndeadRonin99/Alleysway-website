@@ -1,6 +1,4 @@
-﻿// XBCAD/ViewModels/BookedSession.cs
-namespace XBCAD.ViewModels
-{
+﻿
     public class BookedSession
     {
         public string TrainerID { get; set; }
@@ -11,4 +9,4 @@ namespace XBCAD.ViewModels
         public string EndDateTime { get; set; }    // As string in ISO 8601 format
     }
 
-}
+

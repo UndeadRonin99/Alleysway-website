@@ -1,0 +1,59 @@
+﻿@using XBCAD.ViewModels
+@model List<ClientViewModel>
+
+@{
+    ViewData["Title"] = "Client Portfolio";
+    Layout = "~/Views/Shared/_ClientLayout.cshtml";
+}
+
+<div class="container">
+    <h1>Client Portfolio</h1>
+    <div class="search-bar">
+        <!-- Search form can be added here -->
+    </div>
+    <div class="client-grid">
+        @foreach (var client in Model)
+        {
+            <div class="client-card">
+                <img src="@client.ProfileImageUrl" alt="Profile image of @client.Name">
+                <h3>@client.Name</h3>
+                <a href="@Url.Action("ViewDetails", "Clients", new { id = client.Id })" class="view-button">View</a>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .client-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+    }
+
+    .client-card {
+        width: 200px;
+        border: 1px solid #ccc;
+        padding: 10px;
+        text-align: center;
+    }
+
+        .client-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 50%;
+        }
+
+    .view-button {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 5px 10px;
+        background-color: orange;
+        color: white;
+        text-decoration: none;
+    }
+
+    .search-bar {
+        margin-bottom: 20px;
+    }
+</style>
