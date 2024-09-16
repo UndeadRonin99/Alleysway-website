@@ -3,21 +3,179 @@
     Layout = "~/Views/Shared/_ClientLayout.cshtml";
 }
 
-<div id="user-list" style="float: left; width: 20%;">
-    <h3>Users</h3>
-    <ul id="users"></ul>
+<div class="chat-container">
+    <div id="user-list" class="user-list">
+        <ul id="users"></ul>
+    </div>
+
+    <div id="chat-container" class="chat-window">
+        <div id="chat-header">
+            <span id="chatWith">Select a user</span>
+        </div>
+
+        <div id="messages" class="message-area"></div>
+
+        <div class="input-area">
+            <input type="text" id="messageInput" placeholder="Type your message here..." />
+            <button id="sendButton">Send</button>
+        </div>
+    </div>
 </div>
 
-<div id="chat-container" style="float: right; width: 75%;">
-    <h2>Chat with <span id="chatWith">Select a user</span></h2>
-    <div id="messages" style="border: 1px solid #ccc; height: 300px; overflow-y: scroll; padding: 10px;"></div>
-    <input type="text" id="messageInput" placeholder="Type your message here..." style="width: 80%;" />
-    <button id="sendButton" style="width: 18%;">Send</button>
-</div>
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #E1E1E1;
+        margin: 0;
+        padding: 0;
+        overflow: hidden; /* Remove page scroll */
+    }
 
-<div style="clear: both;"></div>
+    .chat-container {
+        display: flex;
+        height: 95vh;
+        background-color: #333;
+        border-radius: 20px; /* Rounded corners for the entire container */
+        overflow: hidden; /* Prevent overflow of rounded corners */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Add some shadow for effect */
+    }
 
-<!-- Include Firebase SDKs -->
+    .user-list {
+        width: 30%;
+        background-color: #1E1E1E;
+        color: white;
+        padding: 10px;
+        overflow-y: auto;
+        border-top-left-radius: 20px; /* Round top-left corner */
+        border-bottom-left-radius: 20px; /* Round bottom-left corner */
+    }
+
+    #users {
+        list-style-type: none;
+        padding: 0;
+    }
+
+        #users li {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            margin: 5px 0;
+            background-color: #FF4F17;
+            color: white;
+            border-radius: 10px; /* Rounded user list items */
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+            #users li:hover {
+                background-color: #FF7F50;
+            }
+
+            #users li img {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%; /* Make profile images circular */
+                margin-right: 8px;
+            }
+
+    .chat-window {
+        width: 80%;
+        background-color: #2E2E2E;
+        display: flex;
+        flex-direction: column;
+        border-top-right-radius: 20px; /* Round top-right corner */
+        border-bottom-right-radius: 20px; /* Round bottom-right corner */
+    }
+
+    #chat-header {
+        padding: 10px;
+        font-size: 16px;
+        background-color: #333;
+        color: white;
+        text-align: center;
+        font-weight: bold;
+        border-top-right-radius: 20px; /* Rounded top-right corner of header */
+    }
+
+    .message-area {
+        flex-grow: 1;
+        padding: 10px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        color: white;
+    }
+
+        .message-area .bubble {
+            max-width: 55%;
+            margin-bottom: 8px;
+            padding: 8px;
+            border-radius: 20px; /* Rounded message bubbles */
+            position: relative;
+            font-size: 14px;
+        }
+
+        .message-area .sent {
+            background-color: #FF4F17;
+            color: white;
+            align-self: flex-end;
+            text-align: left;
+        }
+
+        .message-area .received {
+            background-color: #3E3E3E;
+            color: white;
+            align-self: flex-start;
+            text-align: left;
+        }
+
+        .message-area .bubble-text {
+            margin-right: 10px;
+            word-wrap: break-word;
+        }
+
+        .message-area .timestamp {
+            font-size: 10px;
+            color: #ccc;
+            white-space: nowrap;
+            align-self: flex-end;
+        }
+
+    .input-area {
+        display: flex;
+        background-color: #333;
+        padding: 8px;
+        align-items: center;
+        border-bottom-right-radius: 20px; /* Rounded bottom-right corner for input */
+    }
+
+        .input-area input {
+            width: 85%;
+            padding: 8px;
+            border-radius: 20px; /* Rounded input field */
+            border: none;
+            font-size: 14px;
+            background-color: #1E1E1E;
+            color: white;
+        }
+
+        .input-area button {
+            width: 12%;
+            background-color: #FF4F17;
+            color: white;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 8px;
+            border-radius: 20px; /* Rounded button */
+        }
+
+            .input-area button:hover {
+                background-color: #FF7F50;
+            }
+</style>
+
 <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
@@ -44,7 +202,6 @@
 
     firebase.auth().onAuthStateChanged(function (user) {
         if (user) {
-            console.log('User is authenticated');
             loadUsers();
         } else {
             console.log('User is not authenticated');
@@ -63,14 +220,21 @@
             snapshot.forEach(function (childSnapshot) {
                 var userId = childSnapshot.key;
                 var userData = childSnapshot.val();
+                var profileImageUrl = userData.profileImageUrl || '/images/default.jpg'; // Use default image from wwwroot/images
+
                 if (userId !== firebase.auth().currentUser.uid) {
                     var li = document.createElement('li');
-                    li.textContent = userData.firstName + ' ' + userData.lastName;
+                    li.innerHTML = `
+                                <img src="${profileImageUrl}" alt="Profile Image">
+                                <span>${userData.firstName} ${userData.lastName}</span>
+                            `;
                     li.setAttribute('data-user-id', userId);
                     li.style.cursor = 'pointer';
+
                     li.addEventListener('click', function () {
                         selectUser(userId, userData.firstName + ' ' + userData.lastName);
                     });
+
                     usersList.appendChild(li);
                 }
             });
@@ -90,8 +254,6 @@
     }
 
     function initializeChat() {
-        console.log('initializeChat called');
-
         if (!selectedUserId) {
             console.log('No user selected for chat.');
             return;
@@ -121,8 +283,6 @@
     }
 
     function sendMessage() {
-        console.log('sendMessage called');
-
         if (!selectedUserId) {
             alert('Please select a user to chat with.');
             return;
@@ -156,16 +316,29 @@
             });
 
             document.getElementById('messageInput').value = '';
-        } else {
-            console.log('Message text is empty');
         }
     }
 
     function displayMessage(userName, text, timestamp) {
         var messagesDiv = document.getElementById('messages');
         var messageElement = document.createElement('div');
-        var time = new Date(timestamp).toLocaleTimeString();
-        messageElement.innerHTML = '<strong>' + userName + ':</strong> ' + text + ' <span style="float:right;">' + time + '</span>';
+        var time = new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        // Check if the message is sent by the current user
+        var isSentByCurrentUser = (userName === '@ViewBag.Name');
+
+        messageElement.classList.add('bubble');
+        if (isSentByCurrentUser) {
+            messageElement.classList.add('sent');
+        } else {
+            messageElement.classList.add('received');
+        }
+
+        messageElement.innerHTML = `
+                    <div class="bubble-text">${text}</div>
+                    <span class="timestamp">${time}</span>
+                `;
+
         messagesDiv.appendChild(messageElement);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
