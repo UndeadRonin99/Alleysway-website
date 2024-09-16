@@ -24,23 +24,23 @@ public class FirebaseService
         // Initialize Firebase Storage 
         storage = new FirebaseStorage("alleysway-310a8.appspot.com");
     }
-
-    public async Task putBookedSession(BookedSession session, string trainerID, string userID)
+    public async Task PutBookedSession(BookedSession session, string trainerID, string clientID)
     {
+        // Save session under trainer's data
         await firebase
             .Child("users")
             .Child(trainerID)
             .Child("sessions")
-            .Child("SessionID")
             .PostAsync(session);
 
+        // Save session under client's data
         await firebase
             .Child("users")
-            .Child(userID)
+            .Child(clientID)
             .Child("sessions")
-            .Child("SessionID")
             .PostAsync(session);
     }
+
 
     public async Task<AvailabilityViewModel> GetRawAvailabilityAsync(string userId)
     {

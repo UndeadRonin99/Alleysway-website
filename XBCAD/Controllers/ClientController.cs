@@ -189,7 +189,8 @@ namespace XBCAD.Controllers
             return View(trainers); // Pass the trainer data to the view
         }
 
-     
+
+        // In ClientController.cs
         [HttpPost]
         public async Task<IActionResult> BookSession(TrainerAvailabilityViewModel model)
         {
@@ -235,24 +236,27 @@ namespace XBCAD.Controllers
                 // Create calendar event
                 await CreateCalendarEvent(accessToken, clientEmail, trainerEmail, startDateTime, endDateTime, trainer.Name);
 
+                // Create the BookedSession object
                 BookedSession session = new BookedSession
                 {
-                    trainerID = trainer.Id,
-                    clientID = User.FindFirstValue(ClaimTypes.NameIdentifier),
-                    payed = false,
-                    totalAmount = model.SelectedTimeSlots.Count * trainer.HourlyRate,
-                    DateTime = startDateTime
+                    TrainerID = trainer.Id,
+                    ClientID = User.FindFirstValue(ClaimTypes.NameIdentifier),
+                    Paid = false,
+                    TotalAmount = trainer.HourlyRate,
+                    StartDateTime = startDateTime.ToString("o"),  // Store as ISO 8601 string
+                    EndDateTime = endDateTime.ToString("o")
                 };
 
-                await _firebaseService.putBookedSession(session, trainer.Id, User.FindFirstValue(ClaimTypes.NameIdentifier));
+                // Save the session to Firebase
+                await _firebaseService.PutBookedSession(session, trainer.Id, User.FindFirstValue(ClaimTypes.NameIdentifier));
             }
 
-            // Optional: Save booking details to Firebase or database
-            
+
 
             // Redirect to the calendar page or a confirmation page
             return RedirectToAction("Calendar");
         }
+
 
         // Helper method to create a calendar event
         private async Task CreateCalendarEvent(string accessToken, string clientEmail, string trainerEmail, DateTime startDateTime, DateTime endDateTime, string trainerName)
