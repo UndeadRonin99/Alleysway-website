@@ -53,7 +53,6 @@ public class FirebaseService
                 .PostAsync(clientMessage);
     }
 
-
     public async Task<AvailabilityViewModel> GetRawAvailabilityAsync(string userId)
     {
         var model = new AvailabilityViewModel
@@ -111,7 +110,6 @@ public class FirebaseService
         return model;
     }
 
-
     public AvailabilityViewModel ConvertToHourlySegments(AvailabilityViewModel rawAvailability)
     {
         var hourlyAvailability = new AvailabilityViewModel
@@ -157,8 +155,6 @@ public class FirebaseService
         return hourlyAvailability;
     }
 
-
-
     public async Task<Trainer> GetTrainerByIdAsync(string userId)
     {
         var user = await firebase
@@ -179,7 +175,6 @@ public class FirebaseService
             Email = user.email // Ensure this field is available in Firebase
         };
     }
-
 
     public async Task<List<Trainer>> GetAllTrainersAsync()
     {
@@ -206,13 +201,8 @@ public class FirebaseService
                 });
             }
         }
-
         return trainers;
     }
-
-
-
-
 
     public async Task DeleteUserDataAsync(string userId)
     {
@@ -300,7 +290,6 @@ public class FirebaseService
         }
     }
 
-
     // Method to get the profile image URL for a user
     public async Task<string> GetProfileImageUrlAsync(string userId)
     {
@@ -320,7 +309,6 @@ public class FirebaseService
             return null; // or you can return a default image URL if needed
         }
     }
-
 
     public async Task<AvailabilityViewModel> GetAvailabilityAsync(string userId)
     {
@@ -371,8 +359,6 @@ public class FirebaseService
         return model;
     }
 
-
-
     public async Task SaveTimeSlotAsync(string day, string startTime, string endTime, string userId)
     {
         var timeSlot = new TimeSlot { StartTime = startTime, EndTime = endTime };
@@ -384,7 +370,6 @@ public class FirebaseService
             .Child("TimeSlots")
             .PostAsync(timeSlot);
     }
-
 
     public async Task RemoveTimeSlotAsync(string day, string startTime, string endTime, string userId)
     {
@@ -424,5 +409,4 @@ public class FirebaseService
             throw; // Re-throwing the exception to be caught by the calling method
         }
     }
-
 }

@@ -213,33 +213,49 @@
     var conversationRef = null;
 
     function loadUsers() {
+        var currentUser = firebase.auth().currentUser.uid;
         var usersRef = firebase.database().ref('users');
-        usersRef.once('value').then(function (snapshot) {
-            var usersList = document.getElementById('users');
-            usersList.innerHTML = '';
-            snapshot.forEach(function (childSnapshot) {
-                var userId = childSnapshot.key;
-                var userData = childSnapshot.val();
-                var profileImageUrl = userData.profileImageUrl || '/images/default.jpg'; // Use default image from wwwroot/images
+        var messagesRef = firebase.database().ref('user_messages/' + currentUser);
 
-                if (userId !== firebase.auth().currentUser.uid) {
-                    var li = document.createElement('li');
-                    li.innerHTML = `
-                                <img src="${profileImageUrl}" alt="Profile Image">
-                                <span>${userData.firstName} ${userData.lastName}</span>
-                            `;
-                    li.setAttribute('data-user-id', userId);
-                    li.style.cursor = 'pointer';
+        messagesRef.once('value').then(function (messagesSnapshot) {
+            var activeUsers = {}; // Object to keep track of users with open chats
 
-                    li.addEventListener('click', function () {
-                        selectUser(userId, userData.firstName + ' ' + userData.lastName);
-                    });
+            // Collect all user IDs with whom the current user has messages
+            messagesSnapshot.forEach(function (childSnapshot) {
+                activeUsers[childSnapshot.key] = true;
+            });
 
-                    usersList.appendChild(li);
-                }
+            usersRef.once('value').then(function (usersSnapshot) {
+                var usersList = document.getElementById('users');
+                usersList.innerHTML = '';
+
+                usersSnapshot.forEach(function (childSnapshot) {
+                    var userId = childSnapshot.key;
+                    var userData = childSnapshot.val();
+
+                    // Check if the user is in the list of active chats
+                    if (activeUsers[userId] && userId !== currentUser) {
+                        var profileImageUrl = userData.profileImageUrl || '/images/default.jpg'; // Use default image
+
+                        var li = document.createElement('li');
+                        li.innerHTML = `
+                            <img src="${profileImageUrl}" alt="Profile Image">
+                            <span>${userData.firstName} ${userData.lastName}</span>
+                        `;
+                        li.setAttribute('data-user-id', userId);
+                        li.style.cursor = 'pointer';
+
+                        li.addEventListener('click', function () {
+                            selectUser(userId, userData.firstName + ' ' + userData.lastName);
+                        });
+
+                        usersList.appendChild(li);
+                    }
+                });
             });
         });
     }
+
 
     function selectUser(userId, userName) {
         selectedUserId = userId;
