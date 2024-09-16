@@ -16,7 +16,7 @@
         }
 
         DateTime today = DateTime.Now.Date;
-        int daysUntilTarget = ((int)targetDay - (int)today.DayOfWeek + 7) % 7;
+        int daysUntilTarget = ((int)targetDay - (int)DateTime.Now.DayOfWeek + 7) % 7;
         DateTime targetDate = today.AddDays(daysUntilTarget);
         return targetDate;
     }
@@ -43,6 +43,7 @@
                 foreach (var day in Model.Availability.Days)
                 {
                     var dayDate = GetNextDateForDayOfWeek(day.Day);
+                    bool isToday = dayDate.Date == DateTime.Now.Date;
 
                     if (dayDate >= today)
                     {
@@ -51,11 +52,60 @@
                             <div class="time-slot-container">
                                 @if (day.TimeSlots != null && day.TimeSlots.Any())
                                 {
+                                    bool hasSlotsToDisplay = false;
                                     foreach (var slot in day.TimeSlots)
                                     {
-                                        <button type="button" class="time-slot" data-day="@day.Day" data-date="@dayDate.ToString("yyyy-MM-dd")" data-start-time="@slot.StartTime" data-end-time="@slot.EndTime">
-                                            @slot.StartTime - @slot.EndTime
-                                        </button>
+                                        DateTime slotStartDateTime;
+                                        DateTime slotEndDateTime;
+
+                                        // Parse StartTime
+                                        bool startParsed = DateTime.TryParseExact(
+                                        dayDate.ToString("yyyy-MM-dd") + " " + slot.StartTime,
+                                        "yyyy-MM-dd HH:mm",
+                                        null,
+                                        System.Globalization.DateTimeStyles.None,
+                                        out slotStartDateTime);
+
+                                        // Parse EndTime
+                                        bool endParsed = DateTime.TryParseExact(
+                                        dayDate.ToString("yyyy-MM-dd") + " " + slot.EndTime,
+                                        "yyyy-MM-dd HH:mm",
+                                        null,
+                                        System.Globalization.DateTimeStyles.None,
+                                        out slotEndDateTime);
+
+                                        if (startParsed && endParsed)
+                                        {
+                                            // If EndTime is less than or equal to StartTime, add one day
+                                            if (slotEndDateTime <= slotStartDateTime)
+                                            {
+                                                slotEndDateTime = slotEndDateTime.AddDays(1);
+                                            }
+
+                                            if (isToday)
+                                            {
+                                                // Check if slot ends after now
+                                                if (slotEndDateTime > DateTime.Now)
+                                                {
+                                                    hasSlotsToDisplay = true;
+                                                    <button type="button" class="time-slot" data-day="@day.Day" data-date="@dayDate.ToString("yyyy-MM-dd")" data-start-time="@slot.StartTime" data-end-time="@slot.EndTime">
+                                                        @slot.StartTime - @slot.EndTime
+                                                    </button>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                // For future days, display all slots
+                                                hasSlotsToDisplay = true;
+                                                <button type="button" class="time-slot" data-day="@day.Day" data-date="@dayDate.ToString("yyyy-MM-dd")" data-start-time="@slot.StartTime" data-end-time="@slot.EndTime">
+                                                    @slot.StartTime - @slot.EndTime
+                                                </button>
+                                            }
+                                        }
+                                    }
+                                    if (!hasSlotsToDisplay)
+                                    {
+                                        <p>No available slots for @day.Day</p>
                                     }
                                 }
                                 else
