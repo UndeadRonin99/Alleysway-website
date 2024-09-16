@@ -28,6 +28,38 @@ namespace XBCAD.Controllers
             googleCalendarService = calendarService;
         }
 
+        public async Task<IActionResult> Chat()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var name = User.FindFirstValue(ClaimTypes.Name);
+            ViewBag.UserId = userId;
+            ViewBag.Name = name;
+
+            // Generate a custom Firebase Auth token
+            var firebaseToken = await GenerateFirebaseTokenAsync(userId);
+            ViewBag.FirebaseToken = firebaseToken;
+
+            return View();
+        }
+
+        private async Task<string> GenerateFirebaseTokenAsync(string userId)
+        {
+            // Initialize Firebase Admin SDK if not already done
+            if (FirebaseApp.DefaultInstance == null)
+            {
+                FirebaseApp.Create(new AppOptions
+                {
+                    Credential = GoogleCredential.GetApplicationDefault(),
+                });
+            }
+
+            // Generate a custom token for the user
+            string customToken = await FirebaseAuth.DefaultInstance.CreateCustomTokenAsync(userId);
+            return customToken;
+        }
+
+
+
         public async Task<IActionResult> Calendar()
         {
             var accessToken = await HttpContext.GetTokenAsync("access_token");

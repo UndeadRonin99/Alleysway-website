@@ -1,0 +1,172 @@
+﻿@{
+    ViewData["Title"] = "Chat";
+    Layout = "~/Views/Shared/_ClientLayout.cshtml";
+}
+
+<div id="user-list" style="float: left; width: 20%;">
+    <h3>Users</h3>
+    <ul id="users"></ul>
+</div>
+
+<div id="chat-container" style="float: right; width: 75%;">
+    <h2>Chat with <span id="chatWith">Select a user</span></h2>
+    <div id="messages" style="border: 1px solid #ccc; height: 300px; overflow-y: scroll; padding: 10px;"></div>
+    <input type="text" id="messageInput" placeholder="Type your message here..." style="width: 80%;" />
+    <button id="sendButton" style="width: 18%;">Send</button>
+</div>
+
+<div style="clear: both;"></div>
+
+<!-- Include Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+
+<script>
+    // Firebase configuration
+    var firebaseConfig = {
+        apiKey: "AIzaSyDX4j_urjkjhoxeN5AHFxcOW1viBqsicWA",
+        authDomain: "alleysway-310a8.firebaseapp.com",
+        databaseURL: "https://alleysway-310a8-default-rtdb.firebaseio.com",
+        projectId: "alleysway-310a8",
+        storageBucket: "alleysway-310a8.appspot.com",
+        messagingSenderId: "890106355046",
+        appId: "1:890106355046:web:8101b0ff960c28943efca7",
+        measurementId: "G-DFMZCZGFT0"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    var firebaseToken = '@Html.Raw(ViewBag.FirebaseToken)';
+
+    firebase.auth().signInWithCustomToken(firebaseToken).catch(function (error) {
+        console.error('Firebase sign-in error:', error);
+    });
+
+    firebase.auth().onAuthStateChanged(function (user) {
+        if (user) {
+            console.log('User is authenticated');
+            loadUsers();
+        } else {
+            console.log('User is not authenticated');
+        }
+    });
+
+    var selectedUserId = null;
+    var selectedUserName = null;
+    var conversationRef = null;
+
+    function loadUsers() {
+        var usersRef = firebase.database().ref('users');
+        usersRef.once('value').then(function (snapshot) {
+            var usersList = document.getElementById('users');
+            usersList.innerHTML = '';
+            snapshot.forEach(function (childSnapshot) {
+                var userId = childSnapshot.key;
+                var userData = childSnapshot.val();
+                if (userId !== firebase.auth().currentUser.uid) {
+                    var li = document.createElement('li');
+                    li.textContent = userData.firstName + ' ' + userData.lastName;
+                    li.setAttribute('data-user-id', userId);
+                    li.style.cursor = 'pointer';
+                    li.addEventListener('click', function () {
+                        selectUser(userId, userData.firstName + ' ' + userData.lastName);
+                    });
+                    usersList.appendChild(li);
+                }
+            });
+        });
+    }
+
+    function selectUser(userId, userName) {
+        selectedUserId = userId;
+        selectedUserName = userName;
+        document.getElementById('chatWith').textContent = userName;
+
+        // Clear previous messages
+        document.getElementById('messages').innerHTML = '';
+
+        // Re-initialize the chat with the selected user
+        initializeChat();
+    }
+
+    function initializeChat() {
+        console.log('initializeChat called');
+
+        if (!selectedUserId) {
+            console.log('No user selected for chat.');
+            return;
+        }
+
+        var database = firebase.database();
+        var userId = firebase.auth().currentUser.uid;
+
+        // Detach previous listener if any
+        if (conversationRef) {
+            conversationRef.off();
+        }
+
+        conversationRef = database.ref('user_messages/' + userId + '/' + selectedUserId + '/messages');
+
+        conversationRef.on('child_added', function (data) {
+            var message = data.val();
+            displayMessage(message.senderName, message.text, message.timestamp);
+        });
+
+        document.getElementById('sendButton').addEventListener('click', sendMessage);
+        document.getElementById('messageInput').addEventListener('keyup', function (event) {
+            if (event.keyCode === 13) {
+                sendMessage();
+            }
+        });
+    }
+
+    function sendMessage() {
+        console.log('sendMessage called');
+
+        if (!selectedUserId) {
+            alert('Please select a user to chat with.');
+            return;
+        }
+
+        var messageText = document.getElementById('messageInput').value.trim();
+        if (messageText !== '') {
+            var senderId = firebase.auth().currentUser.uid;
+            var senderName = '@ViewBag.Name';
+            var receiverId = selectedUserId;
+
+            var message = {
+                senderId: senderId,
+                senderName: senderName,
+                receiverId: receiverId,
+                text: messageText,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            };
+
+            // Store the message under both users
+            var updates = {};
+            var newMessageKey = firebase.database().ref().child('user_messages').push().key;
+
+            updates['/user_messages/' + senderId + '/' + receiverId + '/messages/' + newMessageKey] = message;
+            updates['/user_messages/' + receiverId + '/' + senderId + '/messages/' + newMessageKey] = message;
+
+            firebase.database().ref().update(updates).then(function () {
+                console.log('Message sent');
+            }).catch(function (error) {
+                console.error('Error sending message:', error);
+            });
+
+            document.getElementById('messageInput').value = '';
+        } else {
+            console.log('Message text is empty');
+        }
+    }
+
+    function displayMessage(userName, text, timestamp) {
+        var messagesDiv = document.getElementById('messages');
+        var messageElement = document.createElement('div');
+        var time = new Date(timestamp).toLocaleTimeString();
+        messageElement.innerHTML = '<strong>' + userName + ':</strong> ' + text + ' <span style="float:right;">' + time + '</span>';
+        messagesDiv.appendChild(messageElement);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+</script>
