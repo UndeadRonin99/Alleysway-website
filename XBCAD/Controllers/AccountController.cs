@@ -160,67 +160,6 @@ namespace XBCAD.Controllers
         }
 
 
-
-
-        [HttpGet("Register")]
-        public IActionResult Register()
-        {
-            return View();
-        }
-        //test1
-
-        //FOR THE LOVE OF ALL THINGS HOLY PLEASE DO NOT FUCKING TOUCH THIS REGISTER METHOD EVER
-        //IT WORKS NOW AND I REALLY DON'T WANT TO HAVE TO TOUCH IT AGAIN
-        [HttpPost("Register")]
-        public async Task<IActionResult> Register(RegisterViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    var userRecord = await this.auth.CreateUserAsync(new UserRecordArgs
-                    {
-                        Email = model.Username,
-                        Password = model.Password,
-                        DisplayName = $"{model.FirstName} {model.LastName}",
-                        Disabled = false,
-                    });
-
-                    // Prepare data to be saved in RTDB
-                    var data = new
-                    {
-                        firstName = model.FirstName,
-                        lastName = model.LastName,
-                        role = "admin"
-                    };
-                    var json = JsonSerializer.Serialize(data);
-                    var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                    // Construct the URL to Firebase RTDB
-                    var url = $"https://alleysway-310a8-default-rtdb.firebaseio.com/users/{userRecord.Uid}.json";
-
-                    // Send data to Firebase RTDB
-                    var response = await httpClient.PutAsync(url, content);
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        return RedirectToAction("Login");
-                    }
-                    else
-                    {
-                        throw new Exception("Failed to save user data to database.");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError("", $"Registration failed: {ex.Message}");
-                    return View(model);
-                }
-            }
-            return View(model);
-        }
-
-
         public IActionResult Login()
         {
             return View(new LoginViewModel());  // Ensure a model instance is passed, even if empty

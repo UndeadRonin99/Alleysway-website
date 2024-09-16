@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
@@ -18,7 +20,6 @@ namespace XBCAD.Controllers
     public class ClientController : Controller
     {
         private readonly GoogleCalendarService googleCalendarService;
-
         private readonly FirebaseService _firebaseService;
 
         public ClientController(FirebaseService firebaseService, GoogleCalendarService calendarService)
@@ -54,11 +55,97 @@ namespace XBCAD.Controllers
             return View();
         }
 
-        // Client Profile
-        public IActionResult Profile()
+        [HttpPost]
+        public async Task<IActionResult> DeleteProfile()
         {
-            ViewData["Title"] = "Profile";
-            return View();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            try
+            {
+                // Delete the user from Firebase Authentication
+                await FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance.DeleteUserAsync(userId);
+
+                // Optionally, you could also remove user data from the Realtime Database
+                await _firebaseService.DeleteUserDataAsync(userId);
+
+                // Sign out the user after deletion
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+                TempData["SuccessMessage"] = "Your profile has been deleted successfully.";
+                return RedirectToAction("Login", "Account");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Profile deletion failed: {ex.Message}");
+                return RedirectToAction("Settings");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveProfile(IFormFile photo, string rate)
+        {
+            TempData["ActiveTab"] = "editProfile"; // Set the active tab to "addPT"
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            try
+            {
+                string imageUrl = null;
+
+
+                // If a photo was uploaded, upload it to Firebase Storage
+                if (photo != null && photo.Length > 0)
+                {
+                    imageUrl = await _firebaseService.UploadProfileImageAsync(userId, photo);
+
+
+                    // Save the image URL to Firebase Realtime Database
+                    await _firebaseService.SaveProfileImageUrlAsync(userId, imageUrl);
+                }
+
+                // Save the rate to Firebase Realtime Database
+                await _firebaseService.SaveRateAsync(userId, rate);
+
+
+                TempData["SuccessMessage"] = "Profile updated successfully.";
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Profile update failed: {ex.Message}");
+            }
+
+            return RedirectToAction("Settings");
+        }
+
+        public async Task<IActionResult> Settings()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var email = User.FindFirstValue(ClaimTypes.Email);
+            var Name = User.FindFirstValue(ClaimTypes.Name); //Retrieve Name
+            ViewBag.Name = Name;
+            ViewBag.Email = email;
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return RedirectToAction("Login", "Account"); // Redirect to login if the user ID is not found
+            }
+
+            // Get the profile image URL from Firebase Realtime Database
+            var profileImageUrl = await _firebaseService.GetProfileImageUrlAsync(userId);
+            ViewBag.ProfileImageUrl = profileImageUrl;
+
+            // Get the rate from Firebase Realtime Database
+            var rate = await _firebaseService.GetRateAsync(userId);
+            ViewBag.Rate = rate;
+
+            var model = await _firebaseService.GetAvailabilityAsync(userId);
+            model.UserId = userId;
+            return View(model); // Pass the availability data to the view
         }
 
         public async Task<IActionResult> BookTrainer()
@@ -211,7 +298,5 @@ namespace XBCAD.Controllers
 
             return View(viewModel);
         }
-
     }
-
 }

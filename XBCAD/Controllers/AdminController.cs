@@ -22,6 +22,25 @@ namespace XBCAD.Controllers
         private readonly FirebaseAdmin.Auth.FirebaseAuth auth;
         private readonly HttpClient httpClient;
         public string uid;
+        private readonly FirebaseService firebaseService;
+        private readonly GoogleCalendarService googleCalendarService;
+
+        public AdminController(IHttpClientFactory httpClientFactory, GoogleCalendarService calendarService)
+        {
+            firebaseService = new FirebaseService();
+            googleCalendarService = calendarService;
+            this.httpClient = httpClientFactory.CreateClient();
+
+            if (FirebaseApp.DefaultInstance == null)
+            {
+                FirebaseApp.Create(new AppOptions
+                {
+                    Credential = GoogleCredential.GetApplicationDefault(),
+                });
+            }
+
+            this.auth = FirebaseAuth.DefaultInstance;
+        }
 
         public async Task<IActionResult> Calendar()
         {
@@ -42,7 +61,6 @@ namespace XBCAD.Controllers
 
             return View();
         }
-
 
         public async Task<IActionResult> Dashboard()
         {
@@ -139,34 +157,10 @@ namespace XBCAD.Controllers
             return View();
         }
 
-
-
-
-        //testing to see if i have to revert
         public IActionResult Users()
         {
             ViewData["Title"] = "Manage Users";
             return View();
-        }
-
-        private readonly FirebaseService firebaseService;
-        private readonly GoogleCalendarService googleCalendarService;
-
-        public AdminController(IHttpClientFactory httpClientFactory, GoogleCalendarService calendarService)
-        {
-            firebaseService = new FirebaseService();
-            googleCalendarService = calendarService;
-            this.httpClient = httpClientFactory.CreateClient();
-
-            if (FirebaseApp.DefaultInstance == null)
-            {
-                FirebaseApp.Create(new AppOptions
-                {
-                    Credential = GoogleCredential.GetApplicationDefault(),
-                });
-            }
-
-            this.auth = FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance;
         }
 
         [HttpPost]
@@ -199,6 +193,7 @@ namespace XBCAD.Controllers
                 return RedirectToAction("Settings");
             }
         }
+
         public string EncodeEmail(string email)
         {
             return email.Replace('.', ',');
@@ -254,10 +249,6 @@ namespace XBCAD.Controllers
             return RedirectToAction("Settings");
         }
 
-
-
-
-
         [HttpPost]
         public async Task<IActionResult> SaveProfile(IFormFile photo, string rate)
         {
@@ -293,9 +284,6 @@ namespace XBCAD.Controllers
 
             return RedirectToAction("Settings");
         }
-
-
-
 
         public async Task<IActionResult> Settings()
         {
@@ -340,7 +328,6 @@ namespace XBCAD.Controllers
             return View(model); // Pass the availability data to the view
         }
 
-
         // Method to return updated availability as partial view
         public async Task<IActionResult> GetAvailabilityPartial()
         {
@@ -374,7 +361,6 @@ namespace XBCAD.Controllers
             await firebaseService.SaveTimeSlotAsync(day, startTime, endTime, userId);
             return Json(new { success = true });
         }
-
 
         [HttpPost]
         public async Task<IActionResult> RemoveTimeSlot(string day, string startTime, string endTime)
