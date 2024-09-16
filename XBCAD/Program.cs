@@ -61,6 +61,8 @@ namespace XBCAD
 
                 // Add Google Calendar OAuth scope
                 googleOptions.Scope.Add("https://www.googleapis.com/auth/calendar.readonly");
+                googleOptions.Scope.Add("https://www.googleapis.com/auth/calendar");
+
             });
 
             var app = builder.Build();

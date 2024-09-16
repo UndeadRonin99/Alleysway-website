@@ -1,87 +1,88 @@
 ﻿@model XBCAD.ViewModels.TrainerAvailabilityViewModel
+@using XBCAD.ViewModels
 @{
     ViewData["Title"] = $"Book Session with {Model.Trainer.Name}";
     Layout = "~/Views/Shared/_ClientLayout.cshtml";
 
-    // Current date (today)
-    DateTime today = DateTime.Now.Date;  // Ensuring we're only comparing the date part
-
-    // Days of the week in order
+    DateTime today = DateTime.Now.Date;
     var daysOfWeek = new List<string> { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
 
-    // Adjust to make Monday the first day of the week
-    int currentDayIndex = (int)today.DayOfWeek;
-    currentDayIndex = currentDayIndex == 0 ? 7 : currentDayIndex; // Adjust for Sunday being 0 in .NET, make it 7 for easier calculation
-}
+    // Helper function to get the next date for a given day of the week
+    DateTime GetNextDateForDayOfWeek(string dayOfWeek)
+    {
+        if (!Enum.TryParse(dayOfWeek, true, out DayOfWeek targetDay))
+        {
+            throw new ArgumentException("Invalid day of week");
+        }
 
+        DateTime today = DateTime.Now.Date;
+        int daysUntilTarget = ((int)targetDay - (int)today.DayOfWeek + 7) % 7;
+        DateTime targetDate = today.AddDays(daysUntilTarget);
+        return targetDate;
+    }
+}
 <h2 class="page-title">Book session with @Model.Trainer.Name</h2>
 
-<div class="availability-page">
-    <div class="trainer-details">
-        <div class="rate-info">
-            <div class="rate-card">
-                <span>Hourly Rate: @Model.Trainer.HourlyRate</span>
-            </div>
+<form method="post" action="@Url.Action("BookSession", "Client")">
+    <!-- Hidden input for the trainer's ID -->
+    <input type="hidden" name="Trainer.Id" value="@Model.Trainer.Id" />
+
+    <!-- Hidden inputs for selected time slots -->
+    <div id="selected-slots"></div>
+
+    <div class="availability-page">
+        <!-- Existing content -->
+        <div class="trainer-details">
+            <!-- ... -->
         </div>
-    </div>
 
-    <div class="availability-container">
-        <h3>Choose Date and Time to work with @Model.Trainer.Name</h3>
-        @if (Model.Availability != null && Model.Availability.Days != null)
-        {
-            for (int i = 0; i < Model.Availability.Days.Count; i++)
+        <div class="availability-container">
+            <h3>Choose Date and Time to work with @Model.Trainer.Name</h3>
+            @if (Model.Availability != null && Model.Availability.Days != null)
             {
-                var day = Model.Availability.Days[i];
+                foreach (var day in Model.Availability.Days)
+                {
+                    var dayDate = GetNextDateForDayOfWeek(day.Day);
 
-                // Calculate the correct date for each day, considering the current day
-                DateTime dayDate;
-                if (daysOfWeek[i] == day.Day)
-                {
-                    dayDate = today.AddDays(i - (currentDayIndex - 1)); // Adjust based on the current day of the week
-                }
-                else
-                {
-                    dayDate = today.AddDays(i);
-                }
-
-                // Check if the calculated dayDate is in the future or today
-                if (dayDate >= today)
-                {
-                    <div class="day">
-                        <h4>@day.Day (@dayDate.ToString("dd MMMM yyyy"))</h4>
-                        <div class="time-slot-container">
-                            @if (day.TimeSlots != null && day.TimeSlots.Any())
-                            {
-                                @foreach (var slot in day.TimeSlots)
+                    if (dayDate >= today)
+                    {
+                        <div class="day">
+                            <h4>@day.Day (@dayDate.ToString("dd MMMM yyyy"))</h4>
+                            <div class="time-slot-container">
+                                @if (day.TimeSlots != null && day.TimeSlots.Any())
                                 {
-                                    <button class="time-slot">@slot.StartTime - @slot.EndTime</button>
+                                    foreach (var slot in day.TimeSlots)
+                                    {
+                                        <button type="button" class="time-slot" data-day="@day.Day" data-date="@dayDate.ToString("yyyy-MM-dd")" data-start-time="@slot.StartTime" data-end-time="@slot.EndTime">
+                                            @slot.StartTime - @slot.EndTime
+                                        </button>
+                                    }
                                 }
-                            }
-                            else
-                            {
-                                <p>No available slots for @day.Day</p>
-                            }
+                                else
+                                {
+                                    <p>No available slots for @day.Day</p>
+                                }
+                            </div>
                         </div>
-                    </div>
+                    }
                 }
             }
-        }
-        else
-        {
-            <p>No availability data found</p>
-        }
-    </div>
-
-    <div class="booking-summary">
-        <div class="price-summary">
+            else
+            {
+                <p>No availability data found</p>
+            }
         </div>
-        <button class="btn-book">Book now</button>
+
+        <div class="booking-summary">
+            <div class="price-summary">
+                <!-- Optional: Display total price -->
+            </div>
+            <button type="submit" class="btn-book">Book now</button>
+        </div>
     </div>
-</div>
+</form>
 
-</div>
-
-
+<!-- Existing styles -->
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -215,21 +216,42 @@
             background-color: #333;
         }
 </style>
+
 <script>
     document.querySelectorAll('.time-slot').forEach(button => {
         button.addEventListener('click', function () {
             this.classList.toggle('selected');
-            updateSelectedSlots(); // Update the list of selected slots
+
+            const date = this.getAttribute('data-date');
+            const startTime = this.getAttribute('data-start-time');
+            const endTime = this.getAttribute('data-end-time');
+
+            if (this.classList.contains('selected')) {
+                // Add hidden inputs for the selected slot
+                const index = document.querySelectorAll('#selected-slots input[name^="SelectedTimeSlots"]').length / 3; // Each slot has 3 inputs
+                const dateInput = document.createElement('input');
+                dateInput.type = 'hidden';
+                dateInput.name = `SelectedTimeSlots[${index}].Date`;
+                dateInput.value = date;
+
+                const startTimeInput = document.createElement('input');
+                startTimeInput.type = 'hidden';
+                startTimeInput.name = `SelectedTimeSlots[${index}].StartTime`;
+                startTimeInput.value = startTime;
+
+                const endTimeInput = document.createElement('input');
+                endTimeInput.type = 'hidden';
+                endTimeInput.name = `SelectedTimeSlots[${index}].EndTime`;
+                endTimeInput.value = endTime;
+
+                document.getElementById('selected-slots').appendChild(dateInput);
+                document.getElementById('selected-slots').appendChild(startTimeInput);
+                document.getElementById('selected-slots').appendChild(endTimeInput);
+            } else {
+                // Remove hidden inputs for the deselected slot
+                const inputs = document.querySelectorAll(`#selected-slots input[value='${date}'],#selected-slots input[value='${startTime}'],#selected-slots input[value='${endTime}']`);
+                inputs.forEach(input => input.remove());
+            }
         });
     });
-
-    function updateSelectedSlots() {
-        const selectedSlotsList = document.getElementById('selected-slots-list');
-        selectedSlotsList.innerHTML = ''; // Clear previous entries
-        document.querySelectorAll('.time-slot.selected').forEach(slot => {
-            const li = document.createElement('li');
-            li.textContent = slot.innerText;
-            selectedSlotsList.appendChild(li);
-        });
-    }
 </script>

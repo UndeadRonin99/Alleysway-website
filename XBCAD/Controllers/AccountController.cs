@@ -70,7 +70,7 @@ namespace XBCAD.Controllers
                         try
                         {
                             // Process pending user
-                            var finalData = new { firstName, lastName, role, rate};
+                            var finalData = new { firstName, lastName, role, rate, email };
                             var finalJson = JsonSerializer.Serialize(finalData);
                             var finalContent = new StringContent(finalJson, Encoding.UTF8, "application/json");
                             var finalUrl = $"https://alleysway-310a8-default-rtdb.firebaseio.com/users/{googleUid}.json";
@@ -108,7 +108,7 @@ namespace XBCAD.Controllers
 
                         // Update name and other details if needed
                         var updateUrl = $"https://alleysway-310a8-default-rtdb.firebaseio.com/users/{googleUid}.json";
-                        var updateData = new { firstName, lastName };
+                        var updateData = new { firstName, lastName, email };
                         var updateJson = JsonSerializer.Serialize(updateData);
                         var updateContent = new StringContent(updateJson, Encoding.UTF8, "application/json");
                         await httpClient.PatchAsync(updateUrl, updateContent);
@@ -127,7 +127,7 @@ namespace XBCAD.Controllers
                             });
 
                             // Initialize default data in Firebase
-                            var data = new { role = role, firstName, lastName };
+                            var data = new { role = role, firstName, lastName, email };
                             var jsonData = JsonSerializer.Serialize(data);
                             var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
                             var initUrl = $"https://alleysway-310a8-default-rtdb.firebaseio.com/users/{googleUid}.json";
@@ -302,9 +302,20 @@ namespace XBCAD.Controllers
         [HttpGet]
         public IActionResult GoogleLogin(string returnUrl = "/Intermediate")
         {
-            var properties = new AuthenticationProperties { RedirectUri = returnUrl };
+            var properties = new AuthenticationProperties
+            {
+                RedirectUri = returnUrl,
+                Items =
+        {
+            { "LoginProvider", GoogleDefaults.AuthenticationScheme }
+        }
+            };
+
+            properties.Parameters["scope"] = "openid profile email https://www.googleapis.com/auth/calendar";
+
             return Challenge(properties, GoogleDefaults.AuthenticationScheme);
         }
+
 
         [HttpGet("signin-google-admin")]
         public async Task<IActionResult> GoogleResponse(string returnUrl = "/Intermediate")

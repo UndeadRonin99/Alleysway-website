@@ -147,9 +147,11 @@ public class FirebaseService
             Id = userId,
             Name = $"{user.firstName} {user.lastName}",
             ProfilePictureUrl = user.profileImageUrl,
-            HourlyRate = user.rate
+            HourlyRate = user.rate,
+            Email = user.email // Ensure this field is available in Firebase
         };
     }
+
 
     public async Task<List<Trainer>> GetAllTrainersAsync()
     {

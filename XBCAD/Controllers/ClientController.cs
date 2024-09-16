@@ -2,6 +2,8 @@
 using FirebaseAdmin.Auth;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Calendar.v3;
+using Google.Apis.Calendar.v3.Data;
+using Google.Apis.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
@@ -68,7 +70,98 @@ namespace XBCAD.Controllers
             return View(trainers); // Pass the trainer data to the view
         }
 
+     
+        [HttpPost]
+        public async Task<IActionResult> BookSession(TrainerAvailabilityViewModel model)
+        {
+            // Get the client's access token
+            var accessToken = await HttpContext.GetTokenAsync("access_token");
 
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                // Redirect to Google Login if not authenticated
+                return RedirectToAction("GoogleLogin", "Account", new { returnUrl = Url.Action("Calendar", "Client") });
+            }
+
+            // Get the client's email
+            var clientEmail = User.FindFirstValue(ClaimTypes.Email);
+
+            // Get the trainer's details, including email
+            var trainer = await _firebaseService.GetTrainerByIdAsync(model.Trainer.Id);
+            if (trainer == null)
+            {
+                return NotFound("Trainer not found.");
+            }
+
+            var trainerEmail = trainer.Email;
+            if (string.IsNullOrEmpty(trainerEmail))
+            {
+                return BadRequest("Trainer's email is not available.");
+            }
+
+            // Iterate over selected time slots and create calendar events
+            foreach (var slot in model.SelectedTimeSlots)
+            {
+                // Parse date and times
+                if (!DateTime.TryParseExact(slot.Date + " " + slot.StartTime, "yyyy-MM-dd HH:mm", null, System.Globalization.DateTimeStyles.None, out DateTime startDateTime))
+                {
+                    continue; // Invalid date/time format
+                }
+
+                if (!DateTime.TryParseExact(slot.Date + " " + slot.EndTime, "yyyy-MM-dd HH:mm", null, System.Globalization.DateTimeStyles.None, out DateTime endDateTime))
+                {
+                    continue; // Invalid date/time format
+                }
+
+                // Create calendar event
+                await CreateCalendarEvent(accessToken, clientEmail, trainerEmail, startDateTime, endDateTime, trainer.Name);
+            }
+
+            // Optional: Save booking details to Firebase or database
+
+            // Redirect to the calendar page or a confirmation page
+            return RedirectToAction("Calendar");
+        }
+
+        // Helper method to create a calendar event
+        private async Task CreateCalendarEvent(string accessToken, string clientEmail, string trainerEmail, DateTime startDateTime, DateTime endDateTime, string trainerName)
+        {
+            var credential = GoogleCredential.FromAccessToken(accessToken);
+
+            var calendarService = new CalendarService(new BaseClientService.Initializer()
+            {
+                HttpClientInitializer = credential,
+                ApplicationName = "Alleysway Gym",
+            });
+
+            var newEvent = new Event()
+            {
+                Summary = $"Training session with {trainerName}",
+                Start = new EventDateTime()
+                {
+                    DateTime = startDateTime,
+                    TimeZone = "Africa/Johannesburg",
+                },
+                End = new EventDateTime()
+                {
+                    DateTime = endDateTime,
+                    TimeZone = "Africa/Johannesburg",
+                },
+                Attendees = new List<EventAttendee>()
+            {
+                new EventAttendee() { Email = trainerEmail }
+            },
+                Reminders = new Event.RemindersData()
+                {
+                    UseDefault = true
+                }
+            };
+
+            var request = calendarService.Events.Insert(newEvent, "primary");
+            request.SendUpdates = EventsResource.InsertRequest.SendUpdatesEnum.All;
+
+            await request.ExecuteAsync();
+        }
 
         [HttpGet]
         public IActionResult GoogleLogin(string returnUrl = "/Client/Calendar")

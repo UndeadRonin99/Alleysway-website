@@ -7,11 +7,23 @@
         public string ProfilePictureUrl { get; set; }
         public string HourlyRate { get; set; }
         public string Role { get; set; }
+        public string Email { get; set; } // Ensure Email property exists
     }
+
     public class TrainerAvailabilityViewModel
     {
         public Trainer Trainer { get; set; } = default!;  // The selected trainer
         public AvailabilityViewModel Availability { get; set; } = default!;  // Their availability
+
+        // Add this property to capture selected time slots
+        public List<SelectedTimeSlot> SelectedTimeSlots { get; set; } = new List<SelectedTimeSlot>();
     }
 
+    // Define SelectedTimeSlot class
+    public class SelectedTimeSlot
+    {
+        public string Date { get; set; } = default!;  // Date in yyyy-MM-dd format
+        public string StartTime { get; set; } = default!;
+        public string EndTime { get; set; } = default!;
+    }
 }
