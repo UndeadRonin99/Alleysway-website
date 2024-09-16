@@ -1,4 +1,5 @@
-﻿using Firebase.Database;
+﻿using Firebase.Auth;
+using Firebase.Database;
 using Firebase.Database.Query;
 using Firebase.Storage;
 using FirebaseAdmin;
@@ -22,9 +23,25 @@ public class FirebaseService
 
         // Initialize Firebase Storage 
         storage = new FirebaseStorage("alleysway-310a8.appspot.com");
-
-
     }
+
+    public async Task putBookedSession(BookedSession session, string trainerID, string userID)
+    {
+        await firebase
+            .Child("users")
+            .Child(trainerID)
+            .Child("sessions")
+            .Child("SessionID")
+            .PostAsync(session);
+
+        await firebase
+            .Child("users")
+            .Child(userID)
+            .Child("sessions")
+            .Child("SessionID")
+            .PostAsync(session);
+    }
+
     public async Task<AvailabilityViewModel> GetRawAvailabilityAsync(string userId)
     {
         var model = new AvailabilityViewModel
@@ -141,7 +158,6 @@ public class FirebaseService
         {
             return null;
         }
-
         return new Trainer
         {
             Id = userId,

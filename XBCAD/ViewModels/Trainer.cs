@@ -5,7 +5,7 @@
         public string Id { get; set; }  // Ensure this property exists to fetch specific data
         public string Name { get; set; }
         public string ProfilePictureUrl { get; set; }
-        public string HourlyRate { get; set; }
+        public int HourlyRate { get; set; }
         public string Role { get; set; }
         public string Email { get; set; } // Ensure Email property exists
     }
