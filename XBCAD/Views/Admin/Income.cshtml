@@ -7,7 +7,7 @@
 }
 
 <div class="container">
-    <h1>Client Portfolio</h1>
+    <h1 class="page-title">Client Portfolio</h1>
     <div class="search-bar">
         <!-- Search form can be added here -->
     </div>
@@ -15,45 +15,97 @@
         @foreach (var client in Model)
         {
             <div class="client-card">
-                <img src="@client.ProfileImageUrl" alt="Profile image of @client.Name">
-                <h3>@client.Name</h3>
-                <a href="@Url.Action("Income2", "Admin", new { id = client.Id })" class="view-button">View</a>
+                <img src="@client.ProfileImageUrl" alt="Profile image of @client.Name" class="client-image">
+                <div class="client-info">
+                    <h3>@client.Name</h3>
+                    <a href="@Url.Action("Income2", "Admin", new { id = client.Id })" class="btn btn-view">View</a>
+                </div>
             </div>
         }
     </div>
 </div>
 
 <style>
+    /* Container and Page Title */
+    .container {
+        background-color: #f5f5f5;
+        padding: 40px;
+        border-radius: 15px;
+        max-width: 1200px;
+        margin: 40px auto;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .page-title {
+        font-size: 32px;
+        font-weight: bold;
+        color: #333;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    /* Client Grid Styling */
     .client-grid {
         display: flex;
         flex-wrap: wrap;
+        justify-content: space-evenly;
         gap: 20px;
-        justify-content: center;
     }
 
+    /* Client Card Styling */
     .client-card {
-        width: 200px;
-        border: 1px solid #ccc;
-        padding: 10px;
+        background-color: #fff;
+        border-radius: 15px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
         text-align: center;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        width: 220px;
     }
 
-        .client-card img {
-            width: 100%;
-            height: auto;
-            border-radius: 50%;
+        .client-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
         }
 
-    .view-button {
-        display: inline-block;
-        margin-top: 10px;
-        padding: 5px 10px;
-        background-color: orange;
-        color: white;
-        text-decoration: none;
+    /* Client Image Styling */
+    .client-image {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 15px;
+        border: 3px solid #ddd;
     }
 
+    /* Client Information Styling */
+    .client-info h3 {
+        font-size: 18px;
+        color: #333;
+        margin: 10px 0;
+    }
+
+    /* Button Styling */
+    .btn-view {
+        background-color: #FF7900;
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .btn-view:hover {
+            background-color: #FC670B;
+            box-shadow: 0px 0px 15px rgba(255, 121, 0, 0.5);
+        }
+
+    /* Search Bar */
     .search-bar {
         margin-bottom: 20px;
+        text-align: center;
     }
 </style>
