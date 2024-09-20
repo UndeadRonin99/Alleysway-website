@@ -185,7 +185,7 @@ Ensure you have the following installed:
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more information.
+This project is licensed under the MIT License. For more information, contact st10043367@vcconnect.edu.za or any other team member.
 
 ---
 
