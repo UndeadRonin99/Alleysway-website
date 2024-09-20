@@ -137,7 +137,7 @@ Ensure you have the following installed:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/XBCAD.git
+   git clone https://github.com/UndeadRonin99/Alleysway-website.git
    cd XBCAD
    ```
 
