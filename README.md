@@ -36,7 +36,6 @@ The project is structured as follows:
     AccountController.cs
     AdminController.cs
     ClientController.cs
-    HomeController.cs
 /Models
     ErrorViewModel.cs
     FirebaseError.cs
@@ -78,8 +77,7 @@ The project is structured as follows:
 - Integrates Google Calendar to display training sessions.
 - Similar to AdminController but tailored for clients.
 
-### HomeController
-- Basic home and error handling pages.
+
 
 ---
 
@@ -191,4 +189,3 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ---
 
-For the best presentation on GitHub, this Markdown file should automatically render well with proper headers, lists, and code blocks. If you need to add further customization, like images, make sure they are linked properly in the `/wwwroot` folder.
