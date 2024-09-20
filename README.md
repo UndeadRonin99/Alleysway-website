@@ -138,7 +138,7 @@ Ensure you have the following installed:
 1. Clone the repository:
    ```bash
    git clone https://github.com/UndeadRonin99/Alleysway-website.git
-   cd XBCAD
+   cd Alleysway-website
    ```
 
 2. Open the project in Visual Studio.
