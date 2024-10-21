@@ -2,12 +2,13 @@
 using Firebase.Database.Query;
 using Firebase.Storage;
 using Google.Cloud.Firestore;
+using Newtonsoft.Json;
 using XBCAD.ViewModels;
 
 
 public class FirebaseService
 {
-    private readonly FirebaseClient firebase;
+    public readonly FirebaseClient firebase;
     private readonly FirebaseStorage storage;
 
 
@@ -19,6 +20,48 @@ public class FirebaseService
         // Initialize Firebase Storage 
         storage = new FirebaseStorage("alleysway-310a8.appspot.com");
     }
+
+    public async Task<Dictionary<string, object>> CheckUserByEmailAsync(string email)
+    {
+        try
+        {
+            // Query the 'users' node for the given email
+            var snapshot = await firebase
+                .Child("users")
+                .OrderBy("email")
+                .EqualTo(email)
+                .OnceAsync<dynamic>();
+
+            // Check if the snapshot has any results
+            if (snapshot != null && snapshot.Count > 0)
+            {
+                var user = snapshot.FirstOrDefault();
+                if (user != null)
+                {
+                    var userId = user.Key;
+
+                    // Use JsonConvert to deserialize the user data
+                    string jsonData = JsonConvert.SerializeObject(user.Object);
+                    var userData = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonData);
+
+                    if (userData != null)
+                    {
+                        userData.Add("uid", userId); // Include UID in the returned data
+                        return new Dictionary<string, object>(userData);
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error checking user by email: {ex.Message}");
+        }
+
+        // Return null if no user is found or an error occurred
+        return null;
+    }
+
+
 
     public async Task<ClientPaymentSummaryViewModel> GetClientPaymentSummaryAsync(string clientId)
     {

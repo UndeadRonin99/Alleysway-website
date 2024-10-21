@@ -9,13 +9,18 @@ using Newtonsoft.Json.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
+using Firebase.Database;
+using Firebase.Database.Query;
+using Firebase.Storage;
+using Google.Cloud.Firestore;
 using XBCAD.ViewModels;
+using Firebase.Auth;
 
 namespace XBCAD.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly FirebaseAuth auth;
+        private readonly FirebaseAdmin.Auth.FirebaseAuth auth;
         private readonly HttpClient httpClient;
 
         public AccountController(IHttpClientFactory httpClientFactory)
@@ -29,7 +34,7 @@ namespace XBCAD.Controllers
                     Credential = GoogleCredential.GetApplicationDefault(),
                 });
             }
-            this.auth = FirebaseAuth.DefaultInstance;
+            this.auth = FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance;
         }
 
         [HttpGet("Intermediate")]
@@ -56,17 +61,72 @@ namespace XBCAD.Controllers
             string role = "client";
             try
             {
-                try
+                var firebaseService = new FirebaseService();
+                var userDetails = await firebaseService.CheckUserByEmailAsync(email);
+
+                if (userDetails != null)
                 {
-                    // Attempt to find pending user setup
+                    var existingUid = userDetails["uid"].ToString();
+                    if (!string.Equals(existingUid, googleUid, StringComparison.Ordinal))
+                    {
+                        // Update Firebase entry under the new Google UID
+                        var finalData = userDetails;
+                        finalData["firstName"] = firstName;
+                        finalData["lastName"] = lastName;
+                        finalData["email"] = email;
+                        finalData.Remove("uid");
+
+                        await firebaseService.firebase
+                            .Child("users")
+                            .Child(googleUid)
+                            .PutAsync(finalData);
+
+                        // Delete the old entry
+                        await firebaseService.firebase
+                            .Child("users")
+                            .Child(existingUid)
+                            .DeleteAsync();
+
+
+                        // Delete old account that was created on the phone first
+                        await FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance.DeleteUserAsync(existingUid);
+
+                        // Create new account using google UID style
+                        var userRecord = await auth.CreateUserAsync(new UserRecordArgs
+                        {
+                            Uid = googleUid,
+                            Email = email,
+                            Disabled = false
+                        });
+                    }
+                    else
+                    {
+                        // Update user details if needed
+                        var updates = new Dictionary<string, object> { { "firstName", firstName }, { "lastName", lastName }, { "email", email } };
+                        await firebaseService.firebase
+                            .Child("users")
+                            .Child(googleUid)
+                            .PatchAsync(updates);
+                    }
+
+                    // Set the role from the existing user data
+                    if (userDetails.ContainsKey("role"))
+                    {
+                        role = userDetails["role"].ToString();
+                    }
+                }
+                else
+                {
+                    // Check for pending user setup
                     var pendingUrl = $"https://alleysway-310a8-default-rtdb.firebaseio.com/pending_users/{encodedEmail}.json";
                     var pendingResponse = await httpClient.GetStringAsync(pendingUrl);
                     var userData = JsonSerializer.Deserialize<Dictionary<string, string>>(pendingResponse);
-                    role = userData["role"];  // Use the role from pending setup
-                    var rate = userData["ptRate"];
 
                     if (userData != null && userData.ContainsKey("role"))
                     {
+                        role = userData["role"];
+                        var rate = userData["ptRate"];
+
                         try
                         {
                             // Process pending user
@@ -92,53 +152,48 @@ namespace XBCAD.Controllers
                     }
                     else
                     {
-                        return BadRequest("Malformed user");
-                    }
-                }
-                catch
-                {
-                    UserRecord userRecord;
-                    try
-                    {
-                        userRecord = await auth.GetUserAsync(googleUid);
-                        // Fetch role from Firebase RTDB
-                        var url = $"https://alleysway-310a8-default-rtdb.firebaseio.com/users/{googleUid}/role.json";
-                        var roleResponse = await httpClient.GetStringAsync(url);
-                        role = JsonSerializer.Deserialize<string>(roleResponse);
-
-                        // Update name and other details if needed
-                        var updateUrl = $"https://alleysway-310a8-default-rtdb.firebaseio.com/users/{googleUid}.json";
-                        var updateData = new { firstName, lastName, email };
-                        var updateJson = JsonSerializer.Serialize(updateData);
-                        var updateContent = new StringContent(updateJson, Encoding.UTF8, "application/json");
-                        await httpClient.PatchAsync(updateUrl, updateContent);
-                    }
-                    catch (FirebaseAuthException ex)
-                    {
-                        if (ex.AuthErrorCode == AuthErrorCode.UserNotFound)
+                        UserRecord userRecord;
+                        try
                         {
-                            // Default to client if not specified
-                            role = "client";
-                            userRecord = await auth.CreateUserAsync(new UserRecordArgs
+                            userRecord = await auth.GetUserAsync(googleUid);
+                            // Fetch role from Firebase RTDB
+                            var url = $"https://alleysway-310a8-default-rtdb.firebaseio.com/users/{googleUid}/role.json";
+                            var roleResponse = await httpClient.GetStringAsync(url);
+                            role = JsonSerializer.Deserialize<string>(roleResponse);
+
+                            // Update name and other details if needed
+                            var updateUrl = $"https://alleysway-310a8-default-rtdb.firebaseio.com/users/{googleUid}.json";
+                            var updateData = new { firstName, lastName, email };
+                            var updateJson = JsonSerializer.Serialize(updateData);
+                            var updateContent = new StringContent(updateJson, Encoding.UTF8, "application/json");
+                            await httpClient.PatchAsync(updateUrl, updateContent);
+                        }
+                        catch (FirebaseAdmin.Auth.FirebaseAuthException ex)
+                        {
+                            if (ex.AuthErrorCode == AuthErrorCode.UserNotFound)
                             {
-                                Uid = googleUid,
-                                Email = email,
-                                Disabled = false
-                            });
+                                // Default to client if not specified
+                                role = "client";
+                                userRecord = await auth.CreateUserAsync(new UserRecordArgs
+                                {
+                                    Uid = googleUid,
+                                    Email = email,
+                                    Disabled = false
+                                });
 
-                            // Initialize default data in Firebase
-                            var data = new { role = role, firstName, lastName, email };
-                            var jsonData = JsonSerializer.Serialize(data);
-                            var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
-                            var initUrl = $"https://alleysway-310a8-default-rtdb.firebaseio.com/users/{googleUid}.json";
-                            await httpClient.PutAsync(initUrl, content);
-                        }
-                        else
-                        {
-                            throw;
+                                // Initialize default data in Firebase
+                                var data = new { role = role, firstName, lastName, email };
+                                var jsonData = JsonSerializer.Serialize(data);
+                                var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+                                var initUrl = $"https://alleysway-310a8-default-rtdb.firebaseio.com/users/{googleUid}.json";
+                                await httpClient.PutAsync(initUrl, content);
+                            }
+                            else
+                            {
+                                throw;
+                            }
                         }
                     }
-
                 }
             }
             catch (Exception ex)
@@ -158,6 +213,8 @@ namespace XBCAD.Controllers
                     return BadRequest("User role is not defined properly.");
             }
         }
+
+
 
 
         public IActionResult Login()
