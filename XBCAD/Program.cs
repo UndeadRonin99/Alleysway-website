@@ -1,7 +1,6 @@
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Google;
 using XBCAD.ViewModels; // Make sure you're referencing your ViewModels
 
 namespace XBCAD
@@ -86,7 +85,7 @@ namespace XBCAD
             // Configure route mapping
             app.MapControllerRoute(
                name: "default",
-               pattern: "{controller=Account}/{action=Login}/{id?}");
+               pattern: "{controller=Account}/{action=Home}/{id?}");
 
             app.Run(); // Start the app
         }

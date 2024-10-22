@@ -8,11 +8,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
-using System.Net.Http;
 using System.Security.Claims;
-using System.Text;
-using System.Text.Json;
 using XBCAD.ViewModels;
 
 namespace XBCAD.Controllers
@@ -189,7 +185,7 @@ namespace XBCAD.Controllers
             return View(trainers); // Pass the trainer data to the view
         }
 
-     
+
         [HttpPost]
         public async Task<IActionResult> BookSession(TrainerAvailabilityViewModel model)
         {

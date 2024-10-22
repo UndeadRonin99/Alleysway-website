@@ -1,13 +1,10 @@
-﻿using Firebase.Auth;
-using System.Security.Claims;
-
-namespace XBCAD.ViewModels
+﻿namespace XBCAD.ViewModels
 {
     public class AvailabilityViewModel
     {
         public List<DayAvailability> Days { get; set; }
-        public string UserId {  get; set; }
-        
+        public string UserId { get; set; }
+
     }
 
     public class DayAvailability

@@ -1,4 +1,5 @@
-﻿using FirebaseAdmin;
+﻿using Firebase.Database.Query;
+using FirebaseAdmin;
 using FirebaseAdmin.Auth;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication;
@@ -9,12 +10,7 @@ using Newtonsoft.Json.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
-using Firebase.Database;
-using Firebase.Database.Query;
-using Firebase.Storage;
-using Google.Cloud.Firestore;
 using XBCAD.ViewModels;
-using Firebase.Auth;
 
 namespace XBCAD.Controllers
 {
@@ -35,6 +31,11 @@ namespace XBCAD.Controllers
                 });
             }
             this.auth = FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance;
+        }
+
+        public IActionResult Home()
+        {
+            return View();
         }
 
         [HttpGet("Intermediate")]

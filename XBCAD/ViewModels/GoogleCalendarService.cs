@@ -1,7 +1,6 @@
 ﻿using Google.Apis.Auth.OAuth2;
 using Google.Apis.Calendar.v3;
 using Google.Apis.Services;
-using System.Threading.Tasks;
 
 namespace XBCAD.ViewModels
 {

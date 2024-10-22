@@ -7,7 +7,7 @@ public class BookedSession
     public decimal TotalAmount { get; set; }
     public string StartDateTime { get; set; }  // As string in ISO 8601 format
     public string EndDateTime { get; set; }    // As string in ISO 8601 format
-    public string SessionKey { get; set; }  
+    public string SessionKey { get; set; }
 
 }
 

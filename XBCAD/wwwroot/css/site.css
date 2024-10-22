@@ -1,22 +1,43 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
+    width: 100%;
+    position: relative;
+    min-height: 100%;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+    html {
+        font-size: 16px;
+    }
 }
 
 body {
-  margin-bottom: 60px;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto; /* Allow vertical scrolling */
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+.container-fluid,
+.navbar {
+    width: 100%; /* Full viewport width without extra scrollbar */
+    margin: 0 auto; /* Center content */
+    padding: 0; /* Remove any default padding */
+    box-sizing: border-box; /* Include padding and borders in width/height */
+}
+
+.navbar {
+    box-sizing: border-box; /* Consistent sizing including borders and padding */
+    width: 100%; /* Ensures the navbar takes the entire width */
 }

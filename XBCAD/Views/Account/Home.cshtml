@@ -1,0 +1,373 @@
+﻿@{
+    Layout = "~/Views/Shared/_LandingLayout.cshtml";
+}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #121212;
+            color: #f5f5f5;
+            font-family: Arial, sans-serif;
+        }
+
+        .top-section {
+            position: relative;
+            padding: 5rem 2rem;
+            color: #f5f5f5;
+            background-size: cover;
+            background-attachment: fixed;
+            width: 100vw; /* Ensure it spans the entire viewport width */
+            margin: 0; /* Remove any margin that might create gaps */
+            left: 50%;
+            transform: translateX(-50%); /* Center the section */
+        }
+
+            .top-section .content {
+                position: relative;
+                z-index: 2;
+                padding: 3rem 2rem;
+            }
+
+            .top-section h1 {
+                font-size: 3rem;
+                font-weight: bold;
+                text-transform: uppercase;
+            }
+
+            .top-section h3 {
+                font-size: 2rem;
+                font-weight: bold;
+            }
+
+            .top-section h4 {
+                font-size: 1.75rem;
+                font-weight: bold;
+            }
+
+            .top-section p.lead {
+                font-size: 1.2rem;
+                line-height: 1.6;
+            }
+
+        .btn-primary {
+            background-color: #ed8240;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+            .btn-primary:hover {
+                background-color: #c5692e;
+            }
+
+        .programs-section {
+            padding: 4rem 2rem;
+        }
+
+        .program-card {
+            position: relative;
+            height: 400px; /* Set a fixed height for cards */
+            overflow: hidden;
+            border: none;
+            border-radius: 10px;
+            color: #ffffff;
+        }
+
+            .program-card .card-bg {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-size: cover;
+                background-position: center;
+                filter: brightness(0.5); /* Darken the background for better text visibility */
+                z-index: 1;
+            }
+
+            .program-card .card-content {
+                position: relative;
+                z-index: 2;
+                padding: 2rem;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+            }
+
+            .program-card h3 {
+                font-weight: bold;
+                font-size: 1.5rem;
+                margin-bottom: 1rem;
+            }
+
+            .program-card p {
+                font-size: 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .program-card .btn {
+                border: 2px solid #fff;
+                text-transform: uppercase;
+                font-weight: bold;
+                transition: background-color 0.3s, color 0.3s;
+            }
+
+                .program-card .btn:hover {
+                    background-color: #fff;
+                    color: #000;
+                }
+
+        .stat-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            color: #ffffff;
+            text-align: center;
+            transition: transform 0.3s ease;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-card-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 1rem;
+            border-radius: 5px;
+        }
+
+        .stat-card:hover {
+            transform: scale(1.05);
+        }
+
+
+
+        .testimonials-section {
+            padding: 4rem 2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Top Section -->
+    <div class="top-section text-center text-white" style="background-image: url('/images/DSC_0432.png'); width: 100vw">
+        <div class="content">
+            <h1>ALLEYSWAY</h1>
+            <h4>IS THE ONLY WAY</h4>
+            <div class="row align-items-center">
+                <div class="col-md-6 mb-4">
+                    <h3>A health and fitness club designed by the best, for you.</h3>
+                    <p class="lead">
+                        Built by Vic and Irene Alley, South Africa’s infamous bodybuilding power-couple, Alleysway is not just a gym, it's a family.
+                    </p>
+                    <p class="lead">Located in Bedfordview, Johannesburg. It has become a second home to the members and staff who frequent and work there.</p>
+                    <a href="/about" class="btn btn-primary btn-lg mt-4">Read More</a>
+                </div>
+                <div class="col-md-6">
+                    <img src="/images/VIC&IRENE.jpeg" alt="Vic and Irene" class="img-fluid rounded">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Programs Section with Cards -->
+    <div class="container-fluid programs-section">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card program-card text-center">
+                    <div class="card-bg" style="background-image: url('/images/SportSpecificTraining.jpg');"></div>
+                    <div class="card-content">
+                        <h3>SPORT-SPECIFIC TRAINING</h3>
+                        <p>Alleysway Trainers can devise a fitness and performance training program designed specifically for your athletic performance enhancement.</p>
+                        <a href="#" class="btn btn-outline-light">Learn More</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card program-card text-center">
+                    <div class="card-bg" style="background-image: url('/images/PersonalTrainer.jpg');"></div>
+                    <div class="card-content">
+                        <h3>PERSONAL TRAINING</h3>
+                        <p>Alleysway offers one-on-one private workout sessions with a trainer to develop a comprehensive fitness and nutritional program.</p>
+                        <a href="#" class="btn btn-outline-light">Learn More</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card program-card text-center">
+                    <div class="card-bg" style="background-image: url('/images/rehab.jpg');"></div>
+                    <div class="card-content">
+                        <h3>REHABILITATION</h3>
+                        <p>Alleysway Trainers provide multidisciplinary approaches to treat injuries and help restore normal pain-free mobility.</p>
+                        <a href="#" class="btn btn-outline-light">Learn More</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card program-card text-center">
+                    <div class="card-bg" style="background-image: url('/images/bodyBuilding.jpg');"></div>
+                    <div class="card-content">
+                        <h3>BODYBUILDING</h3>
+                        <p>Home of GTS, Alleysway is one of South Africa's largest bodybuilding training centers.</p>
+                        <a href="#" class="btn btn-outline-light">Learn More</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card program-card text-center">
+                    <div class="card-bg" style="background-image: url('/images/nutritionalCounseling.jpg');"></div>
+                    <div class="card-content">
+                        <h3>NUTRITIONAL COUNSELLING</h3>
+                        <p>Alleysway Personal Trainers provide programs to help make healthy eating part of a healthy lifestyle.</p>
+                        <a href="#" class="btn btn-outline-light">Learn More</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card program-card text-center">
+                    <div class="card-bg" style="background-image: url('/images/dumbbellRack.jpg');"></div>
+                    <div class="card-content">
+                        <h3>COACHING</h3>
+                        <p>With experienced coaches Vic and Irene Alley, Alleysway provides unparalleled training expertise.</p>
+                        <a href="#" class="btn btn-outline-light">Learn More</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Statistics Section with Cards -->
+    <div class="container-fluid statistics-section">
+        <div class="row">
+            <!-- Larger Card Spanning 2/3 Width -->
+            <div class="col-md-8 mb-4">
+                <div class="stat-card" style="background-image: url('/images/business.png'); height: 500px;">
+                    <div class="stat-card-content">
+                        <h3>15+</h3>
+                        <p>Years in Business</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Smaller Card Spanning 1/3 Width -->
+            <div class="col-md-4 mb-4">
+                <div class="stat-card" style="background-image: url('/images/championAthletes.png'); height: 500px;">
+                    <div class="stat-card-content">
+                        <h3>500+</h3>
+                        <p>Champion Athletes</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Two Smaller Cards Spanning Half of the Width Each -->
+            <div class="col-md-6 mb-4">
+                <div class="stat-card" style="background-image: url('/images/clients.png'); height: 350px;">
+                    <div class="stat-card-content">
+                        <h3>1,000+</h3>
+                        <p>Happy Clients</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="stat-card" style="background-image: url('/images/champsMade.png'); height: 350px;">
+                    <div class="stat-card-content">
+                        <h3>150+</h3>
+                        <p>Champions Made</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Smaller Card Spanning 1/3 Width -->
+            <div class="col-md-4 mb-4">
+                <div class="stat-card" style="background-image: url('/images/trainers.png'); height: 400px;">
+                    <div class="stat-card-content">
+                        <h3>15+</h3>
+                        <p>Alleysway Trainers</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Larger Card Spanning 2/3 Width -->
+            <div class="col-md-8 mb-4">
+                <div class="stat-card" style="background-image: url('/images/hours.png'); height: 400px;">
+                    <div class="stat-card-content">
+                        <h3>100,000+</h3>
+                        <p>Training Hours</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Testimonials Section -->
+    <div class="container testimonials-section">
+        <h2 class="text-center mb-4">OUR REP</h2>
+        <h4 class="text-center mb-4">What our clients say about us.</h4>
+        <div id="testimonialsCarousel" class="carousel slide" data-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <div class="testimonial text-center">
+                        <p>
+                            "Alleysway staff are always in the best of moods and they always encourage me when I am feeling unmotivated. Alleysway is made of a community of people of different cultures, different sizes and different personalities. But no matter where you’re from, the community is bound by one common factor — a passion for wellness."
+                        </p>
+                        <strong>Alexia Georgiades<br>Member Since 2017</strong>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="testimonial text-center">
+                        <p>
+                            "When I moved to Alleysway, my workout became the highlight of my day. A well-kept gym that is filled with amazing people who have congregated to the home we all call Alleysway. More of a family than a gym, Alleysway has a special place in my heart."
+                        </p>
+                        <strong>George Georgiadese<br>Member Since 2016</strong>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="testimonial text-center">
+                        <p>
+                            "I wish I had the words to say how grateful I am to Alleysway for all they have done for me. My life is forever changed because of them."
+                        </p>
+                        <strong>Arnold Vosloo<br>Member Since 2015</strong>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="testimonial text-center">
+                        <p>
+                            "The welcoming atmosphere as you enter the Alleysway doors is something that I challenge you to try and find elsewhere. Its difficult to explain what Alleysway is to those who frequent it. A wonderful environment that encourages people to reach their best-self."
+                        </p>
+                        <strong>Lawrence Wu<br>Member Since 2014</strong>
+                    </div>
+                </div>
+            </div>
+            <a class="carousel-control-prev" href="#testimonialsCarousel" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#testimonialsCarousel" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
