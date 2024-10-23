@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Views\Home\**" />
+    <Content Remove="Views\Home\**" />
+    <EmbeddedResource Remove="Views\Home\**" />
+    <None Remove="Views\Home\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Firebase.Auth" Version="1.0.0" />
     <PackageReference Include="FirebaseAdmin" Version="3.0.1" />
     <PackageReference Include="FirebaseDatabase.net" Version="4.2.0" />
@@ -16,10 +23,6 @@
     <PackageReference Include="Google.Cloud.Firestore" Version="3.9.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Session" Version="2.2.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Views\Home\" />
   </ItemGroup>
 
 </Project>

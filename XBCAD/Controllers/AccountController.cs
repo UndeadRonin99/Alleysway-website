@@ -33,6 +33,16 @@ namespace XBCAD.Controllers
             this.auth = FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance;
         }
 
+        public IActionResult AboutUs()
+        {
+            return View();
+        }
+
+        public IActionResult Gallery()
+        {
+            return View();
+        }
+
         public IActionResult Home()
         {
             return View();
@@ -214,8 +224,6 @@ namespace XBCAD.Controllers
                     return BadRequest("User role is not defined properly.");
             }
         }
-
-
 
 
         public IActionResult Login()

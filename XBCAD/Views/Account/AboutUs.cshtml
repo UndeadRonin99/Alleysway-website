@@ -1,0 +1,281 @@
+﻿@{
+    Layout = "~/Views/Shared/_LandingLayout.cshtml";
+}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Alleysway</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href='https://fonts.googleapis.com/css?family=Anton' rel='stylesheet'>
+    <link href='https://fonts.googleapis.com/css?family=Antonio' rel='stylesheet'>
+
+
+    <style>
+        body {
+            background-color: #121212;
+            color: #f5f5f5;
+            font-family: Antonio, sans-serif;
+        }
+
+        .top-section {
+            position: relative;
+            padding: 5rem 2rem;
+            color: #f5f5f5;
+            background-size: cover;
+            background-attachment: fixed;
+            width: 100vw; /* Ensure it spans the entire viewport width */
+            margin: 0; /* Remove any margin that might create gaps */
+            left: 50%;
+            transform: translateX(-50%); /* Center the section */
+        }
+
+            .top-section .content {
+                position: relative;
+                z-index: 2;
+                padding: 3rem 2rem;
+            }
+
+            .top-section h1 {
+                font-size: 5rem;
+                font-weight: bold;
+                text-transform: uppercase;
+                font-family: Anton, sans-serif;
+            }
+
+            .top-section h3 {
+                font-size: 2rem;
+                font-weight: bold;
+            }
+
+            .top-section h4 {
+                font-size: 1.75rem;
+                font-weight: bold;
+            }
+
+            .top-section p.lead {
+                font-size: 1.2rem;
+                line-height: 1.6;
+            }
+
+        .btn-primary {
+            background-color: #FF6600;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+            .btn-primary:hover {
+                background-color: #B94A00;
+            }
+
+        .crossBar{
+            position: relative;
+            padding: 3rem 2rem;
+            color: #f5f5f5;
+            width: 100vw; /* Ensure it spans the entire viewport width */
+            margin: 0; /* Remove any margin that might create gaps */
+            left: 50%;
+            transform: translateX(-50%); /* Center the section */
+        }
+
+        .middle-section{
+            position: relative;
+            padding: 1rem 2rem;
+            background-size: cover;
+            background-attachment: fixed;
+            width: 100vw; /* Ensure it spans the entire viewport width */
+            margin: 0; /* Remove any margin that might create gaps */
+            left: 50%;
+            transform: translateX(-50%); /* Center the section */
+        }
+
+            .middle-section .content {
+                position: relative;
+                z-index: 2;
+                padding: 3rem 2rem;
+            }
+
+            .middle-section h1 {
+                font-size: 5rem;
+                font-weight: bold;
+                text-transform: uppercase;
+                font-family: Anton, sans-serif;
+            }
+
+            .middle-section h3 {
+                font-size: 2rem;
+                font-weight: bold;
+            }
+
+            .middle-section h4 {
+                font-size: 1.75rem;
+                font-weight: bold;
+            }
+
+            .middle-section p.lead {
+                font-size: 1.2rem;
+                line-height: 1.6;
+            }
+
+        /* CSS for creating consistent overlap */
+        .middle-section .overlapping-section {
+            position: absolute; /* Changed to absolute positioning for reliable overlap */
+            width: 100%;
+            top: -500px;
+            z-index: 5;
+            padding: 2rem; /* Adjust as needed for consistent spacing */
+            padding-bottom: 0; /* Remove bottom padding */
+            background: transparent;
+            border-radius: 10px; /* Optional for rounded corners */
+        }
+
+        .service-item {
+            text-align: center;
+            padding: 2rem;
+            border-radius: 10px;
+            background: #1d1d1d; /* Darker shade for contrast */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Adding shadow for depth */
+        }
+
+        .service-icon {
+            width: 60px;
+            height: auto;
+        }
+
+        .service-item h4 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #FF6600; /* Updated color for contrast */
+            margin-top: 1rem;
+        }
+
+        .service-item p {
+            font-size: 1rem;
+            color: #d3d3d3;
+        }
+
+        /* Adjusting the relative positioning of the overlapping-section parent */
+        .middle-section-container {
+            position: relative;
+            margin-top: -500px; /* Adjust this value to control initial overlap offset */
+            z-index: 3; /* Ensure it layers behind the overlapping section */
+        }
+
+    </style>
+</head>
+
+<body>
+    <!-- Top Section -->
+    <div class="top-section text-center text-white" style="background-image: url('/images/AboutUs1.png'); width: 100vw">
+        <div class="content">
+            <div style="height:250px"></div>
+            <h1>OUR STORY</h1>
+            <div style="height:300px"></div>
+            <div class="row align-items-center" style="background-color:##171717">
+                <h3>Every client is important to us. We built a gym that’s a home away from home, where everyone can get fit and healthy</h3>
+                <h4 style="color:#FF6600">- Irene Alley</h4>
+                <div class="col-md-6 mb-4">
+                    
+                    <p class="lead">
+                        Vic and Irene Alley both started as personal trainers at a gym located in Bedfordview, Johannesburg. In 2005, the opportunity arose for them to follow their dreams and open their own gym; and thus, Alleysway was born.
+                    </p>
+                    <p class="lead">
+                        Mr Tony and Mrs Nadia Cimato presented the fitness couple with a unique site within the famous Italian Club located in Bedfordview, Gauteng. The name Alleysway was chosen to symbolise the only way the gym would be run – Alley’s Way.
+                    </p>
+                    <p class="lead">
+                        10 years after opening, Alleysway expanded their operation and moved to a larger building on the same premises. This allowed the centre to incorporate new equipment and allowed for the operation to expand into new fitness realms. The new premises also allowed for the inclusion of a supplement store, a sports massage parlour, and a mesotherapy Clinique.
+                    </p>
+                    <p class="lead">
+                        Alleysway is a gym with a difference. Every client is treated like family. Alleysway has seen clients grow up in the gym, influencing their lifestyle choices from a young age.
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <img src="/images/AboutUs4.jpg" alt="Vic and Irene" class="img-fluid rounded">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="crossBar" style="width:100vw; background-color:#ED8240; left: 50%; transform: translateX(-50%);"></div>
+
+    <div class="top-section text-center text-white" style="background-image: url('/images/AboutUs2.png'); width: 100vw; padding: 5rem 2rem;">
+        <div class="content">
+            <div class="row align-items-center" style="background-color:##171717; padding: 10rem">
+                <h3>MIND, BODY, AND SOUL</h3>
+                <h4 style="color:#FF6600">Not just a gym.</h4>
+                <h4 style="color:#FF6600">Take a look at our other on-site amenities below.</h4>
+            </div>
+            <div style="height:10vh"></div>
+        </div>
+    </div>
+
+    <!-- Middle Section with Overlapping -->
+    <div class="middle-section overlapping-section" style="width:100vw; background:transparent; padding:0rem; z-index: 3;">
+        <div class="content" style="padding:0rem 2rem">
+            <div class="row align-items-center" style="padding:0rem 2rem">
+                <div class="col-md-4 mb-4">
+                    <div class="service-item">
+                        <img src="/images/nutrition_icon.png" alt="Smart Choice Nutrition" class="service-icon mb-3">
+                        <h4>Smart Choice Nutrition</h4>
+                        <p>Located within Alleysway is SCN - a supplement store designed to improve your physical and mental well-being.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="service-item">
+                        <img src="/images/clinic_icon.png" alt="Younique Clinique" class="service-icon mb-3">
+                        <h4>Younique Clinique</h4>
+                        <p>Alleysway features a mesotherapy Clinique designed to take you on a skincare journey to paradise.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="service-item">
+                        <img src="/images/massage_icon.png" alt="Sports Massage Therapy" class="service-icon mb-3">
+                        <h4>Sports Massage Therapy</h4>
+                        <p>Training can put significant strain on your body. Michelle Robbins, our in-house sports therapist, will assist with any aches and pains.</p>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <div class="service-item">
+                        <img src="/images/biokinetics_icon.png" alt="Biokineticist" class="service-icon mb-3">
+                        <h4>Biokineticist</h4>
+                        <p>Biokinetics provides rehabilitation through movement to improve your health, wellness, and everyday life with individual scientific assessments and prescribed exercises.</p>
+                        <p>Let Kate-Lyn, our in-house Bio, assist your health and recovery journey.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="top-section text-center text-white" style="background-image: url('/images/AboutUs3.png'); width: 100vw; padding: 0rem 2rem; top:-200px; z-index: 1; position: relative;">
+        <div class="content" style="padding:0rem 2rem">
+            <div style="height:50vh"></div>
+            <div class="row align-items-center" style="background-color:##171717">
+                <h3>EAT. SLEEP. TRAIN. REPEAT.</h3>
+            </div>
+            <div style="height:50vh"></div>
+        </div>
+    </div>
+
+    <!-- Middle Section with Overlapping -->
+    <div class="middle-section overlapping-section" style="width:100vw; background:transparent; padding:0rem; z-index: 3;">
+        <div class="content" style="padding:0rem 2rem">
+            <div class="row align-items-center" style="padding:0rem 2rem; transform:translateY(-200px) translateX(20vw)">
+                <div class="col-md-4 mb-4">
+                    <img src="/images/aboutUs5.png" alt="Images of the gym">
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h4>Take the first step to a better you.</h4>
+                    <h2 style="color:#FF6600; font-style:oblique">MAKE THE IMPOSSIBLE,</h2>
+                    <h2 style="color:#FF6600; font-style:oblique">POSSIBLE</h2>      
+                    <a href="@Url.Action("Contact", "Account")" class="btn btn-primary btn-lg mt-4">Join us now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
