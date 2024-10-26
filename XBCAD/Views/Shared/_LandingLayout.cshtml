@@ -10,49 +10,119 @@
     <link rel="stylesheet" href="~/css/site.css">
 </head>
 
-
 <body style="background-color:black; font-family:Arial, sans-serif">
-    
-        <!-- Navbar -->
+
+    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light" style="width: 100vw; background-color:#ED8240; overflow-x:hidden">
-            <img src="/images/Alleysway-Logo-1-768x423.png" alt="Bodybuilding" class="navbar-brand" width="150" height="100">
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">Home</a>
-                    </li>
-                    <li class="nav-item">
+        <img src="/images/Alleysway-Logo-1-768x423.png" alt="Bodybuilding" class="navbar-brand" width="150" height="100">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="@Url.Action("AboutUs", "Account")">About Us</a>
-                    </li>
-                    <li class="nav-item">
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="@Url.Action("Gallery", "Account")">Gallery</a>
                 </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/contact">Contact Us</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="@Url.Action("Logout", "Account")" class="nav-link">Login</a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-
-        <!-- Main Content -->
-        <div class="container">
-            @RenderBody()
+                <li class="nav-item">
+                    <a class="nav-link" href="javascript:void(0);" data-toggle="modal" data-target="#contactModal">Contact Us</a>
+                </li>
+                <li class="nav-item">
+                    <a href="@Url.Action("Logout", "Account")" class="nav-link">Login</a>
+                </li>
+            </ul>
         </div>
+    </nav>
 
-        <!-- Footer -->
-        <footer class="footer bg-dark text-white mt-5 p-4 text-center">
-            <div>Train@alleysway.co.za | 071 511 4871</div>
-        </footer>
+    <!-- Main Content -->
+    <div class="container">
+        @RenderBody()
+    </div>
 
+    <!-- Contact Us Modal -->
+    <div class="modal fade" id="contactModal" tabindex="-1" role="dialog" aria-labelledby="contactModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="contactModalLabel" style="color:black">Contact Us</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <label for="firstName" style="color:black">First Name</label>
+                            <input type="text" class="form-control" id="firstName" name="firstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName" style="color:black">Last Name</label>
+                            <input type="text" class="form-control" id="lastName" name="lastName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email" style="color:black">Email address</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone" style="color:black">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone" name="phone">
+                        </div>
+                        <div class="form-group">
+                            <label for="message" style="color:black">Message</label>
+                            <textarea class="form-control" id="message" name="message" rows="3" required></textarea>
+                        </div>
+                        <input type="hidden" id="from_name" name="from_name">
+                        <button type="submit" class="btn btn-primary">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer bg-dark text-white mt-5 p-4 text-center">
+        <div>Train@alleysway.co.za | 071 511 4871</div>
+    </footer>
+
+    <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <!-- Include the latest version of EmailJS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@@emailjs/browser@4/dist/email.min.js"></script>
+
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize EmailJS
+            emailjs.init("lE3Z8wS5vJ84DcC8_"); // Replace with your EmailJS user ID
+
+            // Handle the contact form submission
+            document.getElementById('contactForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                // Combine first name and last name into sender_name
+                var firstName = document.getElementById('firstName').value;
+                var lastName = document.getElementById('lastName').value;
+                document.getElementById('from_name').value = firstName + ' ' + lastName;
+
+                // Send form data
+                emailjs.sendForm('service_g1b9mf6', 'template_22quo3l', this)
+                    .then(function (response) {
+                        console.log('SUCCESS!', response.status, response.text);
+                        alert('SUCCESS! Your message has been sent.');
+                    }, function (error) {
+                        console.error('FAILED...', error);
+                        alert('FAILED... Please try again.');
+                    });
+            });
+        });
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
