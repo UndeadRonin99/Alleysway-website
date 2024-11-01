@@ -43,6 +43,11 @@ namespace XBCAD.Controllers
             return View();
         }
 
+        public IActionResult ContactUs()
+        {
+            return View();
+        }
+
         public IActionResult Home()
         {
             return View();

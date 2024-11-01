@@ -1,0 +1,294 @@
+﻿@{
+    Layout = "~/Views/Shared/_LandingLayout.cshtml";
+    ViewData["Title"] = "Contact Us - Alleysway";
+
+}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href='https://fonts.googleapis.com/css?family=Anton' rel='stylesheet'>
+    <link href='https://fonts.googleapis.com/css?family=Antonio' rel='stylesheet'>
+
+
+    <style>
+        body {
+            background-color: #121212;
+            color: #f5f5f5;
+            font-family: Antonio, sans-serif;
+        }
+
+        .top-section {
+            position: relative;
+            padding: 5rem 2rem;
+            color: #f5f5f5;
+            background-size: cover;
+            background-attachment: fixed;
+            width: 100vw; /* Ensure it spans the entire viewport width */
+            margin: 0; /* Remove any margin that might create gaps */
+            left: 50%;
+            transform: translateX(-50%); /* Center the section */
+        }
+
+            .top-section .content {
+                position: relative;
+                z-index: 2;
+                padding: 3rem 2rem;
+            }
+
+            .top-section h1 {
+                font-size: 5rem;
+                font-weight: bold;
+                text-transform: uppercase;
+                font-family: Anton, sans-serif;
+            }
+
+            .top-section h3 {
+                font-size: 2rem;
+                font-weight: bold;
+            }
+
+            .top-section h4 {
+                font-size: 1.75rem;
+                font-weight: bold;
+            }
+
+            .top-section p.lead {
+                font-size: 1.2rem;
+                line-height: 1.6;
+            }
+
+        <style >
+        /* Form adjustments */
+        #contactForm {
+            background-color: #1d1d1d; /* Dark background to match Figma */
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .form-control {
+            background-color: white /* Darker input fields */
+            color: white;
+            border: none;
+            margin-bottom: 1rem;
+        }
+
+            .form-control:focus {
+                background-color: #444;
+                color: white;
+                outline: none;
+                box-shadow: 0 0 0 0.2rem rgba(255, 102, 0, 0.25); /* Light orange border on focus */
+            }
+
+        .btn-primary {
+            background-color: #FF6600;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-weight: bold;
+            width: 100%;
+        }
+
+            .btn-primary:hover {
+                background-color: #B94A00;
+            }
+
+        .title {
+            font-size: 1.75rem; /* Increase size for title */
+            font-weight: bold;
+        }
+
+        .subtitle {
+            font-size: 1.25rem; /* Increase size for subtitles */
+            font-weight: normal;
+            color: #f5f5f5;
+        }
+
+        .subtitle-bold {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #f5f5f5;
+            margin-top: -10px; /* Align closer to the subtitle above */
+        }
+
+        .description {
+            font-size: 1rem;
+            color: #f5f5f5;
+            margin: 1rem 0;
+        }
+
+        .timings {
+            list-style-type: disc; /* Adds bullet points */
+            padding-left: 1rem;
+            font-size: 1rem;
+            color: #f5f5f5;
+            text-align: left; /* Align list items to the left for better readability */
+        }
+
+            .timings li {
+                margin-bottom: 0.5rem; /* Add spacing between list items */
+            }
+
+        .info-box {
+            background-color: #ffffff; /* White background for the boxes */
+            border-radius: 15px; /* Rounded corners */
+            transition: box-shadow 0.3s ease;
+        }
+
+            .info-box:hover {
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Subtle shadow on hover */
+            }
+
+            .info-box h4 {
+                font-size: 1.25rem;
+                font-weight: bold;
+                color: #333;
+                margin-bottom: 10px;
+            }
+
+            .info-box p {
+                color: #666;
+                font-size: 1rem;
+            }
+
+        .arrow-icon {
+            font-size: 1.5rem;
+            color: #333;
+            margin-top: 15px;
+        }
+
+        /* Full-width map styling */
+        .map-container {
+            margin-top: 20px;
+        }
+
+            .map-container iframe {
+                width: 100%;
+                border: none;
+                border-radius: 10px; /* Rounded corners for the map */
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            }
+    </style>
+</head>
+
+<body>
+    <!-- Top Section -->
+    <div class="top-section text-center text-white" style="background-image: url('/images/ContactUs_title.png'); width: 100vw">
+        <div class="content">
+            <div style="height:250px"></div>
+            <h1>Contact Us.</h1>
+            <h2>Make a change for the better</h2>
+            <div style="height:300px"></div>
+            <div class="row align-items-center" style="background-color:##171717">
+            
+                <div class="col-md-6 d-flex justify-content-center">
+                    <form id="contactForm" style="width: 100%; max-width: 500px;">
+                        <div class="form-row">
+                            <div class="col">
+                                <input type="text" class="form-control form-control-lg mb-3" id="firstName" name="firstName" placeholder="First Name*" required>
+                            </div>
+                            <div class="col">
+                                <input type="text" class="form-control form-control-lg mb-3" id="lastName" name="lastName" placeholder="Last Name*" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" class="form-control form-control-lg mb-3" id="email" name="email" placeholder="Email*" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="tel" class="form-control form-control-lg mb-3" id="phone" name="phone" placeholder="Phone Number*" required>
+                        </div>
+                        <div class="form-group">
+                            <textarea class="form-control form-control-lg mb-3" id="message" name="message" rows="4" placeholder="Your message..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg w-100">Send Message</button>
+                    </form>
+                </div>
+                <div class="col-md-6 text-center">
+                    <h3 class="title" style="color: #FC670B;">Call Us, Write Us, or Knock on our door</h3>
+                    <p class="subtitle">We’d Love for you to join the</p>
+                    <p class="subtitle-bold">Alleysway family</p>
+                    <p class="description">Looking to compete professionally? Want a personal trainer? Just looking to improve your fitness? Join Alleysway today. It’s the only way.</p>
+                    <ul class="timings">
+                        <li>Monday - Thursday: 5AM - 8PM</li>
+                        <li>Friday: 5AM - 7PM</li>
+                        <li>Saturday: 7AM - 12PM</li>
+                        <li>Sunday: Closed</li>
+                        <li>Public Holidays: 7AM - 12PM</li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="container text-center my-5">
+        <h2>Join Us For A Session</h2>
+        <div class="row my-4">
+            <div class="col-md-4">
+                <div class="info-box shadow-sm p-4">
+                    <h4>Give Us A Call</h4>
+                    <p>072 723 4051</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="info-box shadow-sm p-4">
+                    <h4>We're On The Map</h4>
+                    <p>Greek Sporting Club, 7 Civin Dr,<br>Senderwood, Johannesburg,<br>2007 (Next to SAHETI School)</p>
+                    <div class="arrow-icon">⬇️</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="info-box shadow-sm p-4">
+                    <h4>Send Us A Message</h4>
+                    <p>train@alleysway.co.za</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Google Maps Embed -->
+        <div class="map-container">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3581.324135721155!2d28.125354676165372!3d-26.15357116191518!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1e95123b71ceb9f1%3A0x206619d4793c1c89!2sAlleysway%20Fitness%20Centre!5e0!3m2!1sen!2sza!4v1730459478237!5m2!1sen!2sza"
+                    width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <!-- Include the latest version of EmailJS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@@emailjs/browser@4/dist/email.min.js"></script>
+
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize EmailJS
+            emailjs.init("lE3Z8wS5vJ84DcC8_"); // Replace with your EmailJS user ID
+
+            // Handle the contact form submission
+            document.getElementById('contactModalForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                // Combine first name and last name into sender_name
+                var firstName = document.getElementById('firstName').value;
+                var lastName = document.getElementById('lastName').value;
+                //document.getElementById('from_name').value = firstName + ' ' + lastName;
+
+                // Send form data
+                emailjs.sendForm('service_g1b9mf6', 'template_22quo3l', this)
+                    .then(function (response) {
+                        console.log('SUCCESS!', response.status, response.text);
+                        alert('SUCCESS! Your message has been sent.');
+                    }, function (error) {
+                        console.error('FAILED...', error);
+                        alert('FAILED... Please try again.');
+                    });
+            }, { once: true });
+        });
+    </script>
+
+</body>
+</html>

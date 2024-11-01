@@ -1,12 +1,14 @@
 ﻿@{
     Layout = "~/Views/Shared/_LandingLayout.cshtml";
+    ViewData["Title"] = "About Us - Alleysway";
+
 }
 
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Us - Alleysway</title>
+    <title>@ViewData["Title"]</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href='https://fonts.googleapis.com/css?family=Anton' rel='stylesheet'>
     <link href='https://fonts.googleapis.com/css?family=Antonio' rel='stylesheet'>
@@ -60,7 +62,7 @@
             }
 
         .btn-primary {
-            background-color: #FF6600;
+            background-color: #FC670B;
             border: none;
             padding: 0.75rem 1.5rem;
             text-transform: uppercase;
@@ -269,9 +271,9 @@
                 </div>
                 <div class="col-md-4 mb-4">
                     <h4>Take the first step to a better you.</h4>
-                    <h2 style="color:#FF6600; font-style:oblique">MAKE THE IMPOSSIBLE,</h2>
-                    <h2 style="color:#FF6600; font-style:oblique">POSSIBLE</h2>      
-                    <a href="#" data-toggle="modal" data-target="#contactModal" class="btn btn-primary btn-lg mt-4">Join us now</a>
+                    <h2 style="color:#FC670B; font-style:oblique">MAKE THE IMPOSSIBLE,</h2>
+                    <h2 style="color:#FC670B; font-style:oblique">POSSIBLE</h2>
+                    <a href="@Url.Action("ContactUs", "Account")" class="btn btn-primary btn-lg mt-4">Join us now</a>
                 </div>
             </div>
         </div>
