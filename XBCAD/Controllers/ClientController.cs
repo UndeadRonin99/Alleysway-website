@@ -165,7 +165,14 @@ namespace XBCAD.Controllers
 
             // Get the profile image URL from Firebase Realtime Database
             var profileImageUrl = await _firebaseService.GetProfileImageUrlAsync(userId);
-            ViewBag.ProfileImageUrl = profileImageUrl;
+            if(profileImageUrl != null)
+            {
+                ViewBag.ProfileImageUrl = profileImageUrl;
+            }
+            else
+            {
+                ViewBag.ProfileImageUrl = Url.Content("~/images/default.jpg"); 
+            }
 
             // Get the rate from Firebase Realtime Database
             var rate = await _firebaseService.GetRateAsync(userId);
