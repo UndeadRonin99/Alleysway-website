@@ -240,8 +240,8 @@
                         var li = document.createElement('li');
                         li.innerHTML = `
                             <img src="${profileImageUrl}" alt="Profile Image">
-                            <span>${userData.firstName} ${userData.lastName}</span>
-                        `;
+                            <span>${userData.firstName + (userData.lastName ? " " + userData.lastName : "")}</span>
+                            `;
                         li.setAttribute('data-user-id', userId);
                         li.style.cursor = 'pointer';
 

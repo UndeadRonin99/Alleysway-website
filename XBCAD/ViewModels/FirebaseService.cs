@@ -602,4 +602,29 @@ public class FirebaseService
             throw; // Re-throwing the exception to be caught by the calling method
         }
     }
+
+    public async Task<List<BookedSession>> GetFutureBookedSessionsForTrainerAsync(string trainerId, DateTime currentDateTime)
+    {
+        var sessions = new List<BookedSession>();
+
+        var sessionNodes = await firebase
+            .Child("users")
+            .Child(trainerId)
+            .Child("sessions")
+            .Child("SessionID")
+            .OnceAsync<BookedSession>();
+
+        foreach (var sessionNode in sessionNodes)
+        {
+            var session = sessionNode.Object;
+            if (DateTime.Parse(session.StartDateTime) >= currentDateTime)
+            {
+                sessions.Add(session);
+            }
+        }
+
+        return sessions;
+    }
+
+
 }

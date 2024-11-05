@@ -322,7 +322,7 @@ namespace XBCAD.Controllers
 
         public async Task<IActionResult> TrainerAvailability(string id)
         {
-            var Name = User.FindFirstValue(ClaimTypes.Name); //Retrieve Name
+            var Name = User.FindFirstValue(ClaimTypes.Name);
             ViewBag.Name = Name;
             if (string.IsNullOrEmpty(id))
             {
@@ -335,16 +335,43 @@ namespace XBCAD.Controllers
                 return NotFound("Trainer not found.");
             }
 
-            // Step 1: Fetch raw availability
             var rawAvailability = await _firebaseService.GetRawAvailabilityAsync(id);
-
-            // Step 2: Convert to hourly segments
             var hourlyAvailability = _firebaseService.ConvertToHourlySegments(rawAvailability);
+
+            // For testing, set the current date to a future date
+            DateTime currentDateTime = DateTime.Now;
+
+            // Simulate the day after the session date
+            // For example, to simulate 1 day in the future:
+            //currentDateTime = currentDateTime.AddDays(4);
+
+            var bookedSessions = await _firebaseService.GetFutureBookedSessionsForTrainerAsync(id, currentDateTime);
+
+
+            // Step 4: Remove booked time slots from availability
+            foreach (var bookedSession in bookedSessions)
+            {
+                var startDateTime = DateTime.Parse(bookedSession.StartDateTime);
+                var dayOfWeek = startDateTime.DayOfWeek.ToString();
+
+                var dayAvailability = hourlyAvailability.Days.FirstOrDefault(d => d.Day == dayOfWeek);
+                if (dayAvailability != null)
+                {
+                    var slotToRemove = dayAvailability.TimeSlots.FirstOrDefault(ts =>
+                        ts.StartTime == startDateTime.ToString("HH:mm") &&
+                        ts.EndTime == DateTime.Parse(bookedSession.EndDateTime).ToString("HH:mm")
+                    );
+                    if (slotToRemove != null)
+                    {
+                        dayAvailability.TimeSlots.Remove(slotToRemove);
+                    }
+                }
+            }
 
             var viewModel = new TrainerAvailabilityViewModel
             {
                 Trainer = trainer,
-                Availability = hourlyAvailability // Pass the converted availability
+                Availability = hourlyAvailability
             };
 
             return View(viewModel);
