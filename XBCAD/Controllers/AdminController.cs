@@ -394,10 +394,9 @@ namespace XBCAD.Controllers
         public async Task<IActionResult> Settings()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            Debug.WriteLine(userId);
             var email = User.FindFirstValue(ClaimTypes.Email);
-            var Name = User.FindFirstValue(ClaimTypes.Name); //Retrieve Name
-            ViewBag.Name = Name;
+            var name = User.FindFirstValue(ClaimTypes.Name); // Retrieve Name
+            ViewBag.Name = name;
             ViewBag.Email = email;
 
             if (string.IsNullOrEmpty(userId))
@@ -407,7 +406,11 @@ namespace XBCAD.Controllers
 
             // Get the profile image URL from Firebase Realtime Database
             var profileImageUrl = await firebaseService.GetProfileImageUrlAsync(userId);
-            ViewBag.ProfileImageUrl = profileImageUrl;
+
+            // Set a default image if profileImageUrl is null or empty
+            ViewBag.ProfileImageUrl = !string.IsNullOrEmpty(profileImageUrl)
+                ? profileImageUrl
+                : "/images/default.jpg"; // Path relative to the wwwroot folder
 
             // Get the rate from Firebase Realtime Database
             var rate = await firebaseService.GetRateAsync(userId);
@@ -417,6 +420,7 @@ namespace XBCAD.Controllers
             model.UserId = userId;
             return View(model); // Pass the availability data to the view
         }
+
 
         public async Task<IActionResult> Availability()
         {
