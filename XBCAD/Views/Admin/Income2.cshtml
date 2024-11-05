@@ -33,7 +33,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var session in Model.Sessions)
+                @foreach (var session in Model.Sessions.OrderByDescending(s => DateTime.Parse(s.StartDateTime)))
                 {
                     <tr>
                         <td>@DateTime.Parse(session.StartDateTime).ToString("yyyy-MM-dd")</td>
@@ -46,6 +46,7 @@
                     </tr>
                 }
             </tbody>
+
         </table>
     </div>
 

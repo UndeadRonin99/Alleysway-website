@@ -355,31 +355,35 @@ namespace XBCAD.Controllers
             return RedirectToAction("Settings");
         }
 
+      
         [HttpPost]
         public async Task<IActionResult> SaveProfile(IFormFile photo, string rate)
         {
-            TempData["ActiveTab"] = "editProfile"; // Set the active tab to "addPT"
-
+            TempData["ActiveTab"] = "editProfile"; // Set the active tab to "editProfile"
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             try
             {
-                string imageUrl = null;
+                // Validate rate to ensure it's an integer
+                if (!int.TryParse(rate, out int parsedRate))
+                {
+                    ModelState.AddModelError("Rate", "The rate must be a numeric value.");
+                    return RedirectToAction("Settings");
+                }
 
+                string imageUrl = null;
 
                 // If a photo was uploaded, upload it to Firebase Storage
                 if (photo != null && photo.Length > 0)
                 {
                     imageUrl = await firebaseService.UploadProfileImageAsync(userId, photo);
 
-
                     // Save the image URL to Firebase Realtime Database
                     await firebaseService.SaveProfileImageUrlAsync(userId, imageUrl);
                 }
 
-                // Save the rate to Firebase Realtime Database
-                await firebaseService.SaveRateAsync(userId, rate);
-
+                // Save the rate as an integer to Firebase Realtime Database
+                await firebaseService.SaveRateAsync(userId, parsedRate.ToString());
 
                 TempData["SuccessMessage"] = "Profile updated successfully.";
             }
@@ -390,6 +394,7 @@ namespace XBCAD.Controllers
 
             return RedirectToAction("Settings");
         }
+
 
         public async Task<IActionResult> Settings()
         {
