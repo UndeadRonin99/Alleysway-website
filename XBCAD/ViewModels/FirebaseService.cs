@@ -353,15 +353,17 @@ public class FirebaseService
         {
             return null;
         }
+
         return new Trainer
         {
             Id = userId,
             Name = $"{user.firstName} {user.lastName}",
             ProfilePictureUrl = user.profileImageUrl,
-            HourlyRate = user.rate,
-            Email = user.email // Ensure this field is available in Firebase
+            HourlyRate = user.rate != null ? (int)user.rate : 0, // Default to 0 if rate is null
+            Email = user.email
         };
     }
+
 
     public async Task<List<Trainer>> GetAllTrainersAsync()
     {
@@ -379,17 +381,21 @@ public class FirebaseService
             {
                 string profileImageUrl = user.Object.profileImageUrl ?? "/images/default.jpg";
 
+                // Handle potential null rate by providing a default value, e.g., 0
+                int hourlyRate = user.Object.rate != null ? (int)user.Object.rate : 0;
+
                 trainers.Add(new Trainer
                 {
                     Id = user.Key,  // Set the trainer's Firebase ID
                     Name = $"{user.Object.firstName} {user.Object.lastName}",
                     ProfilePictureUrl = profileImageUrl,
-                    HourlyRate = user.Object.rate
+                    HourlyRate = hourlyRate
                 });
             }
         }
         return trainers;
     }
+
 
     public async Task DeleteUserDataAsync(string userId)
     {
