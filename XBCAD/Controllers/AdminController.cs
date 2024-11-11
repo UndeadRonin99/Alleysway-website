@@ -118,6 +118,7 @@ namespace XBCAD.Controllers
             return View(clients);
         }
 
+        // In AdminController
         public async Task<IActionResult> Chat()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -125,12 +126,32 @@ namespace XBCAD.Controllers
             ViewBag.UserId = userId;
             ViewBag.Name = name;
 
+            // Get the list of clients the trainer has sessions with
+            var clientsFromSessions = await firebaseService.GetClientsForTrainerAsync(userId);
+
+            // Get the list of user IDs from message history
+            var messageContactIds = await firebaseService.GetMessageContactsAsync(userId);
+
+            // Fetch client details for these message contacts
+            var clientsFromMessages = await firebaseService.GetClientsByIdsAsync(messageContactIds);
+
+            // Merge the two lists, removing duplicates
+            var allClients = clientsFromSessions.Concat(clientsFromMessages)
+                .GroupBy(c => c.Id)
+                .Select(g => g.First())
+                .ToList();
+
+            ViewBag.Contacts = allClients;
+
             // Generate a custom Firebase Auth token
             var firebaseToken = await GenerateFirebaseTokenAsync(userId);
             ViewBag.FirebaseToken = firebaseToken;
 
             return View();
         }
+
+
+
 
         private async Task<string> GenerateFirebaseTokenAsync(string userId)
         {

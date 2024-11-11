@@ -1,9 +1,15 @@
-﻿using Firebase.Database;
+﻿
+using Firebase.Database;
 using Firebase.Database.Query;
 using Firebase.Storage;
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Calendar.v3;
+using Google.Apis.Services;
 using Google.Cloud.Firestore;
 using Newtonsoft.Json;
+using System.Security.Policy;
 using XBCAD.ViewModels;
+using static Google.Rpc.Context.AttributeContext.Types;
 
 
 public class FirebaseService
@@ -161,6 +167,43 @@ public class FirebaseService
 
         return null;
     }
+    public async Task<List<Trainer>> GetTrainersForClientAsync(string clientId)
+    {
+        var trainers = new List<Trainer>();
+
+        // Get all sessions for the client
+        var sessions = await firebase
+            .Child("users")
+            .Child(clientId)
+            .Child("sessions")
+            .Child("SessionID")
+            .OnceAsync<BookedSession>();
+
+        // Extract unique trainer IDs
+        var trainerIds = sessions.Select(s => s.Object.TrainerID).Distinct();
+
+        foreach (var trainerId in trainerIds)
+        {
+            // Get trainer details
+            var trainerData = await firebase
+                .Child("users")
+                .Child(trainerId)
+                .OnceSingleAsync<dynamic>();
+
+            if (trainerData != null)
+            {
+                string profileImageUrl = trainerData.profileImageUrl ?? "/images/default.jpg";
+                trainers.Add(new Trainer
+                {
+                    Id = trainerId,
+                    Name = $"{trainerData.firstName} {trainerData.lastName}",
+                    ProfilePictureUrl = profileImageUrl
+                });
+            }
+        }
+
+        return trainers;
+    }
 
     public async Task<List<ClientViewModel>> GetClientsForTrainerAsync(string trainerId)
     {
@@ -202,35 +245,46 @@ public class FirebaseService
 
     public async Task PutBookedSession(BookedSession session, string trainerID, string userID, string userName, DateTime dateTime)
     {
+        // Generate a unique session ID
+        var sessionId = Guid.NewGuid().ToString();
+
+        // Assign the session ID to the session object
+        session.SessionKey = sessionId;
+
+        // Save the session under the same session ID for both the trainer and client
         await firebase
             .Child("users")
             .Child(trainerID)
             .Child("sessions")
             .Child("SessionID")
-            .PostAsync(session);
+            .Child(sessionId)
+            .PutAsync(session);
 
         await firebase
             .Child("users")
             .Child(userID)
             .Child("sessions")
             .Child("SessionID")
-            .PostAsync(session);
+            .Child(sessionId)
+            .PutAsync(session);
 
+        // Send a message to the trainer
         Message clientMessage = new Message
         {
             senderId = userID,
             receiverId = trainerID,
             senderName = userName,
-            text = $"I've booked a session with you on {dateTime.Date.ToString("dd/MM/yyyy")} at {dateTime.TimeOfDay}",
+            text = $"I've booked a session with you on {dateTime:dd/MM/yyyy} at {dateTime:HH:mm}",
             timestamp = Timestamp.GetCurrentTimestamp()
         };
 
+        // Save the message for both client and trainer
         await firebase
-                .Child("user_messages")
-                .Child(userID)
-                .Child(trainerID)
-                .Child("messages")
-                .PostAsync(clientMessage);
+            .Child("user_messages")
+            .Child(userID)
+            .Child(trainerID)
+            .Child("messages")
+            .PostAsync(clientMessage);
 
         await firebase
             .Child("user_messages")
@@ -239,6 +293,7 @@ public class FirebaseService
             .Child("messages")
             .PostAsync(clientMessage);
     }
+
 
     public async Task<AvailabilityViewModel> GetRawAvailabilityAsync(string userId)
     {
@@ -625,6 +680,101 @@ public class FirebaseService
 
         return sessions;
     }
+    public async Task<List<ClientSessionViewModel>> GetClientSessionsAsync(string clientId)
+    {
+        var sessionsList = new List<ClientSessionViewModel>();
+
+        // Get all sessions for the client
+        var sessions = await firebase
+            .Child("users")
+            .Child(clientId)
+            .Child("sessions")
+            .Child("SessionID")
+            .OnceAsync<BookedSession>();
+        foreach (var sessionNode in sessions)
+        {
+            var bookedSession = sessionNode.Object;
+            bookedSession.SessionKey = sessionNode.Key; // Save the session key if needed
+
+            // Check if TrainerID is null or empty
+            if (string.IsNullOrEmpty(bookedSession.TrainerID))
+            {
+                // Optionally log the issue
+                Console.WriteLine($"Session {bookedSession.SessionKey} has a null or empty TrainerID.");
+                continue; // Skip to the next session
+            }
+
+            // Get trainer details
+            var trainerData = await firebase
+                .Child("users")
+                .Child(bookedSession.TrainerID)
+                .OnceSingleAsync<dynamic>();
+
+            if (trainerData != null)
+            {
+                string trainerName = $"{trainerData.firstName} {trainerData.lastName}";
+                string trainerProfileImageUrl = trainerData.profileImageUrl ?? "/images/default.jpg";
+
+                // Create a ViewModel to hold session and trainer details
+                var clientSessionViewModel = new ClientSessionViewModel
+                {
+                    Session = bookedSession,
+                    TrainerName = trainerName,
+                    TrainerProfileImageUrl = trainerProfileImageUrl
+                };
+
+                sessionsList.Add(clientSessionViewModel);
+            }
+        }
+
+        return sessionsList;
+    }
+    public async Task CancelSessionAsync(string clientId, string trainerId, string sessionId, string clientName, BookedSession session)
+    {
+        // Delete the session for the client
+        await firebase
+            .Child("users")
+            .Child(clientId)
+            .Child("sessions")
+            .Child("SessionID")
+            .Child(sessionId)
+            .DeleteAsync();
+
+        // Delete the session for the trainer
+        await firebase
+            .Child("users")
+            .Child(trainerId)
+            .Child("sessions")
+            .Child("SessionID")
+            .Child(sessionId)
+            .DeleteAsync();
+
+        // Send a message to the trainer about the cancellation
+        var sessionStartTime = DateTime.Parse(session.StartDateTime);
+
+        Message cancellationMessage = new Message
+        {
+            senderId = clientId,
+            receiverId = trainerId,
+            senderName = clientName,
+            text = $"{clientName} has canceled the session on {sessionStartTime:dd/MM/yyyy} at {sessionStartTime:HH:mm}. Please check your emails for further information.",
+            timestamp = Timestamp.GetCurrentTimestamp()
+        };
+
+        await firebase
+            .Child("user_messages")
+            .Child(clientId)
+            .Child(trainerId)
+            .Child("messages")
+            .PostAsync(cancellationMessage);
+
+        await firebase
+            .Child("user_messages")
+            .Child(trainerId)
+            .Child(clientId)
+            .Child("messages")
+            .PostAsync(cancellationMessage);
+    }
 
     public async Task SaveDateSpecificAvailabilityAsync(string userId, string date, string startTime, string endTime, bool isFullDayUnavailable)
     {
@@ -769,5 +919,98 @@ public class FirebaseService
             return false;
         }
     }
+
+
+    public async Task<BookedSession> GetSessionAsync(string userId, string sessionId)
+    {
+        var session = await firebase
+            .Child("users")
+            .Child(userId)
+            .Child("sessions")
+            .Child("SessionID")
+            .Child(sessionId)
+            .OnceSingleAsync<BookedSession>();
+
+        if (session != null)
+        {
+            session.SessionKey = sessionId;
+        }
+
+        return session;
+    }
+
+    public async Task<List<string>> GetMessageContactsAsync(string userId)
+    {
+        var contacts = new List<string>();
+        try
+        {
+            var messagesRef = await firebase
+                .Child("user_messages")
+                .Child(userId)
+                .OnceAsync<object>(); // We don't care about the message content here
+
+            foreach (var messageNode in messagesRef)
+            {
+                contacts.Add(messageNode.Key); // The key is the contact userId
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching message contacts: {ex.Message}");
+        }
+        return contacts;
+    }
+    public async Task<List<Trainer>> GetTrainersByIdsAsync(List<string> trainerIds)
+    {
+        var trainers = new List<Trainer>();
+        foreach (var trainerId in trainerIds)
+        {
+            var trainerData = await firebase
+                .Child("users")
+                .Child(trainerId)
+                .OnceSingleAsync<dynamic>();
+
+            if (trainerData != null && trainerData.role == "admin") // Assuming trainers have role "admin"
+            {
+                var trainer = new Trainer
+                {
+                    Id = trainerId,
+                    Name = $"{trainerData.firstName} {trainerData.lastName}",
+                    ProfilePictureUrl = trainerData.profileImageUrl ?? "/images/default.jpg",
+                    // Add other properties as needed
+                };
+                trainers.Add(trainer);
+            }
+        }
+        return trainers;
+    }
+
+    public async Task<List<ClientViewModel>> GetClientsByIdsAsync(List<string> clientIds)
+    {
+        var clients = new List<ClientViewModel>();
+        foreach (var clientId in clientIds)
+        {
+            var clientData = await firebase
+                .Child("users")
+                .Child(clientId)
+                .OnceSingleAsync<dynamic>();
+
+            if (clientData != null && clientData.role != "admin") // Assuming clients don't have role "admin"
+            {
+                var client = new ClientViewModel
+                {
+                    Id = clientId,
+                    Name = $"{clientData.firstName} {clientData.lastName}",
+                    ProfileImageUrl = clientData.profileImageUrl ?? "/images/default.jpg",
+                    // Add other properties as needed
+                };
+                clients.Add(client);
+            }
+        }
+        return clients;
+    }
+
+
+
 
 }

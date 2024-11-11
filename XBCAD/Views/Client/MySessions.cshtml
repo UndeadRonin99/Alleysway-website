@@ -1,0 +1,71 @@
+﻿@model List<XBCAD.ViewModels.ClientSessionViewModel>
+
+@{
+    ViewData["Title"] = "My Sessions";
+    Layout = "~/Views/Shared/_ClientLayout.cshtml";
+}
+
+<div class="container">
+    <h1 class="page-title">My Sessions</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Trainer Name</th>
+                <th>Session Date</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var session in Model.OrderByDescending(s => DateTime.Parse(s.Session.StartDateTime)))
+            {
+                <tr>
+                    <td>@session.TrainerName</td>
+                    <td>@DateTime.Parse(session.Session.StartDateTime).ToString("yyyy-MM-dd")</td>
+                    <td>@DateTime.Parse(session.Session.StartDateTime).ToString("HH:mm")</td>
+                    <td>@DateTime.Parse(session.Session.EndDateTime).ToString("HH:mm")</td>
+                    <td>
+                        @if (DateTime.Parse(session.Session.StartDateTime) > DateTime.Now)
+                        {
+                            <!-- Show the cancel button -->
+                            <form method="post" asp-action="CancelSession" asp-controller="Client" onsubmit="return confirm('Are you sure you want to cancel this session?');">
+                                <input type="hidden" name="sessionId" value="@session.Session.SessionKey" />
+                                <input type="hidden" name="trainerId" value="@session.Session.TrainerID" />
+                                <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <!-- Optionally, show a message for past sessions -->
+                            <span>Completed</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .container {
+        background-color: #f5f5f5;
+        padding: 40px;
+        border-radius: 15px;
+        max-width: 800px;
+        margin: 40px auto;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .page-title {
+        font-size: 28px;
+        font-weight: bold;
+        color: #333;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .table {
+        background-color: #fff;
+    }
+</style>

@@ -1,16 +1,29 @@
 ﻿@{
     ViewData["Title"] = "Chat";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    @using XBCAD.ViewModels
+    var contacts = ViewBag.Contacts as List<ClientViewModel>;
+    var firebaseToken = ViewBag.FirebaseToken as string;
+    var userName = ViewBag.Name as string;
+    var userId = ViewBag.UserId as string;
 }
 
 <div class="chat-container">
     <div id="user-list" class="user-list">
-        <ul id="users"></ul>
+        <ul id="users">
+            @foreach (var contact in contacts)
+            {
+                <li data-user-id="@contact.Id" data-user-name="@contact.Name" data-profile-image-url="@contact.ProfileImageUrl">
+                    <img src="@contact.ProfileImageUrl" alt="Profile Image">
+                    <span>@contact.Name</span>
+                </li>
+            }
+        </ul>
     </div>
 
     <div id="chat-container" class="chat-window">
         <div id="chat-header">
-            <span id="chatWith">Select a user</span>
+            <span id="chatWith">Select a client</span>
         </div>
 
         <div id="messages" class="message-area"></div>
@@ -194,73 +207,41 @@
     };
     firebase.initializeApp(firebaseConfig);
 
-    var firebaseToken = '@Html.Raw(ViewBag.FirebaseToken)';
+    var firebaseToken = '@Html.Raw(firebaseToken)';
+    var userName = '@Html.Raw(userName)';
+    var userId = '@Html.Raw(userId)';
 
     firebase.auth().signInWithCustomToken(firebaseToken).catch(function (error) {
         console.error('Firebase sign-in error:', error);
-    });
-
-    firebase.auth().onAuthStateChanged(function (user) {
-        if (user) {
-            loadUsers();
-        } else {
-            console.log('User is not authenticated');
-        }
     });
 
     var selectedUserId = null;
     var selectedUserName = null;
     var conversationRef = null;
 
-    function loadUsers() {
-        var currentUser = firebase.auth().currentUser.uid;
-        var usersRef = firebase.database().ref('users');
-        var messagesRef = firebase.database().ref('user_messages/' + currentUser);
-
-        messagesRef.once('value').then(function (messagesSnapshot) {
-            var activeUsers = {}; // Object to keep track of users with open chats
-
-            // Collect all user IDs with whom the current user has messages
-            messagesSnapshot.forEach(function (childSnapshot) {
-                activeUsers[childSnapshot.key] = true;
-            });
-
-            usersRef.once('value').then(function (usersSnapshot) {
-                var usersList = document.getElementById('users');
-                usersList.innerHTML = '';
-
-                usersSnapshot.forEach(function (childSnapshot) {
-                    var userId = childSnapshot.key;
-                    var userData = childSnapshot.val();
-
-                    // Check if the user is in the list of active chats
-                    if (activeUsers[userId] && userId !== currentUser) {
-                        var profileImageUrl = userData.profileImageUrl || '/images/default.jpg'; // Use default image
-
-                        var li = document.createElement('li');
-                        li.innerHTML = `
-                            <img src="${profileImageUrl}" alt="Profile Image">
-                            <span>${userData.firstName} ${userData.lastName}</span>
-                        `;
-                        li.setAttribute('data-user-id', userId);
-                        li.style.cursor = 'pointer';
-
-                        li.addEventListener('click', function () {
-                            selectUser(userId, userData.firstName + ' ' + userData.lastName);
-                        });
-
-                        usersList.appendChild(li);
-                    }
-                });
+    document.addEventListener('DOMContentLoaded', function () {
+        var userElements = document.querySelectorAll('#users li');
+        userElements.forEach(function (li) {
+            li.addEventListener('click', function () {
+                var contactId = li.getAttribute('data-user-id');
+                var contactName = li.getAttribute('data-user-name');
+                selectUser(contactId, contactName);
             });
         });
-    }
 
+        // Set up event listeners for sending messages
+        document.getElementById('sendButton').addEventListener('click', sendMessage);
+        document.getElementById('messageInput').addEventListener('keyup', function (event) {
+            if (event.keyCode === 13) {
+                sendMessage();
+            }
+        });
+    });
 
-    function selectUser(userId, userName) {
-        selectedUserId = userId;
-        selectedUserName = userName;
-        document.getElementById('chatWith').textContent = userName;
+    function selectUser(contactId, contactName) {
+        selectedUserId = contactId;
+        selectedUserName = contactName;
+        document.getElementById('chatWith').textContent = contactName;
 
         // Clear previous messages
         document.getElementById('messages').innerHTML = '';
@@ -276,7 +257,6 @@
         }
 
         var database = firebase.database();
-        var userId = firebase.auth().currentUser.uid;
 
         // Detach previous listener if any
         if (conversationRef) {
@@ -289,31 +269,20 @@
             var message = data.val();
             displayMessage(message.senderName, message.text, message.timestamp);
         });
-
-        document.getElementById('sendButton').addEventListener('click', sendMessage);
-        document.getElementById('messageInput').addEventListener('keyup', function (event) {
-            if (event.keyCode === 13) {
-                sendMessage();
-            }
-        });
     }
 
     function sendMessage() {
         if (!selectedUserId) {
-            alert('Please select a user to chat with.');
+            alert('Please select a client to chat with.');
             return;
         }
 
         var messageText = document.getElementById('messageInput').value.trim();
         if (messageText !== '') {
-            var senderId = firebase.auth().currentUser.uid;
-            var senderName = '@ViewBag.Name';
-            var receiverId = selectedUserId;
-
             var message = {
-                senderId: senderId,
-                senderName: senderName,
-                receiverId: receiverId,
+                senderId: userId,
+                senderName: userName,
+                receiverId: selectedUserId,
                 text: messageText,
                 timestamp: firebase.database.ServerValue.TIMESTAMP
             };
@@ -322,8 +291,8 @@
             var updates = {};
             var newMessageKey = firebase.database().ref().child('user_messages').push().key;
 
-            updates['/user_messages/' + senderId + '/' + receiverId + '/messages/' + newMessageKey] = message;
-            updates['/user_messages/' + receiverId + '/' + senderId + '/messages/' + newMessageKey] = message;
+            updates['/user_messages/' + userId + '/' + selectedUserId + '/messages/' + newMessageKey] = message;
+            updates['/user_messages/' + selectedUserId + '/' + userId + '/messages/' + newMessageKey] = message;
 
             firebase.database().ref().update(updates).then(function () {
                 console.log('Message sent');
@@ -335,13 +304,13 @@
         }
     }
 
-    function displayMessage(userName, text, timestamp) {
+    function displayMessage(senderName, text, timestamp) {
         var messagesDiv = document.getElementById('messages');
         var messageElement = document.createElement('div');
         var time = new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
         // Check if the message is sent by the current user
-        var isSentByCurrentUser = (userName === '@ViewBag.Name');
+        var isSentByCurrentUser = (senderName === userName);
 
         messageElement.classList.add('bubble');
         if (isSentByCurrentUser) {
@@ -351,9 +320,9 @@
         }
 
         messageElement.innerHTML = `
-                    <div class="bubble-text">${text}</div>
-                    <span class="timestamp">${time}</span>
-                `;
+                <div class="bubble-text">${text}</div>
+                <span class="timestamp">${time}</span>
+            `;
 
         messagesDiv.appendChild(messageElement);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
