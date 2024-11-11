@@ -116,7 +116,7 @@ namespace XBCAD.Controllers
             var clients = await firebaseService.GetClientsForTrainerAsync(trainerId);
             ViewBag.Name = User.FindFirstValue(ClaimTypes.Name);
             return View(clients);
-        }
+        } 
 
         // In AdminController
         public async Task<IActionResult> Chat()

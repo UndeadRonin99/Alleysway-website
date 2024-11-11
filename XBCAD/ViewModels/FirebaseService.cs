@@ -617,7 +617,7 @@ public class FirebaseService
             .Child(day)
             .Child("TimeSlots")
             .PostAsync(timeSlot);
-    }
+    } 
 
     public async Task RemoveTimeSlotAsync(string day, string startTime, string endTime, string userId)
     {
