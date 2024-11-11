@@ -25,6 +25,7 @@ namespace XBCAD.Controllers
             googleCalendarService = calendarService;
         }
 
+
         public async Task<IActionResult> Chat()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -32,12 +33,33 @@ namespace XBCAD.Controllers
             ViewBag.UserId = userId;
             ViewBag.Name = name;
 
+            // Get the list of trainers the client has sessions with
+            var trainersFromSessions = await _firebaseService.GetTrainersForClientAsync(userId);
+
+            // Get the list of user IDs from message history
+            var messageContactIds = await _firebaseService.GetMessageContactsAsync(userId);
+
+            // Fetch trainer details for these message contacts
+            var trainersFromMessages = await _firebaseService.GetTrainersByIdsAsync(messageContactIds);
+
+            // Merge the two lists, removing duplicates
+            var allTrainers = trainersFromSessions.Concat(trainersFromMessages)
+                .GroupBy(t => t.Id)
+                .Select(g => g.First())
+                .ToList();
+
+            ViewBag.Contacts = allTrainers;
+
             // Generate a custom Firebase Auth token
             var firebaseToken = await GenerateFirebaseTokenAsync(userId);
             ViewBag.FirebaseToken = firebaseToken;
 
             return View();
         }
+
+
+
+
 
         private async Task<string> GenerateFirebaseTokenAsync(string userId)
         {
@@ -166,13 +188,13 @@ namespace XBCAD.Controllers
 
             // Get the profile image URL from Firebase Realtime Database
             var profileImageUrl = await _firebaseService.GetProfileImageUrlAsync(userId);
-            if(profileImageUrl != null)
+            if (profileImageUrl != null)
             {
                 ViewBag.ProfileImageUrl = profileImageUrl;
             }
             else
             {
-                ViewBag.ProfileImageUrl = Url.Content("~/images/default.jpg"); 
+                ViewBag.ProfileImageUrl = Url.Content("~/images/default.jpg");
             }
 
             // Get the rate from Firebase Realtime Database
@@ -418,6 +440,7 @@ namespace XBCAD.Controllers
         public async Task<IActionResult> CancelSession(string sessionId, string trainerId)
         {
             var clientId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var clientName = User.FindFirstValue(ClaimTypes.Name);
 
             if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(sessionId) || string.IsNullOrEmpty(trainerId))
             {
@@ -451,8 +474,8 @@ namespace XBCAD.Controllers
                     await DeleteCalendarEvent(accessToken, session.EventId);
                 }
 
-                // Cancel the session (delete from Firebase)
-                await _firebaseService.CancelSessionAsync(clientId, trainerId, sessionId);
+                // Cancel the session (delete from Firebase) and send message
+                await _firebaseService.CancelSessionAsync(clientId, trainerId, sessionId, clientName, session);
 
                 TempData["SuccessMessage"] = "Session canceled successfully.";
             }
@@ -463,6 +486,7 @@ namespace XBCAD.Controllers
 
             return RedirectToAction("MySessions");
         }
+
 
         private async Task DeleteCalendarEvent(string accessToken, string eventId)
         {
