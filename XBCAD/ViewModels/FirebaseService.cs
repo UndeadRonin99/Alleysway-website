@@ -776,7 +776,7 @@ public class FirebaseService
             .PostAsync(cancellationMessage);
     }
 
-    public async Task SaveDateSpecificAvailabilityAsync(string userId, string date, string startTime, string endTime, bool isFullDayUnavailable)
+    public async Task<string> SaveDateSpecificAvailabilityAsync(string userId, string date, string startTime, string endTime, bool isFullDayUnavailable)
     {
         var timeSlot = new TimeSlot
         {
@@ -786,13 +786,17 @@ public class FirebaseService
         };
 
         // Save timeSlot under the specific date with a unique identifier
-        await firebase
+        var slotReference = await firebase
             .Child("users")
             .Child(userId)
             .Child("DateSpecificAvailability")
             .Child(date)
             .PostAsync(timeSlot);
+
+        // Return the slotId (key of the saved time slot)
+        return slotReference.Key;
     }
+
 
 
     public async Task<Dictionary<string, List<DateSpecificTimeSlot>>> GetAllDateSpecificAvailabilityAsync(string userId)

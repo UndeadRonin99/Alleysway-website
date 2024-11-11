@@ -531,8 +531,6 @@ namespace XBCAD.Controllers
         public async Task<IActionResult> SaveDateSpecificTimeSlot(string date, string startTime, string endTime, bool isFullDayUnavailable)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var Name = User.FindFirstValue(ClaimTypes.Name); //Retrieve Name
-            ViewBag.Name = Name;
 
             if (string.IsNullOrEmpty(userId))
             {
@@ -541,17 +539,17 @@ namespace XBCAD.Controllers
 
             try
             {
-                // Call the service to save date-specific availability with the full-day flag
-                await firebaseService.SaveDateSpecificAvailabilityAsync(userId, date, startTime, endTime, isFullDayUnavailable);
-                return Json(new { success = true, message = "Date-specific availability saved successfully." });
+                // Call the service and get the slotId of the saved availability
+                var slotId = await firebaseService.SaveDateSpecificAvailabilityAsync(userId, date, startTime, endTime, isFullDayUnavailable);
+                return Json(new { success = true, message = "Date-specific availability saved successfully.", slotId = slotId });
             }
             catch (Exception ex)
             {
-                // Log the error if necessary and return an error message
                 Console.WriteLine($"Error saving date-specific availability: {ex.Message}");
                 return Json(new { success = false, message = "An error occurred while saving date-specific availability. Please try again later." });
             }
         }
+
 
 
         [HttpGet]

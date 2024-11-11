@@ -88,7 +88,7 @@
                             <ul class="list-unstyled ms-3">
                                 @foreach (var slot in date.Value)
                                 {
-                                    <li class="d-flex align-items-center justify-content-between border-bottom py-2">
+                                    <li class="d-flex align-items-center justify-content-between border-bottom py-2" data-slot-id="@slot.Id">
                                         <span>
                                             @if (slot.IsFullDayUnavailable)
                                             {
@@ -99,7 +99,7 @@
                                                 <span><i class="bi bi-clock"></i> @slot.StartTime - @slot.EndTime</span>
                                             }
                                         </span>
-                                        <button type="button" class="btn btn-danger btn-sm w-auto" onclick="removeDateSpecificAvailability('@date.Key', '@slot.Id')" style="display: inline-flex; align-items: center;">
+                                        <button type="button" class="btn btn-danger btn-sm w-auto delete-slot-button" data-date="@date.Key" data-slot-id="@slot.Id">
                                             <i class="bi bi-trash-fill me-1">Delete</i>
                                         </button>
                                     </li>
@@ -107,6 +107,7 @@
                             </ul>
                         </div>
                     }
+
                 }
                 else
                 {
@@ -209,8 +210,34 @@
                     if (response.success) {
                         alert(response.message);
 
-                        // Delay before loading to ensure Firebase update
-                        setTimeout(loadDateSpecificAvailability, 1000);
+                        const slotId = response.slotId;  // Retrieve the slotId from the response
+                        const newAvailability = $('<div class="list-group-item-1 bg-light mb-3 shadow-sm rounded">').append(
+                            $('<h5 class="text-dark fw-bold">').html('<i class="bi bi-calendar3 me-2"></i>' + date)
+                        );
+
+                        const slotList = $('<ul class="list-unstyled ms-3">');
+                        const slotItem = $('<li class="d-flex align-items-center justify-content-between border-bottom py-2" data-slot-id="' + slotId + '">');
+
+                        if (isFullDayUnavailable) {
+                            slotItem.append('<span class="badge bg-warning text-dark">Full day unavailable</span>');
+                        } else {
+                            slotItem.append('<span><i class="bi bi-clock"></i> ' + startTime + ' - ' + endTime + '</span>');
+                        }
+
+                        const deleteButton = $('<button type="button" class="btn btn-danger btn-sm w-auto delete-slot-button">')
+                            .attr("data-slot-id", slotId)
+                            .attr("data-date", date)
+                            .html('<i class="bi bi-trash-fill me-1">Delete</i>')
+                            .on('click', function () {
+                                removeDateSpecificAvailability(date, slotId);
+                            });
+
+                        slotItem.append(deleteButton);
+                        slotList.append(slotItem);
+                        newAvailability.append(slotList);
+
+                        $('#existingDateSpecificAvailability').append(newAvailability);
+                        $('#addDateSpecificAvailabilityForm').trigger("reset");
                     } else {
                         alert(response.message);
                     }
@@ -220,6 +247,7 @@
                 }
             });
         }
+
 
         function loadDateSpecificAvailability() {
             $.ajax({
@@ -254,13 +282,23 @@
             });
         }
 
+        $(document).on('click', '.delete-slot-button', function () {
+            const date = $(this).data('date');
+            const slotId = $(this).data('slot-id');
+            if (slotId) {
+                removeDateSpecificAvailability(date, slotId);
+            } else {
+                alert("Slot ID is missing!");
+            }
+        });
+
         function removeDateSpecificAvailability(date, slotId) {
             if (!slotId) {
                 alert("Slot ID is missing!");
                 return;
             }
             if (!confirm("Are you sure you want to delete this availability?")) {
-                return; // Cancel the operation if the user does not confirm
+                return;
             }
 
             $.ajax({
@@ -270,7 +308,9 @@
                 success: function (response) {
                     if (response.success) {
                         alert("Availability removed successfully");
-                        setTimeout(loadDateSpecificAvailability, 1000);
+
+                        // Remove the specific element from the DOM
+                        $('li[data-slot-id="' + slotId + '"]').remove();
                     } else {
                         alert("Failed to remove availability: " + response.message);
                     }
@@ -280,6 +320,9 @@
                 }
             });
         }
+
+
+
 
         function removeTimeSlot(button, day, startTime, endTime, userId) {
             if (!confirm("Are you sure you want to delete this time slot?")) {
