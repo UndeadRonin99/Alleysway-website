@@ -1,4 +1,5 @@
-﻿using FirebaseAdmin;
+﻿using Firebase.Auth;
+using FirebaseAdmin;
 using FirebaseAdmin.Auth;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Calendar.v3;
@@ -50,7 +51,7 @@ namespace XBCAD.Controllers
             }
 
             // Generate a custom token for the user
-            string customToken = await FirebaseAuth.DefaultInstance.CreateCustomTokenAsync(userId);
+            string customToken = await FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance.CreateCustomTokenAsync(userId);
             return customToken;
         }
 
@@ -235,8 +236,8 @@ namespace XBCAD.Controllers
                     continue; // Invalid date/time format
                 }
 
-                // Create calendar event
-                await CreateCalendarEvent(accessToken, clientEmail, trainerEmail, startDateTime, endDateTime, trainer.Name);
+                // Create calendar event and get the EventId
+                var eventId = await CreateCalendarEvent(accessToken, clientEmail, trainerEmail, startDateTime, endDateTime, trainer.Name);
 
                 // Create the BookedSession object
                 BookedSession session = new BookedSession
@@ -246,22 +247,21 @@ namespace XBCAD.Controllers
                     Paid = false,
                     TotalAmount = trainer.HourlyRate,
                     StartDateTime = startDateTime.ToString("o"),  // Store as ISO 8601 string
-                    EndDateTime = endDateTime.ToString("o")
+                    EndDateTime = endDateTime.ToString("o"),
+                    EventId = eventId  // Store the EventId
                 };
 
                 // Save the session to Firebase
                 await _firebaseService.PutBookedSession(session, trainer.Id, User.FindFirstValue(ClaimTypes.NameIdentifier), User.FindFirstValue(ClaimTypes.Name), startDateTime);
             }
 
-            // Optional: Save booking details to Firebase or database
-
-
             // Redirect to the calendar page or a confirmation page
             return RedirectToAction("Calendar");
         }
 
+
         // Helper method to create a calendar event
-        private async Task CreateCalendarEvent(string accessToken, string clientEmail, string trainerEmail, DateTime startDateTime, DateTime endDateTime, string trainerName)
+        private async Task<string> CreateCalendarEvent(string accessToken, string clientEmail, string trainerEmail, DateTime startDateTime, DateTime endDateTime, string trainerName)
         {
             var clientName = User.FindFirstValue(ClaimTypes.Name);
             var credential = GoogleCredential.FromAccessToken(accessToken);
@@ -286,9 +286,9 @@ namespace XBCAD.Controllers
                     TimeZone = "Africa/Johannesburg",
                 },
                 Attendees = new List<EventAttendee>()
-            {
-                new EventAttendee() { Email = trainerEmail }
-            },
+        {
+            new EventAttendee() { Email = trainerEmail }
+        },
                 Reminders = new Event.RemindersData()
                 {
                     UseDefault = true
@@ -298,7 +298,10 @@ namespace XBCAD.Controllers
             var request = calendarService.Events.Insert(newEvent, "primary");
             request.SendUpdates = EventsResource.InsertRequest.SendUpdatesEnum.All;
 
-            await request.ExecuteAsync();
+            var createdEvent = await request.ExecuteAsync();
+
+            // Return the EventId
+            return createdEvent.Id;
         }
 
         [HttpGet]
@@ -376,5 +379,108 @@ namespace XBCAD.Controllers
 
             return View(viewModel);
         }
+        public async Task<IActionResult> TrainerSessions(string trainerId)
+        {
+            var clientId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var name = User.FindFirstValue(ClaimTypes.Name);
+            ViewBag.Name = name;
+
+            // Get the sessions between the client and the trainer
+            var sessions = await _firebaseService.GetSessionsBetweenTrainerAndClientAsync(trainerId, clientId);
+
+            // Get trainer details
+            var trainer = await _firebaseService.GetTrainerByIdAsync(trainerId);
+
+            var viewModel = new TrainerSessionsViewModel
+            {
+                Trainer = trainer,
+                Sessions = sessions // Ensure this matches the type in the ViewModel
+            };
+
+            return View(viewModel); // Ensure you're returning the view model, not the sessions list
+        }
+
+
+
+        public async Task<IActionResult> MySessions()
+        {
+            var clientId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var name = User.FindFirstValue(ClaimTypes.Name);
+            ViewBag.Name = name;
+
+            // Fetch all sessions for the client
+            var clientSessions = await _firebaseService.GetClientSessionsAsync(clientId);
+
+            return View(clientSessions); // Ensure you're returning the correct view/model
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CancelSession(string sessionId, string trainerId)
+        {
+            var clientId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(sessionId) || string.IsNullOrEmpty(trainerId))
+            {
+                TempData["ErrorMessage"] = "Invalid session data.";
+                return RedirectToAction("MySessions");
+            }
+
+            try
+            {
+                // Check if the session exists and belongs to the client
+                var session = await _firebaseService.GetSessionAsync(clientId, sessionId);
+                if (session == null || session.ClientID != clientId)
+                {
+                    TempData["ErrorMessage"] = "Session not found or access denied.";
+                    return RedirectToAction("MySessions");
+                }
+
+                // Enforce cancellation policies
+                if (DateTime.Parse(session.StartDateTime) <= DateTime.Now)
+                {
+                    TempData["ErrorMessage"] = "Cannot cancel past or ongoing sessions.";
+                    return RedirectToAction("MySessions");
+                }
+
+                // Get the access token to authenticate with Google Calendar API
+                var accessToken = await HttpContext.GetTokenAsync("access_token");
+
+                if (!string.IsNullOrEmpty(accessToken) && !string.IsNullOrEmpty(session.EventId))
+                {
+                    // Delete the calendar event
+                    await DeleteCalendarEvent(accessToken, session.EventId);
+                }
+
+                // Cancel the session (delete from Firebase)
+                await _firebaseService.CancelSessionAsync(clientId, trainerId, sessionId);
+
+                TempData["SuccessMessage"] = "Session canceled successfully.";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error canceling session: {ex.Message}";
+            }
+
+            return RedirectToAction("MySessions");
+        }
+
+        private async Task DeleteCalendarEvent(string accessToken, string eventId)
+        {
+            var credential = GoogleCredential.FromAccessToken(accessToken);
+
+            var calendarService = new CalendarService(new BaseClientService.Initializer()
+            {
+                HttpClientInitializer = credential,
+                ApplicationName = "Alleysway Gym",
+            });
+
+            var request = calendarService.Events.Delete("primary", eventId);
+            request.SendUpdates = EventsResource.DeleteRequest.SendUpdatesEnum.All; // Notify all attendees
+
+            await request.ExecuteAsync();
+        }
+
     }
+
+
 }

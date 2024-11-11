@@ -1,9 +1,14 @@
 ﻿using Firebase.Database;
 using Firebase.Database.Query;
 using Firebase.Storage;
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Calendar.v3;
+using Google.Apis.Services;
 using Google.Cloud.Firestore;
 using Newtonsoft.Json;
+using System.Security.Policy;
 using XBCAD.ViewModels;
+using static Google.Rpc.Context.AttributeContext.Types;
 
 
 public class FirebaseService
@@ -202,19 +207,28 @@ public class FirebaseService
 
     public async Task PutBookedSession(BookedSession session, string trainerID, string userID, string userName, DateTime dateTime)
     {
+        // Generate a unique session ID
+        var sessionId = Guid.NewGuid().ToString();
+
+        // Assign the session ID to the session object
+        session.SessionKey = sessionId;
+
+        // Save the session under the same session ID for both the trainer and client
         await firebase
             .Child("users")
             .Child(trainerID)
             .Child("sessions")
             .Child("SessionID")
-            .PostAsync(session);
+            .Child(sessionId)
+            .PutAsync(session);
 
         await firebase
             .Child("users")
             .Child(userID)
             .Child("sessions")
             .Child("SessionID")
-            .PostAsync(session);
+            .Child(sessionId)
+            .PutAsync(session);
 
         Message clientMessage = new Message
         {
@@ -226,11 +240,11 @@ public class FirebaseService
         };
 
         await firebase
-                .Child("user_messages")
-                .Child(userID)
-                .Child(trainerID)
-                .Child("messages")
-                .PostAsync(clientMessage);
+            .Child("user_messages")
+            .Child(userID)
+            .Child(trainerID)
+            .Child("messages")
+            .PostAsync(clientMessage);
 
         await firebase
             .Child("user_messages")
@@ -239,6 +253,7 @@ public class FirebaseService
             .Child("messages")
             .PostAsync(clientMessage);
     }
+
 
     public async Task<AvailabilityViewModel> GetRawAvailabilityAsync(string userId)
     {
@@ -625,6 +640,98 @@ public class FirebaseService
 
         return sessions;
     }
+    public async Task<List<ClientSessionViewModel>> GetClientSessionsAsync(string clientId)
+    {
+        var sessionsList = new List<ClientSessionViewModel>();
+
+        // Get all sessions for the client
+        var sessions = await firebase
+            .Child("users")
+            .Child(clientId)
+            .Child("sessions")
+            .Child("SessionID")
+            .OnceAsync<BookedSession>();
+        foreach (var sessionNode in sessions)
+        {
+            var bookedSession = sessionNode.Object;
+            bookedSession.SessionKey = sessionNode.Key; // Save the session key if needed
+
+            // Check if TrainerID is null or empty
+            if (string.IsNullOrEmpty(bookedSession.TrainerID))
+            {
+                // Optionally log the issue
+                Console.WriteLine($"Session {bookedSession.SessionKey} has a null or empty TrainerID.");
+                continue; // Skip to the next session
+            }
+
+            // Get trainer details
+            var trainerData = await firebase
+                .Child("users")
+                .Child(bookedSession.TrainerID)
+                .OnceSingleAsync<dynamic>();
+
+            if (trainerData != null)
+            {
+                string trainerName = $"{trainerData.firstName} {trainerData.lastName}";
+                string trainerProfileImageUrl = trainerData.profileImageUrl ?? "/images/default.jpg";
+
+                // Create a ViewModel to hold session and trainer details
+                var clientSessionViewModel = new ClientSessionViewModel
+                {
+                    Session = bookedSession,
+                    TrainerName = trainerName,
+                    TrainerProfileImageUrl = trainerProfileImageUrl
+                };
+
+                sessionsList.Add(clientSessionViewModel);
+            }
+        }
+
+        return sessionsList;
+    }
+    public async Task CancelSessionAsync(string clientId, string trainerId, string sessionId)
+    {
+        // Delete the session for the client
+        await firebase
+            .Child("users")
+            .Child(clientId)
+            .Child("sessions")
+            .Child("SessionID")
+            .Child(sessionId)
+            .DeleteAsync();
+
+        // Delete the session for the trainer
+        await firebase
+            .Child("users")
+            .Child(trainerId)
+            .Child("sessions")
+            .Child("SessionID")
+            .Child(sessionId)
+            .DeleteAsync();
+    }
+
+
+    public async Task<BookedSession> GetSessionAsync(string userId, string sessionId)
+    {
+        var session = await firebase
+            .Child("users")
+            .Child(userId)
+            .Child("sessions")
+            .Child("SessionID")
+            .Child(sessionId)
+            .OnceSingleAsync<BookedSession>();
+
+        if (session != null)
+        {
+            session.SessionKey = sessionId;
+        }
+
+        return session;
+    }
+   
+
+
+
 
 
 }
