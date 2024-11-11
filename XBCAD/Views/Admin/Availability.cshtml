@@ -1,42 +1,117 @@
 ﻿@model XBCAD.ViewModels.AvailabilityViewModel
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
-    var userId = Model.UserId;  // Assuming Model.UserId is set correctly
+    var userId = Model.UserId;
 }
 
 <div class="container mt-4">
     <h2>Default Availability</h2>
+
+    <!-- General Availability Section -->
     <div class="availability-section">
-        <div class="section-header">
-            <h3 class="section-title">General Availability</h3>
-        </div>
-        <div class="availability-table">
-            <div id="availabilityTable">
-                @foreach (var day in Model.Days)
-                {
-                    <div class="day-row mb-4">
-                        <div class="day-name"><strong>@day.Day</strong></div>
-                        <div class="time-slots" data-day="@day.Day">
-                            @if (day.TimeSlots.Any())
+        <h3 class="section-title">General Availability</h3>
+        <div id="availabilityTable">
+            @foreach (var day in Model.Days)
+            {
+                <div class="day-row mb-4">
+                    <div class="day-name"><strong>@day.Day</strong></div>
+                    <div class="time-slots" data-day="@day.Day">
+                        @if (day.TimeSlots.Any())
+                        {
+                            foreach (var slot in day.TimeSlots)
                             {
-                                foreach (var slot in day.TimeSlots)
-                                {
-                                    <div class="time-slot-row mb-3">
-                                        <div class="time-slot d-flex align-items-center">
-                                            <input type="text" class="form-control me-2 timepicker" value="@slot.StartTime" placeholder="Start Time" readonly>
-                                            <span class="me-2">until</span>
-                                            <input type="text" class="form-control me-2 timepicker" value="@slot.EndTime" placeholder="End Time" readonly>
-                                            <button type="button" class="btn btn-danger me-2" onclick="removeTimeSlot(this, '@day.Day', '@slot.StartTime', '@slot.EndTime', '@userId')">🗑️</button>
-                                        </div>
+                                <div class="time-slot-row mb-3">
+                                    <div class="time-slot d-flex align-items-center">
+                                        <input type="text" class="form-control me-2 timepicker" value="@slot.StartTime" placeholder="Start Time" readonly>
+                                        <span class="me-2">until</span>
+                                        <input type="text" class="form-control me-2 timepicker" value="@slot.EndTime" placeholder="End Time" readonly>
+                                        <button type="button" class="btn btn-danger me-2" onclick="removeTimeSlot(this, '@day.Day', '@slot.StartTime', '@slot.EndTime', '@userId')">🗑️</button>
                                     </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted">No availability set for this day.</p>
+                        }
+                    </div>
+                    <button type="button" class="btn btn-primary mt-2" onclick="addTimeSlot(this, '@day.Day', '@userId')">+ Add Time</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <!-- Date-Specific Availability Section -->
+    <h2>Date-Specific Availability</h2>
+    <div class="availability-section mt-5">
+            <form id="addDateSpecificAvailabilityForm" onsubmit="event.preventDefault(); saveDateSpecificTimeSlot();" class="p-3 border rounded shadow-sm bg-light">
+
+                <div class="mb-3">
+                <label for="dateInput" class="form-label fw-bold" style="vertical-align: middle;">Date:</label>
+                    <input type="date" id="dateInput" name="date" class="form-control" required />
+                </div>
+
+                <div class="form-check mb-3">
+                    <input type="checkbox" id="fullDayUnavailableCheckbox" name="isFullDayUnavailable" class="form-check-input" />
+                    <label for="fullDayUnavailableCheckbox" class="form-check-label">Unavailable for the whole day</label>
+                </div>
+
+                <div id="timeSlotFields" class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="startTime" class="form-label fw-bold">Start Time:</label>
+                        <input type="time" name="startTime" id="startTime" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="endTime" class="form-label fw-bold">End Time:</label>
+                        <input type="time" name="endTime" id="endTime" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary px-4">Add Availability</button>
+                </div>
+            </form>
+
+        <div class="mt-4">
+            <h3 class="section-title">Existing Date-Specific Availabilities</h3>
+            <div id="existingDateSpecificAvailability" class="list-group">
+                @if (Model.DateSpecificAvailability.Any())
+                {
+                    @foreach (var date in Model.DateSpecificAvailability)
+                    {
+                        <div class="list-group-item-1 bg-light mb-3 shadow-sm rounded">
+                            <h5 class="text-dark fw-bold">
+                                <i class="bi bi-calendar3 me-2"></i> @date.Key
+                            </h5>
+                            <ul class="list-unstyled ms-3">
+                                @foreach (var slot in date.Value)
+                                {
+                                    <li class="d-flex align-items-center justify-content-between border-bottom py-2">
+                                        <span>
+                                            @if (slot.IsFullDayUnavailable)
+                                            {
+                                                <span class="badge bg-warning text-dark">Full day unavailable</span>
+                                            }
+                                            else
+                                            {
+                                                <span><i class="bi bi-clock"></i> @slot.StartTime - @slot.EndTime</span>
+                                            }
+                                        </span>
+                                        <button type="button" class="btn btn-danger btn-sm w-auto" onclick="removeDateSpecificAvailability('@date.Key', '@slot.Id')" style="display: inline-flex; align-items: center;">
+                                            <i class="bi bi-trash-fill me-1">Delete</i>
+                                        </button>
+                                    </li>
                                 }
-                            }
-                            else
-                            {
-                                <p class="text-muted">No availability set for this day.</p>
-                            }
+                            </ul>
                         </div>
-                        <button type="button" class="btn btn-primary mt-2" onclick="addTimeSlot(this, '@day.Day', '@userId')">+ Add Time</button>
+                    }
+                }
+                else
+                {
+                    <div class="alert alert-info">
+                        No date-specific availabilities added.
                     </div>
                 }
             </div>
@@ -44,11 +119,17 @@
     </div>
 </div>
 
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
-        var userId = '@userId';  // Correctly scoped variable
+        $(document).ready(function () {
+            initializeTimePickers();
+        });
 
+        // General Availability Section Functions
         function initializeTimePickers() {
             $(".timepicker").flatpickr({
                 enableTime: true,
@@ -57,24 +138,6 @@
                 time_24hr: true
             });
         }
-
-        function loadAvailability() {
-            $.ajax({
-                type: "GET",
-                url: '@Url.Action("GetAvailabilityPartial", "Admin", new { userId = userId, _ = new Random().Next() })',
-                success: function (html) {
-                    $('#availabilityTable').html(html);
-                    initializeTimePickers(); // Ensure this runs after content is replaced
-                },
-                error: function (xhr, status, error) {
-                    console.error("Error loading partial view:", status, error);
-                }
-            });
-        }
-
-        $(document).ready(function () {
-            initializeTimePickers();
-        });
 
         function addTimeSlot(button, day, userId) {
             var container = $(button).closest('.day-row').find('.time-slots');
@@ -89,12 +152,8 @@
                     .append(endTimeInput)
                     .append(saveButton)
                     .append('<button type="button" class="btn btn-danger me-2" onclick="removeTimeSlot(this, \'' + day + '\', $(this).closest(\'.time-slot-row\').find(\'.start-time\').val(), $(this).closest(\'.time-slot-row\').find(\'.end-time\').val(), \'' + userId + '\')">🗑️</button>'));
-            console.log(userId);
 
-            // Remove "No availability set for this day." message if present
-            container.find('.no-availability-message').remove();
-
-            container.append(newSlot); // Append the new slot to the container
+            container.append(newSlot);
             initializeTimePickers();
 
             saveButton.click(function () {
@@ -125,15 +184,104 @@
             });
         }
 
-        function removeTimeSlot(button, day, startTime, endTime, userId) {
-            console.log("removeTimeSlot triggered", { day, startTime, endTime, userId });
-            // If the time slot is being removed before it's saved (no start/end time), just remove from the view
-            if (!startTime && !endTime) {
-                $(button).closest('.time-slot-row').remove();
+        // Date-Specific Availability Section Functions
+        document.getElementById("fullDayUnavailableCheckbox").addEventListener("change", function () {
+            const timeFields = document.getElementById("timeSlotFields");
+            timeFields.style.display = this.checked ? "none" : "block";
+        });
+
+        function saveDateSpecificTimeSlot() {
+            const date = $('input[name="date"]').val();
+            const isFullDayUnavailable = $('#fullDayUnavailableCheckbox').is(':checked');
+            const startTime = isFullDayUnavailable ? null : $('input[name="startTime"]').val();
+            const endTime = isFullDayUnavailable ? null : $('input[name="endTime"]').val();
+
+            if (!date || (!isFullDayUnavailable && (!startTime || !endTime))) {
+                alert("Please fill out all required fields.");
                 return;
             }
 
-            // Confirm deletion if needed
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("SaveDateSpecificTimeSlot", "Admin")',
+                data: { date, startTime, endTime, isFullDayUnavailable },
+                success: function (response) {
+                    if (response.success) {
+                        alert(response.message);
+
+                        // Delay before loading to ensure Firebase update
+                        setTimeout(loadDateSpecificAvailability, 1000);
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function () {
+                    alert("Error occurred while saving availability.");
+                }
+            });
+        }
+
+        function loadDateSpecificAvailability() {
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetDateSpecificAvailability", "Admin")',
+                data: { userId: '@Model.UserId' },
+                success: function (response) {
+                    const container = $('#existingDateSpecificAvailability');
+                    container.empty();
+
+                    if (response.success && response.availability) {
+                        console.log(response.availability);
+                        $.each(response.availability, function (date, slots) {
+                            const dateElement = $('<div class="list-group-item bg-light mb-3 shadow-sm rounded">').append(
+                                $('<h5 class="text-dark fw-bold">').text(date)
+                            );
+
+                            const slotList = $('<ul class="list-unstyled ms-3">');
+
+                            
+
+                            dateElement.append(slotList);
+                            container.append(dateElement);
+                        });
+                    } else {
+                        container.text("No date-specific availabilities added.");
+                    }
+                },
+                error: function () {
+                    alert("Error occurred while loading date-specific availability.");
+                }
+            });
+        }
+
+        function removeDateSpecificAvailability(date, slotId) {
+            if (!slotId) {
+                alert("Slot ID is missing!");
+                return;
+            }
+            if (!confirm("Are you sure you want to delete this availability?")) {
+                return; // Cancel the operation if the user does not confirm
+            }
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("RemoveDateSpecificAvailability", "Admin")',
+                data: { date: date, slotId: slotId },
+                success: function (response) {
+                    if (response.success) {
+                        alert("Availability removed successfully");
+                        setTimeout(loadDateSpecificAvailability, 1000);
+                    } else {
+                        alert("Failed to remove availability: " + response.message);
+                    }
+                },
+                error: function () {
+                    alert("Error occurred while removing availability.");
+                }
+            });
+        }
+
+        function removeTimeSlot(button, day, startTime, endTime, userId) {
             if (!confirm("Are you sure you want to delete this time slot?")) {
                 return;
             }
@@ -141,20 +289,142 @@
             $.ajax({
                 type: "POST",
                 url: '@Url.Action("RemoveTimeSlot", "Admin")',
-                data: { day: day, startTime: startTime, endTime: endTime, userId: userId },
+                data: { day: day, startTime: startTime, endTime: endTime },
                 success: function (response) {
                     if (response.success) {
-                        // Remove the time slot from the view
-                        $(button).closest('.time-slot-row').remove();
+                        alert("Time slot removed successfully.");
+                        $(button).closest('.time-slot-row').remove(); // Remove the slot from the UI
                     } else {
-                        alert('Failed to remove time slot: ' + response.message);
+                        alert("Failed to remove time slot: " + response.message);
                     }
                 },
                 error: function () {
-                    alert('Error occurred while removing time slot.');
+                    alert("Error occurred while removing time slot.");
                 }
             });
         }
 
     </script>
 }
+
+<style>
+    /* General container and page layout */
+    .container {
+        background-color: #f5f5f5;
+        border-radius: 15px;
+        padding: 40px;
+        max-width: 900px;
+        margin: 40px auto;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .page-title {
+        font-size: 28px;
+        font-weight: bold;
+        color: #333;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    /* Client details */
+    .client-details {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .client-image {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 15px;
+        border: 3px solid #ddd;
+    }
+
+    .client-name {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .client-info p {
+        font-size: 18px;
+        margin: 5px 0;
+    }
+
+    /* Session history table */
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .session-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+        .session-table th, .session-table td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        .session-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+    /* Section title styling */
+    .section-title {
+        font-size: 22px;
+        font-weight: bold;
+        margin-top: 40px;
+        color: #333;
+    }
+
+    /* Totals section */
+    .totals-info {
+        margin-top: 20px;
+        font-size: 18px;
+        text-align: left;
+    }
+
+    #addDateSpecificAvailabilityForm {
+        max-width: 500px;
+        margin: auto;
+    }
+
+    #timeSlotFields {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    h5 {
+        border-bottom: 2px solid #FC670B;
+        padding-bottom: 5px;
+    }
+
+    .list-group-item-1 {
+        padding: 15px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+    }
+
+        .list-group-item-1 h5 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+    .btn-danger {
+        font-size: 0.85rem;
+        padding: 5px 10px;
+        display: inline-flex;
+        align-items: center;
+        color: #fff;
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+</style>
+

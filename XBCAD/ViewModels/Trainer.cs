@@ -13,9 +13,13 @@
     public class TrainerAvailabilityViewModel
     {
         public Trainer Trainer { get; set; } = default!;  // The selected trainer
-        public AvailabilityViewModel Availability { get; set; } = default!;  // Their availability
 
-        // Add this property to capture selected time slots
+        public AvailabilityViewModel Availability { get; set; } = default!;  // General weekly availability
+
+        // New property to hold date-specific availability
+        public Dictionary<string, List<TimeSlot>> DateSpecificAvailability { get; set; } = new Dictionary<string, List<TimeSlot>>();
+
+        // Capture selected time slots
         public List<SelectedTimeSlot> SelectedTimeSlots { get; set; } = new List<SelectedTimeSlot>();
     }
 

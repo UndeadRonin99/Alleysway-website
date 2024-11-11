@@ -435,13 +435,19 @@ namespace XBCAD.Controllers
 
             if (string.IsNullOrEmpty(userId))
             {
-                return RedirectToAction("Login", "Account"); // Redirect to login if the user ID is not found
+                return RedirectToAction("Login", "Account");
             }
 
-            var model = await firebaseService.GetAvailabilityAsync(userId);
-            model.UserId = userId;
+            var model = new AvailabilityViewModel
+            {
+                UserId = userId,
+                Days = await firebaseService.GetAllAvailabilityAsync(userId),  // Fetches default availability
+                DateSpecificAvailability = await firebaseService.GetAllDateSpecificAvailabilityAsync(userId) // Fetches date-specific availability
+            };
+
             return View(model); // Pass the availability data to the view
         }
+
 
         // Method to return updated availability as partial view
         public async Task<IActionResult> GetAvailabilityPartial()
@@ -497,6 +503,71 @@ namespace XBCAD.Controllers
             catch (Exception ex)
             {
                 return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveDateSpecificTimeSlot(string date, string startTime, string endTime, bool isFullDayUnavailable)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var Name = User.FindFirstValue(ClaimTypes.Name); //Retrieve Name
+            ViewBag.Name = Name;
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Json(new { success = false, message = "User ID is required." });
+            }
+
+            try
+            {
+                // Call the service to save date-specific availability with the full-day flag
+                await firebaseService.SaveDateSpecificAvailabilityAsync(userId, date, startTime, endTime, isFullDayUnavailable);
+                return Json(new { success = true, message = "Date-specific availability saved successfully." });
+            }
+            catch (Exception ex)
+            {
+                // Log the error if necessary and return an error message
+                Console.WriteLine($"Error saving date-specific availability: {ex.Message}");
+                return Json(new { success = false, message = "An error occurred while saving date-specific availability. Please try again later." });
+            }
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetDateSpecificAvailability(string userId)
+        {
+            var Name = User.FindFirstValue(ClaimTypes.Name); // Retrieve Name
+            ViewBag.Name = Name;
+
+            var availability = await firebaseService.GetAllDateSpecificAvailabilityAsync(userId);
+            if (availability != null)
+            {
+                return Json(new { success = true, availability });
+            }
+            return Json(new { success = false, message = "Failed to load date-specific availability." });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RemoveDateSpecificAvailability(string date, string slotId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var Name = User.FindFirstValue(ClaimTypes.Name); //Retrieve Name
+            ViewBag.Name = Name;
+
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(date) || string.IsNullOrEmpty(slotId))
+            {
+                return Json(new { success = false, message = "Invalid data provided." });
+            }
+
+            var result = await firebaseService.RemoveDateSpecificTimeSlotAsync(userId, date, slotId);
+
+            if (result)
+            {
+                return Json(new { success = true });
+            }
+            else
+            {
+                return Json(new { success = false, message = "Failed to delete availability." });
             }
         }
     }

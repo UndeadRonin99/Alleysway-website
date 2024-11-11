@@ -58,6 +58,10 @@ namespace XBCAD.Controllers
 
         public async Task<IActionResult> Calendar()
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var name = User.FindFirstValue(ClaimTypes.Name);
+            ViewBag.UserId = userId;
+            ViewBag.Name = name;
             var accessToken = await HttpContext.GetTokenAsync("access_token");
             var email = User.FindFirstValue(ClaimTypes.Email);
 
@@ -335,20 +339,30 @@ namespace XBCAD.Controllers
                 return NotFound("Trainer not found.");
             }
 
+            // Retrieve general weekly availability
             var rawAvailability = await _firebaseService.GetRawAvailabilityAsync(id);
             var hourlyAvailability = _firebaseService.ConvertToHourlySegments(rawAvailability);
 
-            // For testing, set the current date to a future date
+            // Retrieve date-specific availability for the next 7 days
+            DateTime today = DateTime.Now.Date;
+            var dateSpecificAvailability = new Dictionary<string, List<TimeSlot>>();
+
+            for (int i = 0; i < 7; i++)
+            {
+                var date = today.AddDays(i).ToString("yyyy-MM-dd");
+                var slots = await _firebaseService.GetDateSpecificAvailabilityAsync(id, date);
+
+                if (slots.Any())
+                {
+                    dateSpecificAvailability[date] = slots;
+                }
+            }
+
+            // Fetch all booked sessions to filter out unavailable slots
             DateTime currentDateTime = DateTime.Now;
-
-            // Simulate the day after the session date
-            // For example, to simulate 1 day in the future:
-            //currentDateTime = currentDateTime.AddDays(4);
-
             var bookedSessions = await _firebaseService.GetFutureBookedSessionsForTrainerAsync(id, currentDateTime);
 
-
-            // Step 4: Remove booked time slots from availability
+            // Remove booked time slots from general availability
             foreach (var bookedSession in bookedSessions)
             {
                 var startDateTime = DateTime.Parse(bookedSession.StartDateTime);
@@ -368,13 +382,36 @@ namespace XBCAD.Controllers
                 }
             }
 
+            // Remove booked time slots from date-specific availability
+            foreach (var bookedSession in bookedSessions)
+            {
+                var bookedDate = DateTime.Parse(bookedSession.StartDateTime).ToString("yyyy-MM-dd");
+
+                if (dateSpecificAvailability.ContainsKey(bookedDate))
+                {
+                    var dateSlots = dateSpecificAvailability[bookedDate];
+                    var slotToRemove = dateSlots.FirstOrDefault(ts =>
+                        ts.StartTime == DateTime.Parse(bookedSession.StartDateTime).ToString("HH:mm") &&
+                        ts.EndTime == DateTime.Parse(bookedSession.EndDateTime).ToString("HH:mm")
+                    );
+
+                    if (slotToRemove != null)
+                    {
+                        dateSlots.Remove(slotToRemove);
+                    }
+                }
+            }
+
+            // Build a ViewModel to pass both weekly and date-specific availability
             var viewModel = new TrainerAvailabilityViewModel
             {
                 Trainer = trainer,
-                Availability = hourlyAvailability
+                Availability = hourlyAvailability,
+                DateSpecificAvailability = dateSpecificAvailability
             };
 
             return View(viewModel);
         }
+
     }
 }

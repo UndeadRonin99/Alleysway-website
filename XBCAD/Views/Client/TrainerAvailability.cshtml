@@ -21,114 +21,84 @@
         return targetDate;
     }
 }
-<h2 class="page-title">Book session with @Model.Trainer.Name</h2>
+
+<h2>Book session with @Model.Trainer.Name</h2>
 
 <form method="post" action="@Url.Action("BookSession", "Client")">
-    <!-- Hidden input for the trainer's ID -->
     <input type="hidden" name="Trainer.Id" value="@Model.Trainer.Id" />
 
-    <!-- Hidden inputs for selected time slots -->
     <div id="selected-slots"></div>
 
-    <div class="availability-page">
-        <!-- Existing content -->
-        <div class="trainer-details">
-            <!-- ... -->
-        </div>
+    <div class="availability-container">
+        <h3>Choose Date and Time</h3>
 
-        <div class="availability-container">
-            <h3>Choose Date and Time to work with @Model.Trainer.Name</h3>
-            @if (Model.Availability != null && Model.Availability.Days != null)
-            {
-                foreach (var day in Model.Availability.Days)
-                {
-                    var dayDate = GetNextDateForDayOfWeek(day.Day);
-                    bool isToday = dayDate.Date == DateTime.Now.Date;
+        @for (int i = 0; i < 7; i++)
+        {
+            var currentDate = today.AddDays(i);
+            var dayOfWeek = currentDate.DayOfWeek.ToString();
+            var formattedDate = currentDate.ToString("yyyy-MM-dd");
 
-                    if (dayDate >= today)
+            <div class="day">
+                <h4>@dayOfWeek (@currentDate.ToString("dd MMMM yyyy"))</h4>
+                <div class="time-slot-container">
+
+                    @if (Model.DateSpecificAvailability.ContainsKey(formattedDate))
                     {
-                        <div class="day">
-                            <h4>@day.Day (@dayDate.ToString("dd MMMM yyyy"))</h4>
-                            <div class="time-slot-container">
-                                @if (day.TimeSlots != null && day.TimeSlots.Any())
+                        <!-- Display date-specific availability slots -->
+                        foreach (var slot in Model.DateSpecificAvailability[formattedDate])
+                        {
+                            if (slot.IsFullDayUnavailable)
+                            {
+                                <p>Unavailable for the whole day</p>
+                            }
+                            else
+                            {
+                                // Split the slot into 1-hour intervals
+                                DateTime slotStart = DateTime.Parse(slot.StartTime);
+                                DateTime slotEnd = DateTime.Parse(slot.EndTime);
+                                while (slotStart.AddHours(1) <= slotEnd) // Ensure each slot is 1 hour long
                                 {
-                                    bool hasSlotsToDisplay = false;
-                                    foreach (var slot in day.TimeSlots)
-                                    {
-                                        DateTime slotStartDateTime;
-                                        DateTime slotEndDateTime;
-
-                                        // Parse StartTime
-                                        bool startParsed = DateTime.TryParseExact(
-                                        dayDate.ToString("yyyy-MM-dd") + " " + slot.StartTime,
-                                        "yyyy-MM-dd HH:mm",
-                                        null,
-                                        System.Globalization.DateTimeStyles.None,
-                                        out slotStartDateTime);
-
-                                        // Parse EndTime
-                                        bool endParsed = DateTime.TryParseExact(
-                                        dayDate.ToString("yyyy-MM-dd") + " " + slot.EndTime,
-                                        "yyyy-MM-dd HH:mm",
-                                        null,
-                                        System.Globalization.DateTimeStyles.None,
-                                        out slotEndDateTime);
-
-                                        if (startParsed && endParsed)
-                                        {
-                                            // If EndTime is less than or equal to StartTime, add one day
-                                            if (slotEndDateTime <= slotStartDateTime)
-                                            {
-                                                slotEndDateTime = slotEndDateTime.AddDays(1);
-                                            }
-
-                                            if (isToday)
-                                            {
-                                                // Check if slot ends after now
-                                                if (slotEndDateTime > DateTime.Now)
-                                                {
-                                                    hasSlotsToDisplay = true;
-                                                    <button type="button" class="time-slot" data-day="@day.Day" data-date="@dayDate.ToString("yyyy-MM-dd")" data-start-time="@slot.StartTime" data-end-time="@slot.EndTime">
-                                                        @slot.StartTime - @slot.EndTime
-                                                    </button>
-                                                }
-                                            }
-                                            else
-                                            {
-                                                // For future days, display all slots
-                                                hasSlotsToDisplay = true;
-                                                <button type="button" class="time-slot" data-day="@day.Day" data-date="@dayDate.ToString("yyyy-MM-dd")" data-start-time="@slot.StartTime" data-end-time="@slot.EndTime">
-                                                    @slot.StartTime - @slot.EndTime
-                                                </button>
-                                            }
-                                        }
-                                    }
-                                    if (!hasSlotsToDisplay)
-                                    {
-                                        <p>No available slots for @day.Day</p>
-                                    }
+                                    <button type="button" class="time-slot" data-date="@formattedDate" data-start-time="@slotStart.ToString("HH:mm")" data-end-time="@slotStart.AddHours(1).ToString("HH:mm")">
+                                        @slotStart.ToString("HH:mm") - @slotStart.AddHours(1).ToString("HH:mm")
+                                    </button>
+                                    slotStart = slotStart.AddHours(1);
                                 }
-                                else
-                                {
-                                    <p>No available slots for @day.Day</p>
-                                }
-                            </div>
-                        </div>
+                            }
+                        }
                     }
-                }
-            }
-            else
-            {
-                <p>No availability data found</p>
-            }
-        </div>
+                    else
+                    {
+                        <!-- Display general availability if no date-specific availability exists -->
+                        var generalDayAvailability = Model.Availability.Days.FirstOrDefault(d => d.Day == dayOfWeek);
 
-        <div class="booking-summary">
-            <div class="price-summary">
-                <!-- Optional: Display total price -->
+                        if (generalDayAvailability != null && generalDayAvailability.TimeSlots.Any())
+                        {
+                            foreach (var slot in generalDayAvailability.TimeSlots)
+                            {
+                                // Split general availability into 1-hour intervals
+                                DateTime slotStart = DateTime.Parse(slot.StartTime);
+                                DateTime slotEnd = DateTime.Parse(slot.EndTime);
+                                while (slotStart.AddHours(1) <= slotEnd) // Ensure each slot is 1 hour long
+                                {
+                                    <button type="button" class="time-slot" data-date="@formattedDate" data-start-time="@slotStart.ToString("HH:mm")" data-end-time="@slotStart.AddHours(1).ToString("HH:mm")">
+                                        @slotStart.ToString("HH:mm") - @slotStart.AddHours(1).ToString("HH:mm")
+                                    </button>
+                                    slotStart = slotStart.AddHours(1);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <p>No available slots for @dayOfWeek</p>
+                        }
+                    }
+                </div>
             </div>
-            <button type="submit" class="btn-book">Book now</button>
-        </div>
+        }
+    </div>
+
+    <div style="display: flex; justify-content: center; margin-top: 20px;">
+        <button type="submit" class="btn btn-primary">Book now</button>
     </div>
 </form>
 
@@ -266,7 +236,6 @@
             background-color: #333;
         }
 </style>
-
 <script>
     document.querySelectorAll('.time-slot').forEach(button => {
         button.addEventListener('click', function () {
@@ -278,7 +247,7 @@
 
             if (this.classList.contains('selected')) {
                 // Add hidden inputs for the selected slot
-                const index = document.querySelectorAll('#selected-slots input[name^="SelectedTimeSlots"]').length / 3; // Each slot has 3 inputs
+                const index = document.querySelectorAll('#selected-slots input[name^="SelectedTimeSlots"]').length / 3;
                 const dateInput = document.createElement('input');
                 dateInput.type = 'hidden';
                 dateInput.name = `SelectedTimeSlots[${index}].Date`;

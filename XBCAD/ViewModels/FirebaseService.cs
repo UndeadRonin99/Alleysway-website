@@ -626,5 +626,148 @@ public class FirebaseService
         return sessions;
     }
 
+    public async Task SaveDateSpecificAvailabilityAsync(string userId, string date, string startTime, string endTime, bool isFullDayUnavailable)
+    {
+        var timeSlot = new TimeSlot
+        {
+            StartTime = startTime,
+            EndTime = endTime,
+            IsFullDayUnavailable = isFullDayUnavailable
+        };
+
+        // Save timeSlot under the specific date with a unique identifier
+        await firebase
+            .Child("users")
+            .Child(userId)
+            .Child("DateSpecificAvailability")
+            .Child(date)
+            .PostAsync(timeSlot);
+    }
+
+
+    public async Task<Dictionary<string, List<DateSpecificTimeSlot>>> GetAllDateSpecificAvailabilityAsync(string userId)
+    {
+        var dateSpecificAvailability = new Dictionary<string, List<DateSpecificTimeSlot>>();
+
+        // Fetch all date nodes under "DateSpecificAvailability"
+        var dateNodes = await firebase
+            .Child("users")
+            .Child(userId)
+            .Child("DateSpecificAvailability")
+            .OnceAsync<object>(); // Fetches each date node
+
+        foreach (var dateNode in dateNodes)
+        {
+            var date = dateNode.Key;
+
+            // Initialize the list for this date if it doesn't exist
+            if (!dateSpecificAvailability.ContainsKey(date))
+            {
+                dateSpecificAvailability[date] = new List<DateSpecificTimeSlot>();
+            }
+
+            // Fetch all slots under this specific date
+            var slots = await firebase
+                .Child("users")
+                .Child(userId)
+                .Child("DateSpecificAvailability")
+                .Child(date)
+                .OnceAsync<TimeSlot>();
+
+            foreach (var slot in slots)
+            {
+                // Create DateSpecificTimeSlot and set its Id, start time, end time, and availability flag
+                var dateSpecificSlot = new DateSpecificTimeSlot
+                {
+                    Id = slot.Key,
+                    StartTime = slot.Object.StartTime,
+                    EndTime = slot.Object.EndTime,
+                    IsFullDayUnavailable = slot.Object.IsFullDayUnavailable
+                };
+
+                // Add the slot to the list for this date
+                dateSpecificAvailability[date].Add(dateSpecificSlot);
+            }
+        }
+
+        return dateSpecificAvailability;
+    }
+
+
+
+
+    public async Task<List<DayAvailability>> GetAllAvailabilityAsync(string userId)
+    {
+        var days = new List<DayAvailability>
+    {
+        new DayAvailability { Day = "Monday", TimeSlots = new List<TimeSlot>() },
+        new DayAvailability { Day = "Tuesday", TimeSlots = new List<TimeSlot>() },
+        new DayAvailability { Day = "Wednesday", TimeSlots = new List<TimeSlot>() },
+        new DayAvailability { Day = "Thursday", TimeSlots = new List<TimeSlot>() },
+        new DayAvailability { Day = "Friday", TimeSlots = new List<TimeSlot>() },
+        new DayAvailability { Day = "Saturday", TimeSlots = new List<TimeSlot>() },
+        new DayAvailability { Day = "Sunday", TimeSlots = new List<TimeSlot>() }
+    };
+
+        // Fetch each day’s time slots from Firebase as individual TimeSlot objects
+        foreach (var day in days)
+        {
+            var timeSlotsSnapshot = await firebase
+                .Child("users")
+                .Child(userId)
+                .Child("Days")
+                .Child(day.Day)
+                .Child("TimeSlots")
+                .OnceAsync<TimeSlot>();
+
+            foreach (var timeSlotEntry in timeSlotsSnapshot)
+            {
+                day.TimeSlots.Add(timeSlotEntry.Object);  // Add each TimeSlot to the day's list
+            }
+        }
+
+        return days;
+    }
+
+    public async Task<List<TimeSlot>> GetDateSpecificAvailabilityAsync(string userId, string date)
+    {
+        var timeSlots = new List<TimeSlot>();
+
+        var slots = await firebase
+            .Child("users")
+            .Child(userId)
+            .Child("DateSpecificAvailability")
+            .Child(date)
+            .OnceAsync<TimeSlot>();
+
+        foreach (var slot in slots)
+        {
+            timeSlots.Add(slot.Object);
+        }
+
+        return timeSlots;
+    }
+
+    public async Task<bool> RemoveDateSpecificTimeSlotAsync(string userId, string date, string slotId)
+    {
+        try
+        {
+            await firebase
+                .Child("users")
+                .Child(userId)
+                .Child("DateSpecificAvailability")
+                .Child(date)
+                .Child(slotId)  // Only delete the specific slot
+                .DeleteAsync();
+
+            Console.WriteLine("Deletion successful.");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting slot: {ex.Message}");
+            return false;
+        }
+    }
 
 }
