@@ -364,11 +364,11 @@ namespace XBCAD.Controllers
                 return NotFound("Trainer not found.");
             }
 
-            // Retrieve general weekly availability
+            // Retrieve general weekly availability and convert to hourly segments
             var rawAvailability = await _firebaseService.GetRawAvailabilityAsync(id);
             var hourlyAvailability = _firebaseService.ConvertToHourlySegments(rawAvailability);
 
-            // Retrieve date-specific availability for the next 7 days
+            // Retrieve date-specific availability and convert to hourly segments
             DateTime today = DateTime.Now.Date;
             var dateSpecificAvailability = new Dictionary<string, List<TimeSlot>>();
 
@@ -379,7 +379,31 @@ namespace XBCAD.Controllers
 
                 if (slots.Any())
                 {
-                    dateSpecificAvailability[date] = slots;
+                    dateSpecificAvailability[date] = new List<TimeSlot>();
+
+                    // Convert each slot in DateSpecificAvailability to hourly segments
+                    foreach (var slot in slots)
+                    {
+                        var startTime = DateTime.Parse($"{date} {slot.StartTime}");
+                        var endTime = DateTime.Parse($"{date} {slot.EndTime}");
+
+                        // Create hourly segments
+                        while (startTime < endTime)
+                        {
+                            var nextHour = startTime.AddHours(1);
+                            if (nextHour > endTime)
+                                nextHour = endTime;
+
+                            dateSpecificAvailability[date].Add(new TimeSlot
+                            {
+                                StartTime = startTime.ToString("HH:mm"),
+                                EndTime = nextHour.ToString("HH:mm"),
+                                IsFullDayUnavailable = slot.IsFullDayUnavailable
+                            });
+
+                            startTime = nextHour;
+                        }
+                    }
                 }
             }
 
@@ -387,42 +411,42 @@ namespace XBCAD.Controllers
             DateTime currentDateTime = DateTime.Now;
             var bookedSessions = await _firebaseService.GetFutureBookedSessionsForTrainerAsync(id, currentDateTime);
 
-            // Remove booked time slots from general availability
+            // Remove booked time slots from general availability and date-specific availability
             foreach (var bookedSession in bookedSessions)
             {
                 var startDateTime = DateTime.Parse(bookedSession.StartDateTime);
+                var endDateTime = DateTime.Parse(bookedSession.EndDateTime);
                 var dayOfWeek = startDateTime.DayOfWeek.ToString();
+                var formattedDate = startDateTime.ToString("yyyy-MM-dd");
 
-                var dayAvailability = hourlyAvailability.Days.FirstOrDefault(d => d.Day == dayOfWeek);
-                if (dayAvailability != null)
+                // Remove from date-specific availability if it exists
+                if (dateSpecificAvailability.ContainsKey(formattedDate))
                 {
-                    var slotToRemove = dayAvailability.TimeSlots.FirstOrDefault(ts =>
-                        ts.StartTime == startDateTime.ToString("HH:mm") &&
-                        ts.EndTime == DateTime.Parse(bookedSession.EndDateTime).ToString("HH:mm")
-                    );
-                    if (slotToRemove != null)
-                    {
-                        dayAvailability.TimeSlots.Remove(slotToRemove);
-                    }
-                }
-            }
-
-            // Remove booked time slots from date-specific availability
-            foreach (var bookedSession in bookedSessions)
-            {
-                var bookedDate = DateTime.Parse(bookedSession.StartDateTime).ToString("yyyy-MM-dd");
-
-                if (dateSpecificAvailability.ContainsKey(bookedDate))
-                {
-                    var dateSlots = dateSpecificAvailability[bookedDate];
+                    var dateSlots = dateSpecificAvailability[formattedDate];
                     var slotToRemove = dateSlots.FirstOrDefault(ts =>
-                        ts.StartTime == DateTime.Parse(bookedSession.StartDateTime).ToString("HH:mm") &&
-                        ts.EndTime == DateTime.Parse(bookedSession.EndDateTime).ToString("HH:mm")
+                        ts.StartTime == startDateTime.ToString("HH:mm") &&
+                        ts.EndTime == endDateTime.ToString("HH:mm")
                     );
 
                     if (slotToRemove != null)
                     {
                         dateSlots.Remove(slotToRemove);
+                    }
+                }
+                else
+                {
+                    // Otherwise, remove from general availability
+                    var dayAvailability = hourlyAvailability.Days.FirstOrDefault(d => d.Day == dayOfWeek);
+                    if (dayAvailability != null)
+                    {
+                        var slotToRemove = dayAvailability.TimeSlots.FirstOrDefault(ts =>
+                            ts.StartTime == startDateTime.ToString("HH:mm") &&
+                            ts.EndTime == endDateTime.ToString("HH:mm")
+                        );
+                        if (slotToRemove != null)
+                        {
+                            dayAvailability.TimeSlots.Remove(slotToRemove);
+                        }
                     }
                 }
             }
@@ -437,6 +461,8 @@ namespace XBCAD.Controllers
 
             return View(viewModel);
         }
+
+
         public async Task<IActionResult> TrainerSessions(string trainerId)
         {
             var clientId = User.FindFirstValue(ClaimTypes.NameIdentifier);
