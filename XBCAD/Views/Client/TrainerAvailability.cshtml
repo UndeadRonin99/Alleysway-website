@@ -27,6 +27,9 @@
 <form method="post" action="@Url.Action("BookSession", "Client")">
     <input type="hidden" name="Trainer.Id" value="@Model.Trainer.Id" />
 
+    <div id="selected-slots"></div>
+
+
     <div class="availability-container">
         <h3>Choose Date and Time</h3>
 
