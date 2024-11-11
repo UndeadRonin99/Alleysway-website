@@ -340,9 +340,6 @@ namespace XBCAD.Controllers
             return LocalRedirect(returnUrl);
         }
 
-
-
-
         public IActionResult Logout()
         {
             return RedirectToAction("Login");
