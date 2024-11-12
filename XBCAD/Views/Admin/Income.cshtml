@@ -18,7 +18,7 @@
     </div>
 
     <div class="client-grid" id="client-grid">
-        @foreach (var client in Model)
+        @foreach (var client in Model.OrderBy(c => c.Name))
         {
             <div class="client-card">
                 <img src="@client.ProfileImageUrl" alt="Profile image of @client.Name" class="client-image">
@@ -28,6 +28,7 @@
                 </div>
             </div>
         }
+
     </div>
 </div>
 

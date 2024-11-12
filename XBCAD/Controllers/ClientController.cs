@@ -565,9 +565,13 @@ namespace XBCAD.Controllers
 
             await request.ExecuteAsync();
         }
+        public async Task<IActionResult> ClientPortfolio()
+        {
+            var clients = await _firebaseService.GetAllClientsAsync(); // Replace with the correct method name
+            return View(clients);
+        }
+
 
     }
-
-
 
 }
