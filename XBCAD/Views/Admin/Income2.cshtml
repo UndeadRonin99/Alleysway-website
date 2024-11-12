@@ -8,14 +8,32 @@
     var cultureInfo = new CultureInfo("en-ZA"); // South African Rand (R)
 }
 
+<!-- Include jsPDF and html2canvas libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
 <div class="container">
-    <div class="back-button">
-        <a href="@Url.Action("Income", "Admin")" class="btn-back">Client Portfolio Page</a>
+    <div class="top-buttons">
+        <div class="back-button">
+            <a href="@Url.Action("Income", "Admin")" class="btn-back">Client Portfolio Page</a>
+        </div>
+        <!-- Add Download PDF Button -->
+        <div class="download-button">
+            <button onclick="generatePDF()" class="btn-download">Download PDF</button>
+        </div>
     </div>
+
     <h1 class="page-title">Sessions with @Model.Client.Name</h1>
 
     <div class="client-details">
-        <img src="@Model.Client.ProfileImageUrl" alt="Profile image of @Model.Client.Name" class="client-image">
+        @if (!string.IsNullOrEmpty(Model.Client.ProfileImageBase64))
+        {
+            <img src="data:image/png;base64,@Model.Client.ProfileImageBase64" alt="Profile image of @Model.Client.Name" class="client-image">
+        }
+        else
+        {
+            <img src="@Model.Client.ProfileImageUrl" alt="Profile image of @Model.Client.Name" class="client-image">
+        }
         <h2 class="client-name">@Model.Client.Name</h2>
         <div class="client-info">
             <p><strong>Total Amount Paid:</strong> @Model.TotalAmountPaid.ToString("C", cultureInfo)</p>
@@ -80,7 +98,6 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <!-- Filtering Script -->
-<!-- Filtering Script -->
 <script>
     function filterSessions() {
         var startDate = document.getElementById('startDateFilter').value;
@@ -134,7 +151,45 @@
         document.getElementById('total-amount-due').innerText = formatCurrency(totalAmountDue);
         document.getElementById('total-amount-paid').innerText = formatCurrency(totalAmountPaid);
     }
+    async function generatePDF() {
+        const { jsPDF } = window.jspdf; // Access jsPDF from the library
+        const pdf = new jsPDF('p', 'mm', 'a4'); // Create a new PDF instance
 
+        // Select the content you want to convert to PDF
+        const content = document.querySelector('.container');
+
+        // Use html2canvas to take a snapshot of the content
+        const canvas = await html2canvas(content, {
+            scale: 2, // Increase scale for better resolution
+            useCORS: true // Enable cross-origin images
+        });
+
+        // Convert the canvas to an image data URL
+        const imgData = canvas.toDataURL('image/png');
+
+        // Calculate the width and height to fit the PDF page
+        const imgWidth = 190; // Width in mm (A4 width is 210mm with 20mm total margins)
+        const pageHeight = 297; // A4 page height in mm
+        const imgHeight = canvas.height * imgWidth / canvas.width; // Maintain aspect ratio
+
+        let heightLeft = imgHeight;
+        let position = 10; // Starting position on Y axis
+
+        // Add the image to the PDF
+        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+
+        // Add additional pages if necessary
+        while (heightLeft > 0) {
+            position = heightLeft - imgHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+        }
+
+        // Download the PDF
+        pdf.save('Client_Details.pdf');
+    }
     // Function to parse currency string to number
     function parseCurrency(value) {
         // Remove currency symbol
@@ -169,6 +224,27 @@
 
 
 <style>
+    .btn-download {
+        background-color: #28a745;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-download:hover {
+            background-color: #218838;
+        }
+
+    .top-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
     .back-button {
         text-align: left;
         margin-bottom: 20px;
