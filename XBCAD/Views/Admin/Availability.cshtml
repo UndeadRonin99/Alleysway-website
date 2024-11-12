@@ -44,35 +44,40 @@
 
 <div class="container mt-4">
     <!-- Date-Specific Availability Section -->
-    <h2>Date-Specific Availability</h2>
+    <h2 class="text-center">Date-Specific Availability</h2>
     <div class="availability-section mt-5">
-            <form id="addDateSpecificAvailabilityForm" onsubmit="event.preventDefault(); saveDateSpecificTimeSlot();" class="p-3 border rounded shadow-sm bg-light">
+        <form id="addDateSpecificAvailabilityForm" onsubmit="event.preventDefault(); saveDateSpecificTimeSlot();" class="p-3 border rounded shadow-sm bg-light">
 
-                <div class="mb-3">
+            <div class="mb-3">
                 <label for="dateInput" class="form-label fw-bold" style="vertical-align: middle;">Date:</label>
-                    <input type="date" id="dateInput" name="date" class="form-control" required />
-                </div>
+                <input type="date" id="dateInput" name="date" class="form-control" required />
+            </div>
 
-                <div class="form-check mb-3">
-                    <input type="checkbox" id="fullDayUnavailableCheckbox" name="isFullDayUnavailable" class="form-check-input" />
-                    <label for="fullDayUnavailableCheckbox" class="form-check-label">Unavailable for the whole day</label>
-                </div>
+            <div class="form-check mb-3">
+                <input type="checkbox" id="fullDayUnavailableCheckbox" name="isFullDayUnavailable" class="form-check-input" />
+                <label for="fullDayUnavailableCheckbox" class="form-check-label">Unavailable for the whole day</label>
+            </div>
 
-                <div id="timeSlotFields" class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="startTime" class="form-label fw-bold">Start Time:</label>
-                        <input type="time" name="startTime" id="startTime" class="form-control" />
-                    </div>
-                    <div class="col-md-6">
-                        <label for="endTime" class="form-label fw-bold">End Time:</label>
-                        <input type="time" name="endTime" id="endTime" class="form-control" />
-                    </div>
-                </div>
+            <!-- Centered Heading and Time Slot Section -->
+            <div class="text-center mb-3">
+                <label class="form-label fw-bold">I am only available from</label>
+            </div>
 
-                <div class="d-flex justify-content-end">
-                    <button type="submit" class="btn btn-primary px-4">Add Availability</button>
+            <div id="timeSlotFields" class="row mb-3 justify-content-center">
+                <div class="col-md-5">
+                    <label for="startTime" class="form-label fw-bold">Start Time:</label>
+                    <input type="time" name="startTime" id="startTime" class="form-control" />
                 </div>
-            </form>
+                <div class="col-md-5">
+                    <label for="endTime" class="form-label fw-bold">End Time:</label>
+                    <input type="time" name="endTime" id="endTime" class="form-control" />
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary px-4">Add Availability</button>
+            </div>
+        </form>
 
         <div class="mt-4">
             <h3 class="section-title">Existing Date-Specific Availabilities</h3>
@@ -107,7 +112,6 @@
                             </ul>
                         </div>
                     }
-
                 }
                 else
                 {
@@ -119,6 +123,7 @@
         </div>
     </div>
 </div>
+
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
