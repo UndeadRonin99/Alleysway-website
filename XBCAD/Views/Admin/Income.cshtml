@@ -8,6 +8,10 @@
 
 <div class="container">
     <h1 class="page-title">Client Portfolio</h1>
+
+    <div class="toolbar">
+        <a href="@Url.Action("PaymentOverview", "Admin")" class="btn btn-overview">Payment Overview</a>
+    </div>
     <div class="search-bar">
         <!-- Search form can be added here -->
     </div>
@@ -26,6 +30,30 @@
 </div>
 
 <style>
+    /* Toolbar Styling for Centering the Button */
+    .toolbar {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .btn-overview {
+        background-color: #FC670B;
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 5px;
+        text-align: center;
+        cursor: pointer;
+        text-decoration: none;
+        margin-bottom: 20px;
+        transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+    }
+
+        .btn-overview:hover {
+            background-color: #FF7900;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
     /* Container and Page Title */
     .container {
         background-color: #f5f5f5;

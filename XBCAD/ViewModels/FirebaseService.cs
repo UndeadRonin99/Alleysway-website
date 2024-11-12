@@ -1013,6 +1013,66 @@ public class FirebaseService
         }
         return clients;
     }
+    public async Task<List<ClientSessionsViewModel>> GetAllSessionsForTrainerAsync(string trainerId)
+    {
+        var sessionsList = new List<ClientSessionsViewModel>();
+
+        // Fetch all session nodes under the trainer's "sessions" path in Firebase
+        var clientSessions = await firebase
+            .Child("users")
+            .Child(trainerId)
+            .Child("sessions")
+            .Child("SessionID")
+            .OnceAsync<BookedSession>();
+
+        // Group sessions by ClientID
+        var clientGroupedSessions = clientSessions.GroupBy(s => s.Object.ClientID);
+
+        foreach (var clientSessionGroup in clientGroupedSessions)
+        {
+            var clientId = clientSessionGroup.Key;
+
+            // Fetch client data
+            var clientData = await firebase
+                .Child("users")
+                .Child(clientId)
+                .OnceSingleAsync<dynamic>();
+
+            if (clientData == null)
+            {
+                continue; // Skip if client data is missing
+            }
+
+            // Extract session information for each client
+            var sessions = clientSessionGroup.Select(s => s.Object).ToList();
+
+            // Calculate total amount due and paid
+            decimal totalAmountDue = sessions.Where(s => !s.Paid).Sum(s => s.TotalAmount);
+            decimal totalAmountPaid = sessions.Where(s => s.Paid).Sum(s => s.TotalAmount);
+
+            // Create client view model
+            var clientViewModel = new ClientViewModel
+            {
+                Id = clientId,
+                Name = $"{clientData.firstName} {clientData.lastName}",
+                ProfileImageUrl = clientData.profileImageUrl ?? "/images/default.jpg"
+            };
+
+            // Add to sessions list
+            sessionsList.Add(new ClientSessionsViewModel
+            {
+                Client = clientViewModel,
+                Sessions = sessions,
+                TotalAmountDue = totalAmountDue,
+                TotalAmountPaid = totalAmountPaid
+            });
+        }
+
+        return sessionsList;
+    }
+
+
+
 
 
 

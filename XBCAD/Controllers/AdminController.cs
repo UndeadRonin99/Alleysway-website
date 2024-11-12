@@ -589,5 +589,24 @@ namespace XBCAD.Controllers
                 return Json(new { success = false, message = "Failed to delete availability." });
             }
         }
+        public async Task<IActionResult> PaymentOverview()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var Name = User.FindFirstValue(ClaimTypes.Name); //Retrieve Name
+            ViewBag.Name = Name;
+
+            var trainerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var sessions = await firebaseService.GetAllSessionsForTrainerAsync(trainerId);
+
+            var model = new PaymentOverviewViewModel
+            {
+                Sessions = sessions // Assigning the correct type here
+            };
+
+            return View("PaymentOverview", model);
+        }
+
+
+
     }
 }
