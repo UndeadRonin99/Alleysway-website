@@ -374,7 +374,7 @@ namespace XBCAD.Controllers
 
             for (int i = 0; i < 7; i++)
             {
-                var date = today.AddDays(i).ToString("yyyy-MM-dd");
+                var date = today.AddDays(i+1).ToString("yyyy-MM-dd");
                 var slots = await _firebaseService.GetDateSpecificAvailabilityAsync(id, date);
 
                 if (slots.Any())

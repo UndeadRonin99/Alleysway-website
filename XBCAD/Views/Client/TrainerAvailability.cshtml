@@ -35,7 +35,7 @@
 
         @for (int i = 0; i < 7; i++)
         {
-            var currentDate = today.AddDays(i);
+            var currentDate = today.AddDays(i+1);
             var dayOfWeek = currentDate.DayOfWeek.ToString();
             var formattedDate = currentDate.ToString("yyyy-MM-dd");
 
