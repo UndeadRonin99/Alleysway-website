@@ -59,7 +59,9 @@ namespace XBCAD.Controllers
             var authenticateResult = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
             if (!authenticateResult.Succeeded)
             {
-                return BadRequest("Google authentication failed.");
+                // Handle the failure
+                TempData["ErrorMessage"] = "Google authentication was canceled or failed. Please try again.";
+                return RedirectToAction("Login", "Account"); // Redirect to login or a custom error page
             }
 
             var googleUid = authenticateResult.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -333,7 +335,11 @@ namespace XBCAD.Controllers
             var authenticateResult = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
 
             if (!authenticateResult.Succeeded)
-                return BadRequest("Error while authenticating with Google.");
+            {
+                // Handle the failed authentication here
+                TempData["ErrorMessage"] = "Google authentication was canceled or failed. Please try again.";
+                return RedirectToAction("Login", "Account"); // Redirect to a safe page, like login
+            }
 
 
             // Perform local sign-in as necessary or redirect
@@ -343,6 +349,12 @@ namespace XBCAD.Controllers
         public IActionResult Logout()
         {
             return RedirectToAction("Login");
+        }
+        [HttpGet]
+        public IActionResult AccessDenied()
+        {
+            TempData["ErrorMessage"] = "Google authentication was canceled. Please try again.";
+            return RedirectToAction("Login"); // Redirect to your login page with an error message
         }
     }
 }

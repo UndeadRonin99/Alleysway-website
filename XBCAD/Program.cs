@@ -57,6 +57,7 @@ namespace XBCAD
                 googleOptions.ClientSecret = "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"; // Replace with your client secret
                 googleOptions.CallbackPath = "/signin-google"; // Ensure this matches the redirect URI in Google Developer Console
                 googleOptions.SaveTokens = true; // Save Google tokens
+                googleOptions.AccessDeniedPath = "/Account/AccessDenied"; // Handle "Cancel" scenario
 
                 // Add Google Calendar OAuth scope
                 googleOptions.Scope.Add("https://www.googleapis.com/auth/calendar.readonly");
