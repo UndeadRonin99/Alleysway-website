@@ -12,16 +12,18 @@
     <div class="toolbar">
         <a href="@Url.Action("PaymentOverview", "Admin")" class="btn btn-overview">Payment Overview</a>
     </div>
+
     <div class="search-bar">
-        <!-- Search form can be added here -->
+        <input type="text" id="client-search" class="search-input" placeholder="Search clients..." onkeyup="searchClients()" />
     </div>
-    <div class="client-grid">
+
+    <div class="client-grid" id="client-grid">
         @foreach (var client in Model)
         {
             <div class="client-card">
                 <img src="@client.ProfileImageUrl" alt="Profile image of @client.Name" class="client-image">
                 <div class="client-info">
-                    <h3>@client.Name</h3>
+                    <h3 class="client-name">@client.Name</h3>
                     <a href="@Url.Action("Income2", "Admin", new { id = client.Id })" class="btn btn-view">View</a>
                 </div>
             </div>
@@ -29,12 +31,34 @@
     </div>
 </div>
 
+<!-- JavaScript for Search Functionality -->
+<script>
+    function searchClients() {
+        var input = document.getElementById('client-search');
+        var filter = input.value.toLowerCase();
+        var clientGrid = document.getElementById('client-grid');
+        var clientCards = clientGrid.getElementsByClassName('client-card');
+
+        for (var i = 0; i < clientCards.length; i++) {
+            var clientNameElem = clientCards[i].getElementsByClassName('client-name')[0];
+            var clientName = clientNameElem.textContent || clientNameElem.innerText;
+
+            if (clientName.toLowerCase().indexOf(filter) > -1) {
+                clientCards[i].style.display = '';
+            } else {
+                clientCards[i].style.display = 'none';
+            }
+        }
+    }
+</script>
+
 <style>
     /* Toolbar Styling for Centering the Button */
     .toolbar {
         text-align: center;
         margin-bottom: 20px;
     }
+
     .btn-overview {
         background-color: #FC670B;
         border: none;
@@ -54,6 +78,7 @@
             transform: translateY(-2px);
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
         }
+
     /* Container and Page Title */
     .container {
         background-color: #f5f5f5;
@@ -136,4 +161,18 @@
         margin-bottom: 20px;
         text-align: center;
     }
+
+    .search-input {
+        width: 300px;
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        transition: border-color 0.3s;
+    }
+
+        .search-input:focus {
+            border-color: #FC670B;
+            outline: none;
+        }
 </style>
