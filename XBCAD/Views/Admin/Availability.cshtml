@@ -25,7 +25,7 @@
                                         <input type="text" class="form-control me-2 timepicker" value="@slot.StartTime" placeholder="Start Time" readonly>
                                         <span class="me-2">until</span>
                                         <input type="text" class="form-control me-2 timepicker" value="@slot.EndTime" placeholder="End Time" readonly>
-                                        <button type="button" class="btn btn-danger me-2" onclick="removeTimeSlot(this, '@day.Day', '@slot.StartTime', '@slot.EndTime', '@userId')">🗑️</button>
+                                        <button type="button" class="btn btn-danger me-2" onclick="removeTimeSlot(this, '@day.Day', '@slot.StartTime', '@slot.EndTime', '@userId')">🗑</button>
                                     </div>
                                 </div>
                             }
@@ -43,84 +43,110 @@
 </div>
 
 <div class="container mt-4">
-    <!-- Date-Specific Availability Section -->
-    <h2 class="text-center">Date-Specific Availability</h2>
-    <div class="availability-section mt-5">
-        <form id="addDateSpecificAvailabilityForm" onsubmit="event.preventDefault(); saveDateSpecificTimeSlot();" class="p-3 border rounded shadow-sm bg-light">
+    <!-- Tab Navigation -->
+    <ul class="nav nav-tabs" id="availabilityTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="unavailability-tab" data-bs-toggle="tab" data-bs-target="#unavailability" type="button" role="tab" aria-controls="unavailability" aria-selected="true">Date-Specific Unavailability</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="availability-tab" data-bs-toggle="tab" data-bs-target="#availability" type="button" role="tab" aria-controls="availability" aria-selected="false">Date-Specific Availability</button>
+        </li>
+    </ul>
 
-            <div class="mb-3">
-                <label for="dateInput" class="form-label fw-bold" style="vertical-align: middle;">Date:</label>
-                <input type="date" id="dateInput" name="date" class="form-control" required />
-            </div>
+    <!-- Tab Content -->
+    <div class="tab-content mt-3" id="availabilityTabsContent"> 
 
-            <div class="form-check mb-3">
-                <input type="checkbox" id="fullDayUnavailableCheckbox" name="isFullDayUnavailable" class="form-check-input" />
-                <label for="fullDayUnavailableCheckbox" class="form-check-label">Unavailable for the whole day</label>
-            </div>
+        <!-- Date-Specific Unavailability Section -->
+        <div class="tab-pane fade show active" id="unavailability" role="tabpanel" aria-labelledby="unavailability-tab">
+            <h2 class="text-center">Date-Specific Unavailability</h2>
 
-            <!-- Centered Heading and Time Slot Section -->
-            <div class="text-center mb-3">
-                <label class="form-label fw-bold">I am only available from</label>
-            </div>
-
-            <div id="timeSlotFields" class="row mb-3 justify-content-center">
-                <div class="col-md-5">
-                    <label for="startTime" class="form-label fw-bold">Start Time:</label>
-                    <input type="time" name="startTime" id="startTime" class="form-control" />
+            <!-- Date-Specific Unavailability Form -->
+            <form id="addDateSpecificUnavailabilityForm" class="p-3 border rounded shadow-sm bg-light">
+                <div class="mb-3">
+                    <label for="unavailableStartDateInput" class="form-label fw-bold">Start date:</label>
+                    <input type="date" id="unavailableStartDateInput" name="startDate" class="form-control" required />
                 </div>
-                <div class="col-md-5">
-                    <label for="endTime" class="form-label fw-bold">End Time:</label>
-                    <input type="time" name="endTime" id="endTime" class="form-control" />
+                <div class="mb-3">
+                    <label for="unavailableEndDateInput" class="form-label fw-bold">End date:</label>
+                    <input type="date" id="unavailableEndDateInput" name="endDate" class="form-control" required />
                 </div>
-            </div>
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-danger px-4" onclick="saveDateSpecificUnavailability()">Add Unavailability</button>
+                </div>
+            </form>
 
-            <div class="d-flex justify-content-end">
-                <button type="submit" class="btn btn-primary px-4">Add Availability</button>
-            </div>
-        </form>
-
-        <div class="mt-4">
-            <h3 class="section-title">Existing Date-Specific Availabilities</h3>
-            <div id="existingDateSpecificAvailability" class="list-group">
-                @if (Model.DateSpecificAvailability.Any())
-                {
-                    @foreach (var date in Model.DateSpecificAvailability)
-                    {
-                        <div class="list-group-item-1 bg-light mb-3 shadow-sm rounded">
-                            <h5 class="text-dark fw-bold">
-                                <i class="bi bi-calendar3 me-2"></i> @date.Key
-                            </h5>
-                            <ul class="list-unstyled ms-3">
-                                @foreach (var slot in date.Value)
-                                {
-                                    <li class="d-flex align-items-center justify-content-between border-bottom py-2" data-slot-id="@slot.Id">
-                                        <span>
-                                            @if (slot.IsFullDayUnavailable)
-                                            {
-                                                <span class="badge bg-warning text-dark">Full day unavailable</span>
-                                            }
-                                            else
-                                            {
-                                                <span><i class="bi bi-clock"></i> @slot.StartTime - @slot.EndTime</span>
-                                            }
-                                        </span>
-                                        <button type="button" class="btn btn-danger btn-sm w-auto delete-slot-button" data-date="@date.Key" data-slot-id="@slot.Id">
-                                            <i class="bi bi-trash-fill me-1">Delete</i>
-                                        </button>
-                                    </li>
-                                }
-                            </ul>
-                        </div>
-                    }
-                }
-                else
-                {
-                    <div class="alert alert-info">
-                        No date-specific availabilities added.
-                    </div>
-                }
-            </div>
         </div>
+
+        <!-- Date-Specific Availability Section -->
+        <div class="tab-pane fade" id="availability" role="tabpanel" aria-labelledby="availability-tab">
+            <h2 class="text-center">Date-Specific Availability</h2>
+
+            <!-- Availability Form -->
+            <form id="addDateSpecificAvailabilityForm" class="p-3 border rounded shadow-sm bg-light">
+                <div class="mb-3">
+                    <label for="availableDateInput" class="form-label fw-bold">Date:</label>
+                    <input type="date" id="availableDateInput" name="date" class="form-control" required />
+                </div>
+                <div id="timeSlotFields" class="row mb-3 justify-content-center">
+                    <div class="col-md-5">
+                        <label for="startTime" class="form-label fw-bold">Start Time:</label>
+                        <input type="time" name="startTime" id="startTime" class="form-control" required />
+                    </div>
+                    <div class="col-md-5">
+                        <label for="endTime" class="form-label fw-bold">End Time:</label>
+                        <input type="time" name="endTime" id="endTime" class="form-control" required />
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary px-4" onclick="saveDateSpecificTimeSlot()">Add Availability</button>
+                </div>
+            </form>
+        </div> 
+    </div>
+</div>
+
+
+<!-- Existing Availabilities Section -->
+<div class="container mt-4">
+    <h3 class="section-title">Existing Date-Specific Availabilities</h3>
+    <div id="existingDateSpecificAvailability" class="list-group">
+        @if (Model.DateSpecificAvailability.Any())
+        {
+            @foreach (var date in Model.DateSpecificAvailability)
+            {
+                <div class="list-group-item-1 bg-light mb-3 shadow-sm rounded">
+                    <h5 class="text-dark fw-bold">
+                        <i class="bi bi-calendar3 me-2"></i> @date.Key
+                    </h5>
+                    <ul class="list-unstyled ms-3">
+                        @foreach (var slot in date.Value)
+                        {
+                            <li class="d-flex align-items-center justify-content-between border-bottom py-2" data-slot-id="@slot.Id">
+                                <span>
+                                    @if (slot.IsFullDayUnavailable)
+                                    {
+                                        <span class="badge bg-warning text-dark">Full day unavailable</span>
+                                    }
+                                    else
+                                    {
+                                        <span><i class="bi bi-clock"></i> @slot.StartTime - @slot.EndTime</span>
+                                    }
+                                </span>
+                                <button type="button" class="btn btn-danger btn-sm w-auto delete-slot-button" data-date="@date.Key" data-slot-id="@slot.Id">
+                                    <i class="bi bi-trash-fill me-1">Delete</i>
+                                </button>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="alert alert-info">
+                No date-specific availabilities added.
+            </div>
+        }
     </div>
 </div>
 
@@ -191,18 +217,73 @@
         }
 
         // Date-Specific Availability Section Functions
-        document.getElementById("fullDayUnavailableCheckbox").addEventListener("change", function () {
-            const timeFields = document.getElementById("timeSlotFields");
-            timeFields.style.display = this.checked ? "none" : "block";
-        });
+
+        function saveDateSpecificUnavailability() {
+            const startDate = $('#unavailableStartDateInput').val();
+            const endDate = $('#unavailableEndDateInput').val();
+
+            if (!startDate || !endDate) {
+                alert("Please fill out both start and end dates.");
+                return;
+            }
+
+            if (new Date(endDate) < new Date(startDate)) {
+                alert("End date cannot be before start date.");
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("SaveDateSpecificUnavailability", "Admin")',
+                data: { startDate: startDate, endDate: endDate },
+                success: function (response) {
+                    if (response.success) {
+                        alert(response.message);
+
+                        const slotId = response.slotId;  // Retrieve the slotId from the response
+                        const newAvailability = $('<div class="list-group-item-1 bg-light mb-3 shadow-sm rounded">').append(
+                            $('<h5 class="text-dark fw-bold">').html('<i class="bi bi-calendar3 me-2"></i>' + date)
+                        );
+
+                        const slotList = $('<ul class="list-unstyled ms-3">');
+                        const slotItem = $('<li class="d-flex align-items-center justify-content-between border-bottom py-2" data-slot-id="' + slotId + '">');
+
+                        if (isFullDayUnavailable) {
+                            slotItem.append('<span class="badge bg-warning text-dark">Full day unavailable</span>');
+                        } else {
+                            slotItem.append('<span><i class="bi bi-clock"></i> ' + startTime + ' - ' + endTime + '</span>');
+                        }
+
+                        const deleteButton = $('<button type="button" class="btn btn-danger btn-sm w-auto delete-slot-button">')
+                            .attr("data-slot-id", slotId)
+                            .attr("data-date", date)
+                            .html('<i class="bi bi-trash-fill me-1">Delete</i>')
+                            .on('click', function () {
+                                removeDateSpecificAvailability(date, slotId);
+                            });
+
+                        slotItem.append(deleteButton);
+                        slotList.append(slotItem);
+                        newAvailability.append(slotList);
+
+                        $('#existingDateSpecificAvailability').append(newAvailability);
+                        $('#addDateSpecificAvailabilityForm').trigger("reset");
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function () {
+                    alert("Error occurred while saving availability.");
+                }
+            });
+        }
 
         function saveDateSpecificTimeSlot() {
             const date = $('input[name="date"]').val();
-            const isFullDayUnavailable = $('#fullDayUnavailableCheckbox').is(':checked');
-            const startTime = isFullDayUnavailable ? null : $('input[name="startTime"]').val();
-            const endTime = isFullDayUnavailable ? null : $('input[name="endTime"]').val();
+            const startTime = $('input[name="startTime"]').val();
+            const endTime = $('input[name="endTime"]').val();
 
-            if (!date || (!isFullDayUnavailable && (!startTime || !endTime))) {
+            if (!date || !startTime || !endTime) {
                 alert("Please fill out all required fields.");
                 return;
             }
@@ -210,7 +291,7 @@
             $.ajax({
                 type: "POST",
                 url: '@Url.Action("SaveDateSpecificTimeSlot", "Admin")',
-                data: { date, startTime, endTime, isFullDayUnavailable },
+                data: { date, startTime, endTime },
                 success: function (response) {
                     if (response.success) {
                         alert(response.message);

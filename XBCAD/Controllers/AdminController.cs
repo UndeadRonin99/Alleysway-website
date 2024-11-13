@@ -535,7 +535,7 @@ namespace XBCAD.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SaveDateSpecificTimeSlot(string date, string startTime, string endTime, bool isFullDayUnavailable)
+        public async Task<IActionResult> SaveDateSpecificTimeSlot(string date, string startTime, string endTime)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -547,13 +547,48 @@ namespace XBCAD.Controllers
             try
             {
                 // Call the service and get the slotId of the saved availability
-                var slotId = await firebaseService.SaveDateSpecificAvailabilityAsync(userId, date, startTime, endTime, isFullDayUnavailable);
+                var slotId = await firebaseService.SaveDateSpecificAvailabilityAsync(userId, date, startTime, endTime);
                 return Json(new { success = true, message = "Date-specific availability saved successfully.", slotId = slotId });
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error saving date-specific availability: {ex.Message}");
                 return Json(new { success = false, message = "An error occurred while saving date-specific availability. Please try again later." });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveDateSpecificUnavailability(string startDate, string endDate)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Json(new { success = false, message = "User ID is required." });
+            }
+
+            try
+            {
+                DateTime start = DateTime.Parse(startDate);
+                DateTime end = DateTime.Parse(endDate);
+
+                if (end < start)
+                {
+                    return Json(new { success = false, message = "End date cannot be before start date." });
+                }
+
+                for (var date = start; date <= end; date = date.AddDays(1))
+                {
+                    var dateString = date.ToString("yyyy-MM-dd");
+                    await firebaseService.SaveDateSpecificUnavailabilityAsync(userId, dateString, null, null, true);
+                }
+
+                return Json(new { success = true, message = "Date-specific unavailability saved successfully." });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saving date-specific unavailability: {ex.Message}");
+                return Json(new { success = false, message = "An error occurred while saving date-specific unavailability. Please try again later." });
             }
         }
 
