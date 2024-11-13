@@ -1,7 +1,9 @@
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using XBCAD.ViewModels; // Make sure you're referencing your ViewModels
+using Microsoft.Extensions.Logging;
+using XBCAD.ViewModels; // Ensure you're referencing your ViewModels
 
 namespace XBCAD
 {
@@ -50,19 +52,33 @@ namespace XBCAD
                 options.SlidingExpiration = true;
                 options.Cookie.HttpOnly = true; // Secure cookie
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Use HTTPS for cookies
+                options.Cookie.SameSite = SameSiteMode.None; // Allow cross-site requests for OAuth
             })
-            .AddGoogle(googleOptions =>
-            {
-                googleOptions.ClientId = "890106355046-i4t8lqblco7om7cc9sf3hq9k57f5k62e.apps.googleusercontent.com"; // Replace with your client ID
-                googleOptions.ClientSecret = "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"; // Replace with your client secret
-                googleOptions.CallbackPath = "/signin-google"; // Ensure this matches the redirect URI in Google Developer Console
-                googleOptions.SaveTokens = true; // Save Google tokens
-                googleOptions.AccessDeniedPath = "/Account/AccessDenied"; // Handle "Cancel" scenario
+           .AddGoogle(googleOptions =>
+           {
+               googleOptions.ClientId = "890106355046-i4t8lqblco7om7cc9sf3hq9k57f5k62e.apps.googleusercontent.com"; // Replace with your client ID
+               googleOptions.ClientSecret = "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"; // Replace with your client secret
+               googleOptions.CallbackPath = "/signin-google"; // Ensure this matches the redirect URI in Google Developer Console
+               googleOptions.SaveTokens = true; // Save Google tokens
+               googleOptions.AccessDeniedPath = "/Account/AccessDenied"; // Handle "Cancel" scenario
 
-                // Add Google Calendar OAuth scope
-                googleOptions.Scope.Add("https://www.googleapis.com/auth/calendar.readonly");
-                googleOptions.Scope.Add("https://www.googleapis.com/auth/calendar");
+               // Add Google Calendar OAuth scope
+               googleOptions.Scope.Add("https://www.googleapis.com/auth/calendar.readonly");
+               googleOptions.Scope.Add("https://www.googleapis.com/auth/calendar");
 
+           
+            // Handle authentication failures
+            googleOptions.Events.OnRemoteFailure = context =>
+                {
+                    // Log the error if desired
+                    var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+                    logger.LogWarning("Authentication failed: {Error}", context.Failure?.Message);
+
+                    // Redirect to the login page with an optional error message
+                    context.Response.Redirect("/Account/Login?error=authentication_failed");
+                    context.HandleResponse(); // Prevent the exception from propagating
+                    return Task.CompletedTask;
+                };
             });
 
             var app = builder.Build();
