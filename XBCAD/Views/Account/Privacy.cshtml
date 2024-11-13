@@ -1,0 +1,293 @@
+﻿@{
+    Layout = "~/Views/Shared/_LandingLayout.cshtml";
+    ViewData["Title"] = "Privacy - Alleysway";
+
+}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href='https://fonts.googleapis.com/css?family=Anton' rel='stylesheet'>
+    <link href='https://fonts.googleapis.com/css?family=Antonio' rel='stylesheet'>
+    <style>
+        body {
+            background-color: #121212;
+            color: #f5f5f5;
+            font-family: Antonio, sans-serif;
+        }
+
+        .top-section {
+            position: relative;
+            padding: 5rem 2rem;
+            color: #f5f5f5;
+            background-size: cover;
+            background-attachment: fixed;
+            width: 100vw; /* Ensure it spans the entire viewport width */
+            margin: 0; /* Remove any margin that might create gaps */
+            left: 50%;
+            transform: translateX(-50%); /* Center the section */
+        }
+
+            .top-section .content {
+                position: relative;
+                z-index: 2;
+                padding: 3rem 2rem;
+            }
+
+            .top-section h1 {
+                font-size: 5rem;
+                font-weight: bold;
+                text-transform: uppercase;
+                font-family: Anton, sans-serif;
+            }
+
+            .top-section h3 {
+                font-size: 2rem;
+                font-weight: bold;
+            }
+
+            .top-section h4 {
+                font-size: 1.75rem;
+                font-weight: bold;
+            }
+
+            .top-section p.lead {
+                font-size: 1.2rem;
+                line-height: 1.6;
+            }
+
+        .btn-primary {
+            background-color: #ed8240;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+            .btn-primary:hover {
+                background-color: #c5692e;
+            }
+
+        .programs-section {
+            padding: 4rem 2rem;
+        }
+
+        .program-card {
+            position: relative;
+            height: 400px; /* Set a fixed height for cards */
+            overflow: hidden;
+            border: none;
+            border-radius: 10px;
+            color: #ffffff;
+        }
+
+            .program-card .card-bg {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-size: cover;
+                background-position: center;
+                filter: brightness(0.5); /* Darken the background for better text visibility */
+                z-index: 1;
+            }
+
+            .program-card .card-content {
+                position: relative;
+                z-index: 2;
+                padding: 2rem;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+            }
+
+            .program-card h3 {
+                font-weight: bold;
+                font-size: 1.5rem;
+                margin-bottom: 1rem;
+            }
+
+            .program-card p {
+                font-size: 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .program-card .btn {
+                border: 2px solid #fff;
+                text-transform: uppercase;
+                font-weight: bold;
+                transition: background-color 0.3s, color 0.3s;
+            }
+
+                .program-card .btn:hover {
+                    background-color: #fff;
+                    color: #000;
+                }
+
+        .stat-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            color: #ffffff;
+            text-align: center;
+            transition: transform 0.3s ease;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-card-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 1rem;
+            border-radius: 5px;
+        }
+
+        .stat-card:hover {
+            transform: scale(1.05);
+        }
+
+
+
+        .testimonials-section {
+            padding: 4rem 2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Top Section -->
+    <div class="top-section text-center text-white" style="background-image: url('/images/DSC_0432.png'); background-size: cover; width: 100vw;">
+        <div class="content" style="max-width: 800px; margin: auto; background: rgba(0, 0, 0, 0.7); padding: 3rem; border-radius: 10px;">
+            <h1 class="display-4" style="font-family: 'Anton', sans-serif; color: #ed8240; margin-bottom: 1.5rem;">Privacy Policy of this website</h1>
+            <p>This Application collects some Personal Data from its Users. This document can be printed for reference by using the print command in any browser’s settings.</p>
+        </div>
+    </div>
+
+    <!-- Content Section -->
+    <div class="container my-5" style="color: #f5f5f5;">
+        <div class="content-section">
+            <!-- Owner and Controller -->
+            <h2 style="font-size: 2rem; font-weight: bold; color: #ed8240;">Owner and Data Controller</h2>
+            <p>TechTitans - Waterstone Drive, Benmore Rd, Sandton, 2196</p>
+            <p>Owner contact email: <a href="mailto:techtitans0907@gmail.com" style="color: #ed8240; text-decoration: none;">techtitans0907@gmail.com</a></p>
+
+            <!-- Types of Data Collected -->
+            <h3 style="font-size: 1.8rem; color: #ed8240; margin-top: 2rem;">Types of Data Collected</h3>
+            <p>Personal Data that this Application collects includes Calendar, Reminders, Photo Library, and Camera permissions; Trackers; and Usage Data. Detailed information on each type is provided below or by specific explanation texts before data collection.</p>
+            <p class="text-muted">Mandatory data is required for this Application’s services, while optional data can be omitted without affecting functionality.</p>
+
+            <!-- Mode and Place of Processing -->
+            <h3 style="font-size: 1.8rem; color: #ed8240; margin-top: 2rem;">Mode and Place of Processing the Data</h3>
+            <h4>Methods of Processing</h4>
+            <p>Data is processed securely using IT-enabled tools following organizational procedures. In addition to the Owner, Data may be accessible to certain personnel or external parties involved in the operation of this Application. An updated list of these parties may be requested from the Owner.</p>
+
+            <h4>Place</h4>
+            <p>Data is processed at the Owner's operating offices or in other locations of involved parties. Users may contact the Owner for more details on data transfers and locations.</p>
+
+            <h4>Retention Time</h4>
+            <p>Data is retained as long as necessary for the purpose collected and may be stored longer due to legal obligations or user consent.</p>
+
+            <!-- Purposes of Processing -->
+            <h3 style="font-size: 1.8rem; color: #ed8240; margin-top: 2rem;">Purposes of Processing</h3>
+            <p>Data concerning the User is collected to provide services, fulfill legal obligations, protect rights, and detect fraud, as well as for Registration, Authentication, Device Permissions, Traffic Optimization, and Displaying Content from External Platforms.</p>
+
+            <!-- Device Permissions -->
+            <h3 style="font-size: 1.8rem; color: #ed8240; margin-top: 2rem;">Device Permissions for Personal Data Access</h3>
+            <p>This Application may request device permissions that Users can grant or revoke through device settings.</p>
+
+            <h4>Calendar Permission</h4>
+            <p>Accesses calendar for reading, adding, and removing entries.</p>
+
+            <h4>Camera Permission (without saving or recording)</h4>
+            <p>Accesses the camera for capturing images or video. This Application does not save or record camera output.</p>
+
+            <h4>Photo Library Permission</h4>
+            <p>Allows access to the User's Photo Library.</p>
+
+            <h4>Reminders Permission</h4>
+            <p>Allows access to the Reminders app for reading, adding, and removing entries.</p>
+
+            <!-- Detailed Information on Processing -->
+            <h3 style="font-size: 1.8rem; color: #ed8240; margin-top: 2rem;">Detailed Information on the Processing of Personal Data</h3>
+            <h4>Device Permissions for Personal Data Access</h4>
+            <p>Personal Data processed: Calendar, Camera, Photo Library, and Reminders permissions.</p>
+
+            <h4>Displaying Content from External Platforms</h4>
+            <p>This Application may allow content from external platforms (e.g., widgets). This may collect traffic data.</p>
+
+            <h5>Google Fonts (Google LLC)</h5>
+            <p>Personal Data processed: Trackers and Usage Data. Location: United States. <a href="https://policies.google.com/privacy" style="color: #ed8240;">Privacy Policy</a></p>
+
+            <h4>Registration and Authentication</h4>
+            <p>Authentication services provided by third parties allow this Application to identify Users.</p>
+
+            <h5>Google OAuth (Google LLC)</h5>
+            <p>Personal Data processed: various types of Data as specified in Google's privacy policy. Location: United States. <a href="https://policies.google.com/privacy" style="color: #ed8240;">Privacy Policy</a></p>
+
+            <h4>Traffic Optimization and Distribution</h4>
+            <h5>Cloudflare (Cloudflare, Inc.)</h5>
+            <p>Personal Data processed: Trackers and Usage Data. Location: United States. <a href="https://www.cloudflare.com/privacypolicy/" style="color: #ed8240;">Privacy Policy</a></p>
+
+            <!-- Cookie Policy -->
+            <h3 style="font-size: 1.8rem; color: #ed8240; margin-top: 2rem;">Cookie Policy</h3>
+            <p>This Application uses Trackers. To learn more, consult the Cookie Policy.</p>
+
+            <!-- User Rights -->
+            <h3 style="font-size: 1.8rem; color: #ed8240; margin-top: 2rem;">User Rights</h3>
+            <p>Users may exercise rights to withdraw consent, object to processing, access data, request rectification, restrict processing, delete data, transfer data, and lodge complaints.</p>
+
+            <h4>How to Exercise These Rights</h4>
+            <p>Users can contact the Owner via the contact details provided in this document. Requests are free of charge and will be addressed within one month.</p>
+
+            <!-- Additional Information -->
+            <h3 style="font-size: 1.8rem; color: #ed8240; margin-top: 2rem;">Additional Information on Data Collection and Processing</h3>
+            <p>This Application may use Personal Data for legal purposes, maintenance, and system logging. Further details can be requested from the Owner.</p>
+
+            <h4>Changes to This Privacy Policy</h4>
+            <p>The Owner reserves the right to make changes to this privacy policy at any time. Users should check this page regularly for updates.</p>
+
+            <!-- Definitions and Legal References -->
+            <h3 style="font-size: 1.8rem; color: #ed8240; margin-top: 2rem;">Definitions and Legal References</h3>
+            <ul>
+                <li><strong>Personal Data (or Data):</strong> Any information that allows for the identification of a person.</li>
+                <li><strong>Usage Data:</strong> Information collected automatically through this Application, including IP addresses and browser details.</li>
+                <li><strong>User:</strong> The individual using this Application.</li>
+                <li><strong>Data Subject:</strong> The natural person to whom the Personal Data refers.</li>
+                <li><strong>Data Processor (or Processor):</strong> The entity processing Data on behalf of the Controller.</li>
+                <li><strong>Data Controller (or Owner):</strong> The entity determining the purposes and means of processing Personal Data.</li>
+                <li><strong>Service:</strong> The service provided by this Application.</li>
+                <li><strong>European Union (EU):</strong> All member states of the EU and the European Economic Area.</li>
+                <li><strong>Cookie:</strong> Small data sets stored in the User's browser.</li>
+                <li><strong>Tracker:</strong> Technology enabling User tracking, such as cookies, identifiers, or beacons.</li>
+            </ul>
+
+            <p class="text-muted">Latest update: November 13, 2024</p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center py-4" style="background-color: #222; color: #ccc;">
+        <p>2024 Alleysway. All rights reserved.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+</body>
+
+
+
+</html>

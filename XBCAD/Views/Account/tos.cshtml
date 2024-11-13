@@ -1,0 +1,256 @@
+﻿@{
+    Layout = "~/Views/Shared/_LandingLayout.cshtml";
+    ViewData["Title"] = "Terms of service - Alleysway";
+
+}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href='https://fonts.googleapis.com/css?family=Anton' rel='stylesheet'>
+    <link href='https://fonts.googleapis.com/css?family=Antonio' rel='stylesheet'>
+    <style>
+        body {
+            background-color: #121212;
+            color: #f5f5f5;
+            font-family: Antonio, sans-serif;
+        }
+
+        .top-section {
+            position: relative;
+            padding: 5rem 2rem;
+            color: #f5f5f5;
+            background-size: cover;
+            background-attachment: fixed;
+            width: 100vw; /* Ensure it spans the entire viewport width */
+            margin: 0; /* Remove any margin that might create gaps */
+            left: 50%;
+            transform: translateX(-50%); /* Center the section */
+        }
+
+            .top-section .content {
+                position: relative;
+                z-index: 2;
+                padding: 3rem 2rem;
+            }
+
+            .top-section h1 {
+                font-size: 5rem;
+                font-weight: bold;
+                text-transform: uppercase;
+                font-family: Anton, sans-serif;
+            }
+
+            .top-section h3 {
+                font-size: 2rem;
+                font-weight: bold;
+            }
+
+            .top-section h4 {
+                font-size: 1.75rem;
+                font-weight: bold;
+            }
+
+            .top-section p.lead {
+                font-size: 1.2rem;
+                line-height: 1.6;
+            }
+
+        .btn-primary {
+            background-color: #ed8240;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+            .btn-primary:hover {
+                background-color: #c5692e;
+            }
+
+        .programs-section {
+            padding: 4rem 2rem;
+        }
+
+        .program-card {
+            position: relative;
+            height: 400px; /* Set a fixed height for cards */
+            overflow: hidden;
+            border: none;
+            border-radius: 10px;
+            color: #ffffff;
+        }
+
+            .program-card .card-bg {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-size: cover;
+                background-position: center;
+                filter: brightness(0.5); /* Darken the background for better text visibility */
+                z-index: 1;
+            }
+
+            .program-card .card-content {
+                position: relative;
+                z-index: 2;
+                padding: 2rem;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+            }
+
+            .program-card h3 {
+                font-weight: bold;
+                font-size: 1.5rem;
+                margin-bottom: 1rem;
+            }
+
+            .program-card p {
+                font-size: 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .program-card .btn {
+                border: 2px solid #fff;
+                text-transform: uppercase;
+                font-weight: bold;
+                transition: background-color 0.3s, color 0.3s;
+            }
+
+                .program-card .btn:hover {
+                    background-color: #fff;
+                    color: #000;
+                }
+
+        .stat-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            color: #ffffff;
+            text-align: center;
+            transition: transform 0.3s ease;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-card-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 1rem;
+            border-radius: 5px;
+        }
+
+        .stat-card:hover {
+            transform: scale(1.05);
+        }
+
+
+
+        .testimonials-section {
+            padding: 4rem 2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Top Section -->
+    <div class="top-section text-center text-white" style="background-image: url('/images/DSC_0432.png'); background-size: cover; width: 100vw;">
+        <div class="content" style="max-width: 800px; margin: auto; background: rgba(0, 0, 0, 0.7); padding: 3rem; border-radius: 10px;">
+            <h1 class="display-4" style="font-family: 'Anton', sans-serif; color: #ed8240; margin-bottom: 1.5rem;">Terms of Service</h1>
+            <p style="font-size: 1.2rem; color: #ccc;">Last updated: November 13, 2024</p>
+        </div>
+    </div>
+
+    <!-- Content Section -->
+    <div class="container my-5" style="color: #f5f5f5;">
+        <div class="content-section">
+            <h2 style="font-size: 2rem; font-weight: bold; color: #ed8240;">Welcome to Alleysway!</h2>
+            <p>These terms of service outline the rules and regulations for using our application. By accessing or using our application, you agree to these terms. If you disagree with any part of the terms, you may not access or use our services.</p>
+
+            <h3 style="font-size: 1.8rem; color: #ed8240; margin-top: 2rem;">1. Acceptance of Terms</h3>
+            <p>By accessing or using our application, you confirm that you have read, understood, and agree to be bound by these Terms of Service, along with our Privacy Policy. These terms apply to all users of the application.</p>
+
+            <h3 style="font-size: 1.8rem; color: #ed8240; margin-top: 2rem;">2. Modifications to Terms</h3>
+            <p>Alleysway reserves the right to modify or replace these terms at any time. We will notify you of any changes by posting the new terms on this page and updating the date at the top. Continued use of the application after changes constitutes acceptance of the new terms.</p>
+
+            <h3 style="font-size: 1.8rem; color: #ed8240; margin-top: 2rem;">3. Eligibility</h3>
+            <p>You must be at least 18 years old to use this application, or have permission from a parent or guardian. By using the application, you represent and warrant that you meet the eligibility requirements.</p>
+
+            <h3 style="font-size: 1.8rem; color: #ed8240; margin-top: 2rem;">4. User Accounts</h3>
+            <h4>Account Registration</h4>
+            <p>To access certain features, you may need to create an account. You agree to provide accurate, complete, and current information and to update it as necessary.</p>
+            <h4>Account Security</h4>
+            <p>You are responsible for maintaining the confidentiality of your account and password. Alleysway cannot and will not be liable for any loss or damage arising from your failure to secure your account.</p>
+
+            <h3 style="font-size: 1.8rem; color: #ed8240; margin-top: 2rem;">5. Permitted Use of the Application</h3>
+            <p>You agree to use the application solely for personal or internal business purposes and in compliance with all applicable laws and regulations. You are prohibited from:</p>
+            <ul>
+                <li>Copying, modifying, or distributing any part of the application without our written consent.</li>
+                <li>Using the application for any unauthorized or illegal purposes.</li>
+                <li>Attempting to interfere with or disrupt the application’s functionality.</li>
+            </ul>
+
+            <h3 style="font-size: 1.8rem; color: #ed8240; margin-top: 2rem;">6. Intellectual Property</h3>
+            <p>All content, trademarks, and other intellectual property in the application, including text, graphics, logos, and software, are owned by or licensed to Alleysway. Unauthorized use of any content is prohibited.</p>
+
+            <h3 style="font-size: 1.8rem; color: #ed8240; margin-top: 2rem;">7. User-Generated Content</h3>
+            <h4>Content Ownership</h4>
+            <p>By uploading or sharing content on the application, you grant Alleysway a worldwide, non-exclusive, royalty-free, and transferable license to use, display, and distribute your content.</p>
+            <h4>User Responsibility</h4>
+            <p>You are solely responsible for the content you upload, post, or share on the application and agree not to upload content that violates the rights of any third party or is unlawful, abusive, or otherwise objectionable.</p>
+
+            <h3 style="font-size: 1.8rem; color: #ed8240; margin-top: 2rem;">8. Privacy and Data Collection</h3>
+            <p>Alleysway collects and processes personal information as described in our <a href="privacy-policy.html" style="color: #ed8240; text-decoration: none;">Privacy Policy</a>. By using our application, you consent to such processing and agree that all information provided by you is accurate.</p>
+
+            <h3 style="font-size: 1.8rem; color: #ed8240; margin-top: 2rem;">9. Third-Party Services and Links</h3>
+            <p>Our application may contain links to third-party websites or services that are not owned or controlled by Alleysway. We do not endorse or assume responsibility for any third-party sites, services, or content. You agree that Alleysway is not responsible for any loss or damage related to your use of third-party services.</p>
+
+            <h3 style="font-size: 1.8rem; color: #ed8240; margin-top: 2rem;">10. Limitation of Liability</h3>
+            <p>To the maximum extent permitted by law, Alleysway and its affiliates will not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits, revenues, data, or use arising out of or related to your use of the application.</p>
+
+            <h3 style="font-size: 1.8rem; color: #ed8240; margin-top: 2rem;">11. Termination</h3>
+            <p>Alleysway reserves the right to suspend or terminate your access to the application at any time, without prior notice, if you violate these terms. Upon termination, your right to use the application will cease immediately.</p>
+
+            <h3 style="font-size: 1.8rem; color: #ed8240; margin-top: 2rem;">12. Dispute Resolution</h3>
+            <p>Any disputes arising out of or relating to these terms or the use of the application shall be governed by the laws of South Africa. You agree to submit to the exclusive jurisdiction of the courts located in South Africa.</p>
+
+            <h3 style="font-size: 1.8rem; color: #ed8240; margin-top: 2rem;">13. Contact Information</h3>
+            <p>If you have any questions about these Terms of Service, please contact us at:</p>
+            <ul>
+                <li><strong>Email:</strong> <a href="mailto:techtitans0907@gmail.com" style="color: #ed8240;">techtitans0907@gmail.com</a></li>
+                <li><strong>Address:</strong> TechTitans, Waterstone Drive, Benmore Rd, Sandton, 2196</li>
+            </ul>
+
+            <p class="text-muted" style="margin-top: 3rem;">By using the Alleysway application, you acknowledge that you have read and agree to these Terms of Service.</p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center py-4" style="background-color: #222; color: #ccc;">
+        <p>2024 Alleysway. All rights reserved.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+</body>
+
+
+
+
+</html>
