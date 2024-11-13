@@ -7,17 +7,20 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/XBCAD.styles.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/login.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
 </head>
 
-<body>
+<body style="background-color:black; font-family:Arial, sans-serif">
+
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light" style="width: 100vw; background-color:#FC670B; overflow-x:hidden">
-        <img src="/images/Alleysway-Logo-1-768x423.png" alt="Bodybuilding" class="navbar-brand" width="150" height="100">
+        <a href="/" class="navbar-brand">
+            <img src="/images/Alleysway-Logo-1-768x423.png" alt="Bodybuilding" width="150" height="100">
+        </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -42,16 +45,70 @@
         </div>
     </nav>
 
+    <!-- Main Content -->
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
+    <!-- Footer -->
+    <footer class="footer bg-dark text-white mt-5 p-4 text-center">
+        <div>thaskala@yahoo.com | 072 723 4051</div>
+        <a href="https://www.iubenda.com/privacy-policy/43652986" class="iubenda-white iubenda-noiframe iubenda-embed iubenda-noiframe" title="Privacy Policy">Privacy Policy</a>
+        <script type="text/javascript">
+            (function (w, d) {
+                var loader = function () {
+                    var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0];
+                    s.src = "https://cdn.iubenda.com/iubenda.js";
+                    tag.parentNode.insertBefore(s, tag);
+                };
+                if (w.addEventListener) {
+                    w.addEventListener("load", loader, false);
+                } else if (w.attachEvent) {
+                    w.attachEvent("onload", loader);
+                } else {
+                    w.onload = loader;
+                }
+            })(window, document);
+        </script>
+        <div class="social-icons mt-3">
+            <a href="https://www.instagram.com/alleyswayfitnesscentre/" target="_blank" class="text-white mx-3">
+                <i class="fab fa-instagram"></i> Instagram
+            </a>
+            <a href="https://www.facebook.com/alleyswayfitnesscentre/" target="_blank" class="text-white mx-3">
+                <i class="fab fa-facebook"></i> Facebook
+            </a>
+        </div>
+    </footer>
 
+    <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <!-- Include the latest version of EmailJS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@@emailjs/browser@4/dist/email.min.js"></script>
+
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            emailjs.init("lE3Z8wS5vJ84DcC8_"); // Replace with your EmailJS user ID
+            document.getElementById('contactModalForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+                var firstName = document.getElementById('firstName').value;
+                var lastName = document.getElementById('lastName').value;
+                document.getElementById('from_name').value = firstName + ' ' + lastName;
+                emailjs.sendForm('service_g1b9mf6', 'template_22quo3l', this)
+                    .then(function (response) {
+                        console.log('SUCCESS!', response.status, response.text);
+                        alert('SUCCESS! Your message has been sent.');
+                    }, function (error) {
+                        console.error('FAILED...', error);
+                        alert('FAILED... Please try again.');
+                    });
+            });
+        });
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
