@@ -82,6 +82,12 @@ namespace XBCAD.Controllers
             // Get client details
             var clientData = await firebaseService.GetClientByIdAsync(id);
 
+            // Fetch and set the Base64 image
+            if (!string.IsNullOrEmpty(clientData.ProfileImageUrl))
+            {
+                clientData.ProfileImageBase64 = await GetImageAsBase64Async(clientData.ProfileImageUrl);
+            }
+
             // Get sessions between the trainer and the client
             var sessions = await firebaseService.GetSessionsBetweenTrainerAndClientAsync(trainerId, id);
 
@@ -100,6 +106,7 @@ namespace XBCAD.Controllers
 
             return View("Income2", model);
         }
+
 
 
         public async Task<IActionResult> Income()
@@ -604,6 +611,23 @@ namespace XBCAD.Controllers
             };
 
             return View("PaymentOverview", model);
+        }
+        private async Task<string> GetImageAsBase64Async(string imageUrl)
+        {
+            using (var client = new HttpClient())
+            {
+                try
+                {
+                    var imageBytes = await client.GetByteArrayAsync(imageUrl);
+                    return Convert.ToBase64String(imageBytes);
+                }
+                catch (Exception ex)
+                {
+                    // Handle exceptions (e.g., image not found)
+                    Console.WriteLine($"Error fetching image: {ex.Message}");
+                    return null;
+                }
+            }
         }
 
 

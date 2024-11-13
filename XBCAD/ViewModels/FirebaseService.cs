@@ -1070,11 +1070,33 @@ public class FirebaseService
 
         return sessionsList;
     }
+    public async Task<List<ClientViewModel>> GetAllClientsAsync()
+    {
+        var clients = new List<ClientViewModel>();
 
+        // Fetch all users from Firebase
+        var users = await firebase
+            .Child("users")
+            .OnceAsync<dynamic>();
 
+        // Filter out clients (assuming that clients are not "admin" role)
+        foreach (var user in users)
+        {
+            if (user.Object.role != "admin") // Assuming clients have role other than "admin"
+            {
+                string profileImageUrl = user.Object.profileImageUrl ?? "/images/default.jpg";
 
+                clients.Add(new ClientViewModel
+                {
+                    Id = user.Key,
+                    Name = $"{user.Object.firstName} {user.Object.lastName}",
+                    ProfileImageUrl = profileImageUrl
+                });
+            }
+        }
 
-
+        return clients;
+    }
 
 
 }

@@ -3,25 +3,50 @@
 
 @model PaymentOverviewViewModel
 @{
-    ViewData["Title"] = "Payment Overview";
+    ViewData["Title"] = "Payment Management";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var cultureInfo = new CultureInfo("en-ZA"); // South African Rand (R)
+
+    // Flatten and sort the sessions
+    var allSessions = new List<SessionWithClientViewModel>();
+    foreach (var clientSessions in Model.Sessions)
+    {
+        foreach (var session in clientSessions.Sessions)
+        {
+            allSessions.Add(new SessionWithClientViewModel
+                    {
+                        Session = session,
+                        Client = clientSessions.Client
+                    });
+        }
+    }
+    allSessions = allSessions.OrderByDescending(s => DateTime.Parse(s.Session.StartDateTime)).ToList();
 }
 
 <div class="container">
-    <h1 class="page-title">Payment Overview</h1>
+    <h1 class="page-title">Payment Management</h1>
+
+    <!-- Navigation Button -->
+    <div class="navigation-button">
+        <a href="@Url.Action("Income", "Admin")" class="btn-income">Individual Client Portfolio</a>
+    </div>
 
     <div class="analytics-section">
         <div class="analytics-item">
             <h2>Total Sessions</h2>
-            <p>@Model.TotalSessions</p>
+            <p id="total-sessions">@Model.TotalSessions</p>
         </div>
         <div class="analytics-item">
             <h2>Total Income</h2>
-            <p>R @Model.TotalIncome.ToString("N2")</p>
+            <p id="total-income">R @Model.TotalIncome.ToString("N2")</p>
+        </div>
+        <div class="analytics-item">
+            <h2>Total Paid Sessions</h2>
+            <p id="total-paid-sessions">@(Model.TotalSessions - Model.TotalUnpaidSessions)</p>
         </div>
         <div class="analytics-item">
             <h2>Total Unpaid Sessions</h2>
-            <p>@Model.TotalUnpaidSessions</p>
+            <p id="total-unpaid-sessions">@Model.TotalUnpaidSessions</p>
         </div>
     </div>
 
@@ -45,33 +70,112 @@
             <tr>
                 <th>Client Name</th>
                 <th>Date</th>
+                <th>Start Time</th>
+                <th>End Time</th>
                 <th>Total Amount</th>
-                <th>Status</th>
+                <th>Paid</th>
             </tr>
         </thead>
         <tbody id="payment-overview-body">
-            @foreach (var clientSessions in Model.Sessions)
+            @foreach (var item in allSessions)
             {
-                foreach (var session in clientSessions.Sessions)
-                {
-                    <tr data-client="@clientSessions.Client.Name" data-status="@(session.Paid ? "paid" : "unpaid")" data-date="@session.StartDateTime">
-                        <td class="client-info-cell">
-                            <img src="@clientSessions.Client.ProfileImageUrl" alt="Profile image of @clientSessions.Client.Name" class="client-profile-image" />
-                            @clientSessions.Client.Name
-                        </td>
-                        <td>@DateTime.Parse(session.StartDateTime).ToString("dd MMM yyyy")</td>
-                        <td>R @session.TotalAmount.ToString("N2")</td>
-                        <td class="@(session.Paid ? "status-paid" : "status-unpaid")">
-                            @(session.Paid ? "Paid" : "Unpaid")
-                        </td>
-                    </tr>
-                }
+                var session = item.Session;
+                var client = item.Client;
+                <tr data-client="@client.Name"
+                    data-status="@(session.Paid ? "paid" : "unpaid")"
+                    data-date="@session.StartDateTime"
+                    data-total-amount="@session.TotalAmount"
+                    data-paid="@(session.Paid ? "true" : "false")">
+                    <td class="client-info-cell">
+                        <img src="@client.ProfileImageUrl" alt="Profile image of @client.Name" class="client-profile-image" />
+                        @client.Name
+                    </td>
+                    <td>@DateTime.Parse(session.StartDateTime).ToString("dd MMM yyyy")</td>
+                    <td>@DateTime.Parse(session.StartDateTime).ToString("HH:mm")</td>
+                    <td>@DateTime.Parse(session.EndDateTime).ToString("HH:mm")</td>
+                    <td>R @session.TotalAmount.ToString("N2")</td>
+                    <td>
+                        <select class="status-dropdown"
+                                data-session-id="@session.SessionKey"
+                                data-client-id="@client.Id">
+                            <option value="paid" selected="@(session.Paid ? "selected" : null)">Paid</option>
+                            <option value="unpaid" selected="@(session.Paid ? null : "selected")">Unpaid</option>
+                        </select>
+                    </td>
+                </tr>
             }
         </tbody>
     </table>
 </div>
 
+
+
+<!-- Include jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
+    $(document).ready(function () {
+        // Apply styles to all status dropdowns
+        $('.status-dropdown').each(function () {
+            updateSelectStyle($(this));
+        });
+
+        // Handle dropdown changes
+        $(document).on('change', '.status-dropdown', function () {
+            var select = $(this);
+            var sessionId = select.data('session-id');
+            var clientId = select.data('client-id');
+            var statusValue = select.val();
+            var isPaid = statusValue === 'paid';
+
+            $.ajax({
+                url: '@Url.Action("UpdateSessionPaymentStatus", "Admin")',
+                type: 'POST',
+                data: {
+                    sessionId: sessionId,
+                    isPaid: isPaid,
+                    clientId: clientId
+                },
+                success: function (response) {
+                    if (response.success) {
+                        // Update the data attributes and status text
+                        var row = select.closest('tr');
+                        row.attr('data-paid', isPaid ? 'true' : 'false');
+                        row.attr('data-status', isPaid ? 'paid' : 'unpaid');
+
+                        // Update the select element's style
+                        updateSelectStyle(select);
+
+                        // Recalculate totals
+                        filterResults();
+                    } else {
+                        alert('Error updating payment status: ' + response.message);
+                        // Revert selection if update fails
+                        select.val(isPaid ? 'unpaid' : 'paid');
+                        updateSelectStyle(select);
+                    }
+                },
+                error: function () {
+                    alert('Error updating payment status.');
+                    // Revert selection if error
+                    select.val(isPaid ? 'unpaid' : 'paid');
+                    updateSelectStyle(select);
+                }
+            });
+        });
+    });
+
+    function updateSelectStyle(select) {
+        var statusValue = select.val();
+        if (statusValue === 'paid') {
+            select.css('background-color', '#d4edda'); // light green
+            select.css('color', '#155724'); // dark green text
+        } else {
+            select.css('background-color', '#f8d7da'); // light red
+            select.css('color', '#721c24'); // dark red text
+        }
+    }
+
     function filterResults() {
         var searchValue = document.getElementById('search-bar').value.toLowerCase();
         var statusValue = document.getElementById('statusFilter').value;
@@ -80,11 +184,18 @@
 
         var rows = document.querySelectorAll('#payment-overview-body tr');
 
+        var totalSessions = 0;
+        var totalIncome = 0;
+        var totalPaidSessions = 0;
+        var totalUnpaidSessions = 0;
+
         rows.forEach(function (row) {
             var clientName = row.getAttribute('data-client').toLowerCase();
             var status = row.getAttribute('data-status');
             var sessionDate = row.getAttribute('data-date');
             var sessionDateObj = new Date(sessionDate);
+            var totalAmount = parseFloat(row.getAttribute('data-total-amount'));
+            var isPaid = row.getAttribute('data-paid') === 'true';
 
             var showRow = true;
 
@@ -115,7 +226,24 @@
 
             // Show or hide the row
             row.style.display = showRow ? '' : 'none';
+
+            // Recalculate totals based on visible rows
+            if (showRow) {
+                totalSessions += 1;
+                if (isPaid) {
+                    totalPaidSessions += 1;
+                    totalIncome += totalAmount; // Sum only paid amounts
+                } else {
+                    totalUnpaidSessions += 1;
+                }
+            }
         });
+
+        // Update the summary totals in the analytics section
+        document.getElementById('total-sessions').innerText = totalSessions;
+        document.getElementById('total-income').innerText = 'R ' + totalIncome.toFixed(2);
+        document.getElementById('total-paid-sessions').innerText = totalPaidSessions;
+        document.getElementById('total-unpaid-sessions').innerText = totalUnpaidSessions;
     }
 </script>
 
@@ -139,6 +267,26 @@
         text-align: center;
         margin-bottom: 30px;
     }
+
+    /* Navigation button */
+    .navigation-button {
+        text-align: right;
+        margin-bottom: 20px;
+    }
+
+    .btn-income {
+        background-color: #27262C;
+        color: white;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: bold;
+        transition: background-color 0.3s;
+    }
+
+        .btn-income:hover {
+            background-color: #27262C;
+        }
 
     /* Analytics section styling */
     .analytics-section {
@@ -221,16 +369,6 @@
             background-color: #f1f1f1;
         }
 
-    .status-paid {
-        color: green;
-        font-weight: bold;
-    }
-
-    .status-unpaid {
-        color: red;
-        font-weight: bold;
-    }
-
     /* Client profile image styling */
     .client-info-cell {
         display: flex;
@@ -244,5 +382,13 @@
         border-radius: 50%;
         object-fit: cover;
         border: 2px solid #ddd;
+    }
+
+    /* Status dropdown styling */
+    .status-dropdown {
+        width: 100px;
+        padding: 5px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
     }
 </style>
