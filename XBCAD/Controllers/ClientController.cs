@@ -261,6 +261,12 @@ namespace XBCAD.Controllers
                 {
                     continue; // Invalid date/time format
                 }
+                var dftStartDateTime = startDateTime;
+                var dftEndDateTime = endDateTime;
+
+                var timeZone = TimeZoneInfo.FindSystemTimeZoneById("South Africa Standard Time");
+                startDateTime = TimeZoneInfo.ConvertTimeToUtc(startDateTime, timeZone);
+                endDateTime = TimeZoneInfo.ConvertTimeToUtc(endDateTime, timeZone);
 
                 // Create calendar event and get the EventId
                 var eventId = await CreateCalendarEvent(accessToken, clientEmail, trainerEmail, startDateTime, endDateTime, trainer.Name);
@@ -272,8 +278,8 @@ namespace XBCAD.Controllers
                     ClientID = User.FindFirstValue(ClaimTypes.NameIdentifier),
                     Paid = false,
                     TotalAmount = trainer.HourlyRate,
-                    StartDateTime = startDateTime.ToString("o"),  // Store as ISO 8601 string
-                    EndDateTime = endDateTime.ToString("o"),
+                    StartDateTime = dftStartDateTime.ToString("o"),  // Store as ISO 8601 string
+                    EndDateTime = dftEndDateTime.ToString("o"),
                     EventId = eventId  // Store the EventId
                 };
 
