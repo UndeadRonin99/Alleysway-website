@@ -38,6 +38,15 @@ namespace XBCAD.Controllers
             return View();
         }
 
+        public IActionResult Privacy()
+        {
+            return View();
+        }
+        public IActionResult tos()
+        {
+            return View();
+        }
+
         public IActionResult Gallery()
         {
             return View();
