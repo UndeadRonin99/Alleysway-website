@@ -136,8 +136,17 @@
                     });
             }, {once: true});
         });
+        document.addEventListener('DOMContentLoaded', function () {
+    // Ensure Bootstrap dropdown toggles are initialized
+    $('.navbar-toggler').on('click', function () {
+    $('#navbarNav').collapse('toggle');
+    });
+    });
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)
+
+    
+
 </body>
 </html>
