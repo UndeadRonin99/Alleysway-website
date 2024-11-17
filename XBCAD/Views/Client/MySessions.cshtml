@@ -18,15 +18,15 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var session in Model.OrderByDescending(s => DateTime.Parse(s.Session.StartDateTime)))
+            @foreach (var session in Model.OrderByDescending(s => DateTimeOffset.Parse(s.Session.StartDateTime)))
             {
                 <tr>
                     <td>@session.TrainerName</td>
-                    <td>@DateTime.Parse(session.Session.StartDateTime).ToString("yyyy-MM-dd")</td>
-                    <td>@DateTime.Parse(session.Session.StartDateTime).ToString("HH:mm")</td>
-                    <td>@DateTime.Parse(session.Session.EndDateTime).ToString("HH:mm")</td>
+                    <td>@DateTimeOffset.Parse(session.Session.StartDateTime).ToString("yyyy-MM-dd")</td>
+                    <td>@DateTimeOffset.Parse(session.Session.StartDateTime).ToString("HH:mm")</td>
+                    <td>@DateTimeOffset.Parse(session.Session.EndDateTime).ToString("HH:mm")</td>
                     <td>
-                        @if (DateTime.Parse(session.Session.StartDateTime) > DateTime.Now)
+                        @if (DateTimeOffset.Parse(session.Session.StartDateTime) > DateTimeOffset.Now)
                         {
                             <!-- Show the cancel button -->
                             <form method="post" asp-action="CancelSession" asp-controller="Client" onsubmit="return confirm('Are you sure you want to cancel this session?');">

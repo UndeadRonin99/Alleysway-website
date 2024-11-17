@@ -33,6 +33,9 @@ namespace XBCAD.Controllers
             this.auth = FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance;
         }
 
+        public IActionResult RequestDeletionSteps()
+        { return View(); }
+
         public IActionResult AboutUs()
         {
             return View();

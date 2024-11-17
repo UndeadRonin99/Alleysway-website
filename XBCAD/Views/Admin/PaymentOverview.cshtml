@@ -90,9 +90,9 @@
                         <img src="@client.ProfileImageUrl" alt="Profile image of @client.Name" class="client-profile-image" />
                         @client.Name
                     </td>
-                    <td>@DateTime.Parse(session.StartDateTime).ToString("dd MMM yyyy")</td>
-                    <td>@DateTime.Parse(session.StartDateTime).ToString("HH:mm")</td>
-                    <td>@DateTime.Parse(session.EndDateTime).ToString("HH:mm")</td>
+                    <td>@DateTimeOffset.Parse(session.StartDateTime).ToString("dd MMM yyyy")</td>
+                    <td>@DateTimeOffset.Parse(session.StartDateTime).ToString("HH:mm")</td>
+                    <td>@DateTimeOffset.Parse(session.EndDateTime).ToString("HH:mm")</td>
                     <td>R @session.TotalAmount.ToString("N2")</td>
                     <td>
                         <select class="status-dropdown"

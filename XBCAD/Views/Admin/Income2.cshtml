@@ -72,11 +72,11 @@
             <tbody id="session-table-body">
                 @foreach (var session in Model.Sessions.OrderByDescending(s => DateTime.Parse(s.StartDateTime)))
                 {
-                    <tr data-date="@DateTime.Parse(session.StartDateTime).ToString("yyyy-MM-dd")"
+                    <tr data-date="@DateTimeOffset.Parse(session.StartDateTime).ToString("yyyy-MM-dd")"
                         data-paid="@(session.Paid ? "paid" : "unpaid")">
-                        <td>@DateTime.Parse(session.StartDateTime).ToString("yyyy-MM-dd")</td>
-                        <td>@DateTime.Parse(session.StartDateTime).ToString("HH:mm")</td>
-                        <td>@DateTime.Parse(session.EndDateTime).ToString("HH:mm")</td>
+                        <td>@DateTimeOffset.Parse(session.StartDateTime).ToString("yyyy-MM-dd")</td>
+                        <td>@DateTimeOffset.Parse(session.StartDateTime).ToString("HH:mm")</td>
+                        <td>@DateTimeOffset.Parse(session.EndDateTime).ToString("HH:mm")</td>
                         <td>@session.TotalAmount.ToString("C", cultureInfo)</td>
                         <td>
                             <input type="checkbox" class="paid-checkbox" @(session.Paid ? "checked" : "") disabled />

@@ -1,0 +1,37 @@
+﻿@{
+    Layout = "~/Views/Shared/_LandingLayout.cshtml";
+    ViewData["Title"] = "How to Request Account Deletion";
+}
+
+<div class="container mt-5">
+    <h1 class="text-danger text-center">Request Account Deletion</h1>
+    <p class="text-center text-muted">
+        Follow these steps to permanently delete your account and all associated data. Note that this action is irreversible.
+    </p>
+
+    <ol class="list-group mt-4">
+        <li class="list-group-item">
+            <strong>Step 1:</strong> Navigate to the Settings page in your account.
+        </li>
+        <li class="list-group-item">
+            <strong>Step 2:</strong> Navigate to the "Delete Account" section.
+        </li>
+        <li class="list-group-item">
+            <strong>Step 3:</strong> Click on the <span class="text-danger">"Delete Account"</span> button.
+        </li>
+        <li class="list-group-item">
+            <strong>Step 4:</strong> Follow the prompts to confirm your account deletion request. You may be asked to verify your identity.
+        </li>
+    </ol>
+    <div class="alert alert-warning mt-4">
+        <strong>Note:</strong> If you try to sign in again it will create a new account with none of your old data
+    </div>
+    <div class="alert alert-warning mt-4">
+        <strong>Important:</strong> Deleting your account will permanently remove all your data, including session history, personal information, and messages. This action cannot be undone.
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="@Url.Action("Home", "Account")" class="btn btn-secondary">Back to Home</a>
+        <a href="@Url.Action("ContactUs", "Account")" class="btn btn-danger">Need Help?</a>
+    </div>
+</div>

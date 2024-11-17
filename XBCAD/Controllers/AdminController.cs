@@ -647,6 +647,7 @@ namespace XBCAD.Controllers
 
             return View("PaymentOverview", model);
         }
+
         private async Task<string> GetImageAsBase64Async(string imageUrl)
         {
             using (var client = new HttpClient())
