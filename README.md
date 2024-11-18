@@ -9,7 +9,7 @@
 2. [Features](#features)
 3. [Project Structure](#project-structure)
 4. [Installation](#installation)
-5. [Configuration](#configuration)
+5. [Configuration](#configuration) 
 6. [Usage](#usage)
 7. [Screenshots](#screenshots)
 8. [Technologies Used](#technologies-used)
