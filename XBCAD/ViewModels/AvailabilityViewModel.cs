@@ -21,7 +21,7 @@ public class DateSpecificTimeSlot
     public string StartTime { get; set; }
     // The end time of the time slot (e.g., "05:00 PM").
     public string EndTime { get; set; }
-    .// Indicates whether the entire day is marked as unavailable.
+    // Indicates whether the entire day is marked as unavailable.
     public bool IsFullDayUnavailable { get; set; }
 }
 
