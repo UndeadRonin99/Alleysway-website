@@ -346,7 +346,7 @@ namespace XBCAD.Controllers
 
             try
             {
-                // Delete the user from Firebase Authentication
+                // Delets the user from Firebase Authentication
                 await FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance.DeleteUserAsync(userId);
 
                 // Optionally, remove user data from the Realtime Database
