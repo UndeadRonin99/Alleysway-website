@@ -1,7 +1,9 @@
-﻿@{
+@{
+    // Set the page title and specify the layout for the Admin Chat view
     ViewData["Title"] = "Chat";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     @using XBCAD.ViewModels
+    // Retrieve data from ViewBag and cast them to appropriate types
     var contacts = ViewBag.Contacts as List<ClientViewModel>;
     var firebaseToken = ViewBag.FirebaseToken as string;
     var userName = ViewBag.Name as string;
@@ -9,10 +11,12 @@
 }
 
 <div class="chat-container">
+    <!-- User list section -->
     <div id="user-list" class="user-list">
         <ul id="users">
             @foreach (var contact in contacts)
             {
+                <!-- Display each contact with profile image and name -->
                 <li data-user-id="@contact.Id" data-user-name="@contact.Name" data-profile-image-url="@contact.ProfileImageUrl">
                     <img src="@contact.ProfileImageUrl" alt="Profile Image">
                     <span>@contact.Name</span>
@@ -21,13 +25,16 @@
         </ul>
     </div>
 
+    <!-- Chat window section -->
     <div id="chat-container" class="chat-window">
         <div id="chat-header">
             <span id="chatWith">Select a client</span>
         </div>
 
+        <!-- Area where messages will be displayed -->
         <div id="messages" class="message-area"></div>
 
+        <!-- Input area for typing and sending messages -->
         <div class="input-area">
             <input type="text" id="messageInput" placeholder="Type your message here..." />
             <button id="sendButton">Send</button>
@@ -36,6 +43,7 @@
 </div>
 
 <style>
+    /* Overall body styling */
     body {
         font-family: 'Arial', sans-serif;
         background-color: #E1E1E1;
@@ -44,6 +52,7 @@
         overflow: hidden; /* Remove page scroll */
     }
 
+    /* Main chat container styling */
     .chat-container {
         display: flex;
         height: 95vh;
@@ -53,6 +62,7 @@
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Add some shadow for effect */
     }
 
+    /* User list styling */
     .user-list {
         width: 30%;
         background-color: #1E1E1E;
@@ -63,34 +73,36 @@
         border-bottom-left-radius: 20px; /* Round bottom-left corner */
     }
 
+    /* User list items */
     #users {
         list-style-type: none;
         padding: 0;
     }
 
-        #users li {
-            display: flex;
-            align-items: center;
-            padding: 20px;
-            margin: 5px 0;
-            background-color: #FF4F17;
-            color: white;
-            border-radius: 10px; /* Rounded user list items */
-            cursor: pointer;
-            font-size: 20px;
-        }
+    #users li {
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        margin: 5px 0;
+        background-color: #FF4F17;
+        color: white;
+        border-radius: 10px; /* Rounded user list items */
+        cursor: pointer;
+        font-size: 20px;
+    }
 
-            #users li:hover {
-                background-color: #FF7F50;
-            }
+    #users li:hover {
+        background-color: #FF7F50;
+    }
 
-            #users li img {
-                width: 40px;
-                height: 40px;
-                border-radius: 50%; /* Make profile images circular */
-                margin-right: 8px;
-            }
+    #users li img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%; /* Make profile images circular */
+        margin-right: 8px;
+    }
 
+    /* Chat window styling */
     .chat-window {
         width: 80%;
         background-color: #2E2E2E;
@@ -100,6 +112,7 @@
         border-bottom-right-radius: 20px; /* Round bottom-right corner */
     }
 
+    /* Chat header styling */
     #chat-header {
         padding: 10px;
         font-size: 16px;
@@ -110,6 +123,7 @@
         border-top-right-radius: 20px; /* Rounded top-right corner of header */
     }
 
+    /* Message area styling */
     .message-area {
         flex-grow: 1;
         padding: 10px;
@@ -119,41 +133,47 @@
         color: white;
     }
 
-        .message-area .bubble {
-            max-width: 55%;
-            margin-bottom: 8px;
-            padding: 8px;
-            border-radius: 20px; /* Rounded message bubbles */
-            position: relative;
-            font-size: 14px;
-        }
+    /* Message bubbles */
+    .message-area .bubble {
+        max-width: 55%;
+        margin-bottom: 8px;
+        padding: 8px;
+        border-radius: 20px; /* Rounded message bubbles */
+        position: relative;
+        font-size: 14px;
+    }
 
-        .message-area .sent {
-            background-color: #FF4F17;
-            color: white;
-            align-self: flex-end;
-            text-align: left;
-        }
+    /* Sent messages */
+    .message-area .sent {
+        background-color: #FF4F17;
+        color: white;
+        align-self: flex-end;
+        text-align: left;
+    }
 
-        .message-area .received {
-            background-color: #3E3E3E;
-            color: white;
-            align-self: flex-start;
-            text-align: left;
-        }
+    /* Received messages */
+    .message-area .received {
+        background-color: #3E3E3E;
+        color: white;
+        align-self: flex-start;
+        text-align: left;
+    }
 
-        .message-area .bubble-text {
-            margin-right: 10px;
-            word-wrap: break-word;
-        }
+    /* Message text */
+    .message-area .bubble-text {
+        margin-right: 10px;
+        word-wrap: break-word;
+    }
 
-        .message-area .timestamp {
-            font-size: 10px;
-            color: #ccc;
-            white-space: nowrap;
-            align-self: flex-end;
-        }
+    /* Timestamp styling */
+    .message-area .timestamp {
+        font-size: 10px;
+        color: #ccc;
+        white-space: nowrap;
+        align-self: flex-end;
+    }
 
+    /* Input area styling */
     .input-area {
         display: flex;
         background-color: #333;
@@ -162,41 +182,42 @@
         border-bottom-right-radius: 20px; /* Rounded bottom-right corner for input */
     }
 
-        .input-area input {
-            width: 85%;
-            padding: 8px;
-            border-radius: 20px; /* Rounded input field */
-            border: none;
-            font-size: 14px;
-            background-color: #1E1E1E;
-            color: white;
-        }
+    .input-area input {
+        width: 85%;
+        padding: 8px;
+        border-radius: 20px; /* Rounded input field */
+        border: none;
+        font-size: 14px;
+        background-color: #1E1E1E;
+        color: white;
+    }
 
-        .input-area button {
-            width: 12%;
-            background-color: #FF4F17;
-            color: white;
-            border: none;
-            padding: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            margin-left: 8px;
-            border-radius: 20px; /* Rounded button */
-        }
+    .input-area button {
+        width: 12%;
+        background-color: #FF4F17;
+        color: white;
+        border: none;
+        padding: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        margin-left: 8px;
+        border-radius: 20px; /* Rounded button */
+    }
 
-            .input-area button:hover {
-                background-color: #FF7F50;
-            }
+    .input-area button:hover {
+        background-color: #FF7F50;
+    }
 </style>
 
+<!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
 
 <script>
-    // Firebase configuration
+    // Firebase configuration (API key and other details)
     var firebaseConfig = {
-        apiKey: "AIzaSyDX4j_urjkjhoxeN5AHFxcOW1viBqsicWA",
+        apiKey: "AIzaSyDX4j_urjkjhoxeN5AHFxcOW1viBqsicWA", // Replace with your actual API key
         authDomain: "alleysway-310a8.firebaseapp.com",
         databaseURL: "https://alleysway-310a8-default-rtdb.firebaseio.com",
         projectId: "alleysway-310a8",
@@ -205,23 +226,29 @@
         appId: "1:890106355046:web:8101b0ff960c28943efca7",
         measurementId: "G-DFMZCZGFT0"
     };
+    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
 
+    // Retrieve variables from Razor view
     var firebaseToken = '@Html.Raw(firebaseToken)';
     var userName = '@Html.Raw(userName)';
     var userId = '@Html.Raw(userId)';
 
+    // Authenticate with Firebase using the custom token
     firebase.auth().signInWithCustomToken(firebaseToken).catch(function (error) {
         console.error('Firebase sign-in error:', error);
     });
 
+    // Variables to keep track of selected user and conversation reference
     var selectedUserId = null;
     var selectedUserName = null;
     var conversationRef = null;
 
+    // Wait for the DOM to load before attaching event listeners
     document.addEventListener('DOMContentLoaded', function () {
         var userElements = document.querySelectorAll('#users li');
         userElements.forEach(function (li) {
+            // Attach click event listener to each user in the list
             li.addEventListener('click', function () {
                 var contactId = li.getAttribute('data-user-id');
                 var contactName = li.getAttribute('data-user-name');
@@ -238,6 +265,7 @@
         });
     });
 
+    // Function to select a user to chat with
     function selectUser(contactId, contactName) {
         selectedUserId = contactId;
         selectedUserName = contactName;
@@ -246,10 +274,11 @@
         // Clear previous messages
         document.getElementById('messages').innerHTML = '';
 
-        // Re-initialize the chat with the selected user
+        // Initialize the chat with the selected user
         initializeChat();
     }
 
+    // Function to initialize the chat by fetching messages from Firebase
     function initializeChat() {
         if (!selectedUserId) {
             console.log('No user selected for chat.');
@@ -263,14 +292,17 @@
             conversationRef.off();
         }
 
+        // Reference to the conversation in Firebase Realtime Database
         conversationRef = database.ref('user_messages/' + userId + '/' + selectedUserId + '/messages');
 
+        // Listen for new messages
         conversationRef.on('child_added', function (data) {
             var message = data.val();
             displayMessage(message.senderName, message.text, message.timestamp);
         });
     }
 
+    // Function to send a message
     function sendMessage() {
         if (!selectedUserId) {
             alert('Please select a client to chat with.');
@@ -287,23 +319,26 @@
                 timestamp: firebase.database.ServerValue.TIMESTAMP
             };
 
-            // Store the message under both users
+            // Store the message under both users' message lists
             var updates = {};
             var newMessageKey = firebase.database().ref().child('user_messages').push().key;
 
             updates['/user_messages/' + userId + '/' + selectedUserId + '/messages/' + newMessageKey] = message;
             updates['/user_messages/' + selectedUserId + '/' + userId + '/messages/' + newMessageKey] = message;
 
+            // Update the database with the new message
             firebase.database().ref().update(updates).then(function () {
                 console.log('Message sent');
             }).catch(function (error) {
                 console.error('Error sending message:', error);
             });
 
+            // Clear the input field after sending
             document.getElementById('messageInput').value = '';
         }
     }
 
+    // Function to display a message in the chat window
     function displayMessage(senderName, text, timestamp) {
         var messagesDiv = document.getElementById('messages');
         var messageElement = document.createElement('div');
@@ -312,6 +347,7 @@
         // Check if the message is sent by the current user
         var isSentByCurrentUser = (senderName === userName);
 
+        // Apply appropriate styling based on the sender
         messageElement.classList.add('bubble');
         if (isSentByCurrentUser) {
             messageElement.classList.add('sent');
@@ -319,12 +355,250 @@
             messageElement.classList.add('received');
         }
 
+        // Construct the message HTML
         messageElement.innerHTML = `
-                <div class="bubble-text">${text}</div>
-                <span class="timestamp">${time}</span>
-            `;
+            <div class="bubble-text">${text}</div>
+            <span class="timestamp">${time}</span>
+        `;
 
+        // Append the message to the messages div and scroll to the bottom
         messagesDiv.appendChild(messageElement);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
 </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
