@@ -11,7 +11,6 @@ using System.Security.Policy;
 using XBCAD.ViewModels;
 using static Google.Rpc.Context.AttributeContext.Types;
 
-
 public class FirebaseService
 {
     // Firebase Realtime Database client for interacting with the database.
