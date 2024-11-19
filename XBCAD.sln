@@ -5,6 +5,8 @@ VisualStudioVersion = 17.8.34525.116
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XBCAD", "XBCAD\XBCAD.csproj", "{78AFFBEB-ED6C-4C6A-AB95-7FB034BE69A9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XBCAD.Tests", "XBCAD.Tests\XBCAD.Tests.csproj", "{BC7E587D-BFCB-42AE-938E-7E4DFECA3DD8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{78AFFBEB-ED6C-4C6A-AB95-7FB034BE69A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{78AFFBEB-ED6C-4C6A-AB95-7FB034BE69A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{78AFFBEB-ED6C-4C6A-AB95-7FB034BE69A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC7E587D-BFCB-42AE-938E-7E4DFECA3DD8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC7E587D-BFCB-42AE-938E-7E4DFECA3DD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC7E587D-BFCB-42AE-938E-7E4DFECA3DD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC7E587D-BFCB-42AE-938E-7E4DFECA3DD8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
