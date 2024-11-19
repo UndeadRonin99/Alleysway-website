@@ -1,7 +1,5 @@
 // Import statements for Firebase Authentication, Google APIs, MVC framework, etc.
-using Firebase.Auth;
 using FirebaseAdmin;
-using FirebaseAdmin.Auth;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Calendar.v3;
 using Google.Apis.Calendar.v3.Data;
@@ -20,14 +18,14 @@ namespace XBCAD.Controllers
     public class ClientController : Controller
     {
         // Services for Google Calendar and Firebase operations
-        private readonly GoogleCalendarService googleCalendarService;
-        private readonly FirebaseService _firebaseService;
+        private readonly IGoogleCalendarService googleCalendarService;
+        private readonly IFirebaseService _firebaseService;
 
         // Constructor to initialize the services
-        public ClientController(FirebaseService firebaseService, GoogleCalendarService calendarService)
+        public ClientController(IFirebaseService firebaseService, IGoogleCalendarService googleCalendarService)
         {
             _firebaseService = firebaseService;
-            googleCalendarService = calendarService;
+            this.googleCalendarService = googleCalendarService;
         }
 
         // Action method for client chat functionality

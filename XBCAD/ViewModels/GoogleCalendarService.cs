@@ -4,7 +4,7 @@ using Google.Apis.Services;
 
 namespace XBCAD.ViewModels
 {
-    public class GoogleCalendarService
+    public class GoogleCalendarService : IGoogleCalendarService
     {
         public async Task<string> GetCalendarEmbedLinkAsync(string accessToken, string email)
         {

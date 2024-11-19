@@ -2,16 +2,11 @@
 using Firebase.Database;
 using Firebase.Database.Query;
 using Firebase.Storage;
-using Google.Apis.Auth.OAuth2;
-using Google.Apis.Calendar.v3;
-using Google.Apis.Services;
 using Google.Cloud.Firestore;
 using Newtonsoft.Json;
-using System.Security.Policy;
 using XBCAD.ViewModels;
-using static Google.Rpc.Context.AttributeContext.Types;
 
-public class FirebaseService
+public class FirebaseService : IFirebaseService
 {
     // Firebase Realtime Database client for interacting with the database.
     public readonly FirebaseClient firebase;
@@ -494,7 +489,7 @@ public class FirebaseService
         }
     }
 
-     // Fetch the hourly rate for a specific user.
+    // Fetch the hourly rate for a specific user.
     public async Task<string> GetRateAsync(string userId)
     {
         try
@@ -649,7 +644,7 @@ public class FirebaseService
             .Child(day)
             .Child("TimeSlots")
             .PostAsync(timeSlot);
-    } 
+    }
 
     // Remove a specific time slot for a user on a specific day.
     public async Task RemoveTimeSlotAsync(string day, string startTime, string endTime, string userId)
@@ -839,7 +834,7 @@ public class FirebaseService
         return slotReference.Key;
     }
 
-     // Save date-specific availability for a user.
+    // Save date-specific availability for a user.
     public async Task<string> SaveDateSpecificAvailabilityAsync(string userId, string date, string startTime, string endTime)
     {
         var timeSlot = new TimeSlot
@@ -1037,13 +1032,13 @@ public class FirebaseService
         }
         catch (Exception ex)
         {
-             // Log errors during the fetching process.
+            // Log errors during the fetching process.
             Console.WriteLine($"Error fetching message contacts: {ex.Message}");
         }
         return contacts;
     }
 
-     // Fetch details of trainers by a list of trainer IDs.
+    // Fetch details of trainers by a list of trainer IDs.
     public async Task<List<Trainer>> GetTrainersByIdsAsync(List<string> trainerIds)
     {
         var trainers = new List<Trainer>();
@@ -1071,7 +1066,7 @@ public class FirebaseService
         return trainers;
     }
 
-     // Fetch details of clients by a list of client IDs.
+    // Fetch details of clients by a list of client IDs.
     public async Task<List<ClientViewModel>> GetClientsByIdsAsync(List<string> clientIds)
     {
         var clients = new List<ClientViewModel>();

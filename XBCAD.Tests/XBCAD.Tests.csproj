@@ -28,8 +28,4 @@
     <ProjectReference Include="..\XBCAD\XBCAD.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Mocks\" />
-  </ItemGroup>
-
 </Project>

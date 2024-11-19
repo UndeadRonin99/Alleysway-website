@@ -1,8 +1,6 @@
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.Extensions.Logging;
 using XBCAD.ViewModels; // Ensure you're referencing your ViewModels
 
 namespace XBCAD
@@ -28,6 +26,9 @@ namespace XBCAD
             builder.Services.AddHttpClient();
             builder.Services.AddSingleton<FirebaseService>();
             builder.Services.AddSingleton<GoogleCalendarService>(); // Register GoogleCalendarService
+            builder.Services.AddScoped<IFirebaseService, FirebaseService>();
+            builder.Services.AddScoped<IGoogleCalendarService, GoogleCalendarService>();
+
 
             // Add memory cache to store session data
             builder.Services.AddDistributedMemoryCache();
@@ -66,20 +67,20 @@ namespace XBCAD
                googleOptions.Scope.Add("https://www.googleapis.com/auth/calendar.readonly");
                googleOptions.Scope.Add("https://www.googleapis.com/auth/calendar");
 
-           
-            // Handle authentication failures
-            googleOptions.Events.OnRemoteFailure = context =>
-                {
-                    // Log the error if desired
-                    var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
-                    logger.LogWarning("Authentication failed: {Error}", context.Failure?.Message);
 
-                    // Redirect to the login page with an optional error message
-                    context.Response.Redirect("/Account/Login?error=authentication_failed");
-                    context.HandleResponse(); // Prevent the exception from propagating
-                    return Task.CompletedTask;
-                };
-            });
+               // Handle authentication failures
+               googleOptions.Events.OnRemoteFailure = context =>
+                   {
+                       // Log the error if desired
+                       var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+                       logger.LogWarning("Authentication failed: {Error}", context.Failure?.Message);
+
+                       // Redirect to the login page with an optional error message
+                       context.Response.Redirect("/Account/Login?error=authentication_failed");
+                       context.HandleResponse(); // Prevent the exception from propagating
+                       return Task.CompletedTask;
+                   };
+           });
 
             var app = builder.Build();
 
