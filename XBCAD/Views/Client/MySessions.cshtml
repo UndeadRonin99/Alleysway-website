@@ -3,10 +3,14 @@
 @{
     ViewData["Title"] = "My Sessions";
     Layout = "~/Views/Shared/_ClientLayout.cshtml";
+    // Current time in SAST (UTC+2)
+    var nowSAST = DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(2));
 }
 
 <div class="container">
     <h1 class="page-title">My Sessions</h1>
+    <p>Current SAST Time (Azure): @nowSAST</p>
+
     <table class="table table-striped">
         <thead>
             <tr>
@@ -20,25 +24,34 @@
         <tbody>
             @foreach (var session in Model.OrderByDescending(s => DateTimeOffset.Parse(s.Session.StartDateTime)))
             {
+                // Parse session start and end times as UTC
+                var sessionStartUTC = DateTimeOffset.Parse(session.Session.StartDateTime); // Stored in UTC
+                var sessionEndUTC = DateTimeOffset.Parse(session.Session.EndDateTime); // Stored in UTC
+
                 <tr>
                     <td>@session.TrainerName</td>
-                    <td>@DateTimeOffset.Parse(session.Session.StartDateTime).ToString("yyyy-MM-dd")</td>
-                    <td>@DateTimeOffset.Parse(session.Session.StartDateTime).ToString("HH:mm")</td>
-                    <td>@DateTimeOffset.Parse(session.Session.EndDateTime).ToString("HH:mm")</td>
+                    <td>@sessionStartUTC.ToString("yyyy-MM-dd")</td>
+                    <td>@sessionStartUTC.ToString("HH:mm")</td>
+                    <td>@sessionEndUTC.ToString("HH:mm")</td>
                     <td>
-                        @if (DateTimeOffset.Parse(session.Session.StartDateTime) > DateTimeOffset.Now)
+                        @if (sessionStartUTC > nowSAST)
                         {
-                            <!-- Show the cancel button -->
+                            <!-- Show the cancel button only if the session has not started -->
                             <form method="post" asp-action="CancelSession" asp-controller="Client" onsubmit="return confirm('Are you sure you want to cancel this session?');">
                                 <input type="hidden" name="sessionId" value="@session.Session.SessionKey" />
                                 <input type="hidden" name="trainerId" value="@session.Session.TrainerID" />
                                 <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
                             </form>
                         }
+                        else if (sessionStartUTC < nowSAST)
+                        {
+                            <!-- Show completed status for past sessions -->
+                            <span>Completed</span>
+                        }
                         else
                         {
-                            <!-- Optionally, show a message for past sessions -->
-                            <span>Completed</span>
+                            <!-- Show ongoing status for sessions that have started but not yet ended -->
+                            <span>In Progress</span>
                         }
                     </td>
                 </tr>
@@ -46,6 +59,7 @@
         </tbody>
     </table>
 </div>
+
 
 <style>
     .container {
