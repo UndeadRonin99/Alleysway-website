@@ -1,4 +1,5 @@
-﻿@{
+@{
+    // Set the page title and layout for the Admin Calendar view
     ViewData["Title"] = "Admin Calendar";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
@@ -6,16 +7,19 @@
 <div class="container py-5">
     <div class="card shadow-sm">
         <div class="card-body">
+            <!-- Display the page heading -->
             <h2 class="card-title text-center mb-4" style="font-size: 2rem; font-weight: 600;">Admin Calendar</h2>
 
             @if (!string.IsNullOrEmpty(ViewBag.CalendarEmbedLink))
             {
+                <!-- If the Calendar Embed Link is available, display the embedded Google Calendar -->
                 <div class="calendar-container d-flex justify-content-center mb-4">
                     <iframe src="@ViewBag.CalendarEmbedLink" style="border: 0; width: 100%; height: 600px;" frameborder="0" scrolling="no"></iframe>
                 </div>
             }
             else
             {
+                <!-- If the Calendar Embed Link is not available, prompt the user to sign in -->
                 <div class="alert alert-warning text-center" role="alert">
                     <p class="mb-2">Unable to load Google Calendar. Please log in to view your calendar.</p>
                     <a href="@Url.Action("GoogleLogin", "Account")" class="btn btn-warning btn-lg">Sign in to Google Calendar</a>
@@ -26,16 +30,19 @@
 </div>
 
 <style>
+    /* Style for the main container */
     .container {
         max-width: 900px;
     }
 
+    /* Style for the calendar iframe */
     .calendar-container iframe {
         max-width: 100%;
         border-radius: 10px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
+    /* Style for the card component */
     .card {
         background-color: #f8f9fa;
         border-radius: 15px;
@@ -43,15 +50,18 @@
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
 
+    /* Style for the card title */
     .card-title {
         color: #333;
     }
 
+    /* Style for large buttons */
     .btn-lg {
         font-size: 1.2rem;
         padding: 10px 20px;
     }
 
+    /* Style for alert messages */
     .alert {
         margin-top: 20px;
     }
