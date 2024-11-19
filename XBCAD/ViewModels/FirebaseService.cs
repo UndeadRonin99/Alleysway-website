@@ -14,10 +14,12 @@ using static Google.Rpc.Context.AttributeContext.Types;
 
 public class FirebaseService
 {
+    // Firebase Realtime Database client for interacting with the database.
     public readonly FirebaseClient firebase;
+    // Firebase Storage client for handling file uploads and downloads.
     private readonly FirebaseStorage storage;
 
-
+    // Constructor to initialize Firebase services.
     public FirebaseService()
     {
         // Ensure this URL is correct and points to your Firebase Realtime Database
@@ -27,6 +29,7 @@ public class FirebaseService
         storage = new FirebaseStorage("alleysway-310a8.appspot.com");
     }
 
+    // Check if a user exists in Firebase Realtime Database by their email.
     public async Task<Dictionary<string, object>> CheckUserByEmailAsync(string email)
     {
         try
@@ -60,6 +63,7 @@ public class FirebaseService
         }
         catch (Exception ex)
         {
+            // Log any errors that occur.
             Console.WriteLine($"Error checking user by email: {ex.Message}");
         }
 
@@ -68,11 +72,12 @@ public class FirebaseService
     }
 
 
-
+    // Fetch a payment summary for a specific client, including payments to their trainers.
     public async Task<ClientPaymentSummaryViewModel> GetClientPaymentSummaryAsync(string clientId)
     {
         var payments = new List<TrainerPayment>();
 
+        // Fetch all sessions for the specified client.
         var sessions = await firebase
             .Child("users")
             .Child(clientId)
@@ -80,6 +85,7 @@ public class FirebaseService
             .Child("SessionID")
             .OnceAsync<BookedSession>();
 
+        // Group paid sessions by trainer.
         var paidSessions = sessions
             .Where(s => s.Object.Paid)
             .GroupBy(s => s.Object.TrainerID);
@@ -97,6 +103,7 @@ public class FirebaseService
 
             string trainerName = $"{trainerData.firstName} {trainerData.lastName}";
 
+            // Add the payment details to the list.
             payments.Add(new TrainerPayment
             {
                 TrainerId = trainerId,
@@ -105,6 +112,7 @@ public class FirebaseService
             });
         }
 
+        // Return the payment summary.
         return new ClientPaymentSummaryViewModel
         {
             Payments = payments
@@ -112,6 +120,7 @@ public class FirebaseService
     }
 
 
+    // Update the payment status of a specific session.
     public async Task UpdateSessionPaymentStatusAsync(string userId, string sessionId, bool isPaid)
     {
         await firebase
@@ -123,10 +132,12 @@ public class FirebaseService
             .Child("Paid")
             .PutAsync(isPaid);
     }
+    // Fetch all sessions between a specific trainer and client.
     public async Task<List<BookedSession>> GetSessionsBetweenTrainerAndClientAsync(string trainerId, string clientId)
     {
         var sessions = new List<BookedSession>();
 
+        // Fetch all sessions for the trainer.
         var sessionNodes = await firebase
             .Child("users")
             .Child(trainerId)
@@ -137,6 +148,7 @@ public class FirebaseService
         foreach (var sessionNode in sessionNodes)
         {
             var session = sessionNode.Object;
+            // Check if the session involves the specified client.
             if (session.ClientID == clientId)
             {
                 session.SessionKey = sessionNode.Key; // Store the key
@@ -147,6 +159,7 @@ public class FirebaseService
         return sessions;
     }
 
+    // Fetch client details by their unique ID.
     public async Task<ClientViewModel> GetClientByIdAsync(string clientId)
     {
         var clientData = await firebase
@@ -167,6 +180,7 @@ public class FirebaseService
 
         return null;
     }
+    // Fetch a list of trainers for a specific client.
     public async Task<List<Trainer>> GetTrainersForClientAsync(string clientId)
     {
         var trainers = new List<Trainer>();
@@ -205,6 +219,7 @@ public class FirebaseService
         return trainers;
     }
 
+    // Fetch all clients for a specific trainer.
     public async Task<List<ClientViewModel>> GetClientsForTrainerAsync(string trainerId)
     {
         var clients = new List<ClientViewModel>();
@@ -243,6 +258,7 @@ public class FirebaseService
         return clients;
     }
 
+    // Create and store a booked session for both the trainer and client.
     public async Task PutBookedSession(BookedSession session, string trainerID, string userID, string userName, DateTime dateTime)
     {
         // Generate a unique session ID
@@ -260,6 +276,7 @@ public class FirebaseService
             .Child(sessionId)
             .PutAsync(session);
 
+        // Save the same session under the client's sessions in Firebase.
         await firebase
             .Child("users")
             .Child(userID)
@@ -295,6 +312,7 @@ public class FirebaseService
     }
 
 
+    // Fetch raw availability data for a specific user.
     public async Task<AvailabilityViewModel> GetRawAvailabilityAsync(string userId)
     {
         var model = new AvailabilityViewModel
@@ -313,6 +331,7 @@ public class FirebaseService
 
         try
         {
+            // Fetch each day's availability data from Firebase.
             var daysSnapshot = await firebase
                 .Child("users")
                 .Child(userId)
@@ -324,6 +343,7 @@ public class FirebaseService
                 var dayName = dayEntry.Key;
                 var timeSlotsForDay = dayEntry.Object["TimeSlots"];
 
+                // Match the day in the model with the data from Firebase.
                 var dayAvailability = model.Days.FirstOrDefault(d => d.Day == dayName);
 
                 if (dayAvailability != null && timeSlotsForDay != null)
@@ -332,6 +352,7 @@ public class FirebaseService
                     {
                         var timeSlot = timeSlotEntry.Value;
 
+                        // Add time slots to the availability model.
                         if (timeSlot.ContainsKey("StartTime") && timeSlot.ContainsKey("EndTime"))
                         {
                             dayAvailability.TimeSlots.Add(new TimeSlot
@@ -346,12 +367,14 @@ public class FirebaseService
         }
         catch (Exception ex)
         {
+            // Log errors during availability fetching.
             Console.WriteLine($"Error fetching raw availability: {ex.Message}");
         }
 
         return model;
     }
 
+    // Convert raw availability data into hourly segments.
     public AvailabilityViewModel ConvertToHourlySegments(AvailabilityViewModel rawAvailability)
     {
         var hourlyAvailability = new AvailabilityViewModel
@@ -397,6 +420,7 @@ public class FirebaseService
         return hourlyAvailability;
     }
 
+    // Fetch trainer details by their unique ID.
     public async Task<Trainer> GetTrainerByIdAsync(string userId)
     {
         var user = await firebase
@@ -406,7 +430,7 @@ public class FirebaseService
 
         if (user == null)
         {
-            return null;
+            return null; // Return null if no user data is found.
         }
 
         return new Trainer
@@ -420,6 +444,7 @@ public class FirebaseService
     }
 
 
+    // Fetch all trainers from the database.
     public async Task<List<Trainer>> GetAllTrainersAsync()
     {
         var trainers = new List<Trainer>();
@@ -452,6 +477,7 @@ public class FirebaseService
     }
 
 
+    // Delete a user's data from Firebase.
     public async Task DeleteUserDataAsync(string userId)
     {
         try
@@ -463,11 +489,13 @@ public class FirebaseService
         }
         catch (Exception ex)
         {
+            // Log any errors during the deletion process.
             Console.WriteLine($"Error deleting user data: {ex.Message}");
             throw;
         }
     }
 
+     // Fetch the hourly rate for a specific user.
     public async Task<string> GetRateAsync(string userId)
     {
         try
@@ -482,11 +510,13 @@ public class FirebaseService
         }
         catch (Exception ex)
         {
+            // Log any errors during rate fetching.
             Console.WriteLine($"Error fetching rate: {ex.Message}");
             return null; // or handle the error as needed
         }
     }
 
+    // Save or update the hourly rate for a specific user.
     public async Task SaveRateAsync(string userId, string rate)
     {
         await firebase
@@ -558,6 +588,7 @@ public class FirebaseService
         }
     }
 
+    // Fetch availability data for a specific user.
     public async Task<AvailabilityViewModel> GetAvailabilityAsync(string userId)
     {
         var model = new AvailabilityViewModel
@@ -576,6 +607,7 @@ public class FirebaseService
 
         try
         {
+            // Fetch availability data for each day from Firebase.
             var daysSnapshot = await firebase
                 .Child("users")
                 .Child(userId)
@@ -607,6 +639,7 @@ public class FirebaseService
         return model;
     }
 
+    // Save a new time slot for a specific day and user.
     public async Task SaveTimeSlotAsync(string day, string startTime, string endTime, string userId)
     {
         var timeSlot = new TimeSlot { StartTime = startTime, EndTime = endTime };
@@ -619,6 +652,7 @@ public class FirebaseService
             .PostAsync(timeSlot);
     } 
 
+    // Remove a specific time slot for a user on a specific day.
     public async Task RemoveTimeSlotAsync(string day, string startTime, string endTime, string userId)
     {
         try
@@ -631,6 +665,7 @@ public class FirebaseService
                 .Child("TimeSlots")
                 .OnceAsync<TimeSlot>();
 
+            // Find the specific slot to remove.
             var slotToRemove = slots.FirstOrDefault(ts => ts.Object.StartTime == startTime && ts.Object.EndTime == endTime);
 
             if (slotToRemove != null)
@@ -647,6 +682,7 @@ public class FirebaseService
             }
             else
             {
+                // Log if the slot is not found.
                 Console.WriteLine("Slot not found or already deleted");  // Log if not found
                 throw new Exception("Time slot not found or already deleted.");
             }
@@ -658,10 +694,12 @@ public class FirebaseService
         }
     }
 
+    // Fetch future booked sessions for a trainer.
     public async Task<List<BookedSession>> GetFutureBookedSessionsForTrainerAsync(string trainerId, DateTime currentDateTime)
     {
         var sessions = new List<BookedSession>();
 
+        // Fetch all sessions for the trainer.
         var sessionNodes = await firebase
             .Child("users")
             .Child(trainerId)
@@ -672,6 +710,7 @@ public class FirebaseService
         foreach (var sessionNode in sessionNodes)
         {
             var session = sessionNode.Object;
+            // Add sessions that are scheduled for the future.
             if (DateTime.Parse(session.StartDateTime) >= currentDateTime)
             {
                 sessions.Add(session);
@@ -680,6 +719,7 @@ public class FirebaseService
 
         return sessions;
     }
+    // Fetch all sessions for a specific client and include trainer details.
     public async Task<List<ClientSessionViewModel>> GetClientSessionsAsync(string clientId)
     {
         var sessionsList = new List<ClientSessionViewModel>();
@@ -729,6 +769,7 @@ public class FirebaseService
 
         return sessionsList;
     }
+    // Cancel a session for a client and notify the trainer.
     public async Task CancelSessionAsync(string clientId, string trainerId, string sessionId, string clientName, BookedSession session)
     {
         // Delete the session for the client
@@ -761,6 +802,7 @@ public class FirebaseService
             timestamp = Timestamp.GetCurrentTimestamp()
         };
 
+        // Save the cancellation message for both client and trainer.
         await firebase
             .Child("user_messages")
             .Child(clientId)
@@ -776,6 +818,7 @@ public class FirebaseService
             .PostAsync(cancellationMessage);
     }
 
+    // Save date-specific unavailability for a user.
     public async Task<string> SaveDateSpecificUnavailabilityAsync(string userId, string date, string startTime, string endTime, bool isFullDayUnavailable)
     {
         var timeSlot = new TimeSlot
@@ -797,6 +840,7 @@ public class FirebaseService
         return slotReference.Key;
     }
 
+     // Save date-specific availability for a user.
     public async Task<string> SaveDateSpecificAvailabilityAsync(string userId, string date, string startTime, string endTime)
     {
         var timeSlot = new TimeSlot
@@ -819,6 +863,7 @@ public class FirebaseService
 
 
 
+    // Fetch all date-specific availability for a user.
     public async Task<Dictionary<string, List<DateSpecificTimeSlot>>> GetAllDateSpecificAvailabilityAsync(string userId)
     {
         var dateSpecificAvailability = new Dictionary<string, List<DateSpecificTimeSlot>>();
@@ -870,6 +915,7 @@ public class FirebaseService
 
 
 
+    // Fetch all availability for a user across all days.
     public async Task<List<DayAvailability>> GetAllAvailabilityAsync(string userId)
     {
         var days = new List<DayAvailability>
@@ -903,10 +949,12 @@ public class FirebaseService
         return days;
     }
 
+    // Fetch date-specific availability for a user for a specific date.
     public async Task<List<TimeSlot>> GetDateSpecificAvailabilityAsync(string userId, string date)
     {
         var timeSlots = new List<TimeSlot>();
 
+        // Fetch all time slots for the given date.
         var slots = await firebase
             .Child("users")
             .Child(userId)
@@ -914,6 +962,7 @@ public class FirebaseService
             .Child(date)
             .OnceAsync<TimeSlot>();
 
+        // Add each slot to the list.
         foreach (var slot in slots)
         {
             timeSlots.Add(slot.Object);
@@ -922,10 +971,12 @@ public class FirebaseService
         return timeSlots;
     }
 
+    // Remove a specific date-specific time slot for a user.
     public async Task<bool> RemoveDateSpecificTimeSlotAsync(string userId, string date, string slotId)
     {
         try
         {
+            // Delete the specific slot from Firebase.
             await firebase
                 .Child("users")
                 .Child(userId)
@@ -939,14 +990,17 @@ public class FirebaseService
         }
         catch (Exception ex)
         {
+            // Log errors during the deletion process.
             Console.WriteLine($"Error deleting slot: {ex.Message}");
             return false;
         }
     }
 
 
+    // Fetch a specific session by user ID and session ID.
     public async Task<BookedSession> GetSessionAsync(string userId, string sessionId)
     {
+        // Fetch the session data from Firebase.
         var session = await firebase
             .Child("users")
             .Child(userId)
@@ -955,6 +1009,7 @@ public class FirebaseService
             .Child(sessionId)
             .OnceSingleAsync<BookedSession>();
 
+        // Assign the session key if found.
         if (session != null)
         {
             session.SessionKey = sessionId;
@@ -963,16 +1018,19 @@ public class FirebaseService
         return session;
     }
 
+    // Fetch a list of message contacts for a user.
     public async Task<List<string>> GetMessageContactsAsync(string userId)
     {
         var contacts = new List<string>();
         try
         {
+            // Fetch all message nodes for the user.
             var messagesRef = await firebase
                 .Child("user_messages")
                 .Child(userId)
                 .OnceAsync<object>(); // We don't care about the message content here
 
+            // Add each contact's user ID to the list.
             foreach (var messageNode in messagesRef)
             {
                 contacts.Add(messageNode.Key); // The key is the contact userId
@@ -980,20 +1038,25 @@ public class FirebaseService
         }
         catch (Exception ex)
         {
+             // Log errors during the fetching process.
             Console.WriteLine($"Error fetching message contacts: {ex.Message}");
         }
         return contacts;
     }
+
+     // Fetch details of trainers by a list of trainer IDs.
     public async Task<List<Trainer>> GetTrainersByIdsAsync(List<string> trainerIds)
     {
         var trainers = new List<Trainer>();
         foreach (var trainerId in trainerIds)
         {
+            // Fetch trainer data for each ID.
             var trainerData = await firebase
                 .Child("users")
                 .Child(trainerId)
                 .OnceSingleAsync<dynamic>();
 
+            // Ensure the user has a trainer role.
             if (trainerData != null && trainerData.role == "admin") // Assuming trainers have role "admin"
             {
                 var trainer = new Trainer
@@ -1009,16 +1072,19 @@ public class FirebaseService
         return trainers;
     }
 
+     // Fetch details of clients by a list of client IDs.
     public async Task<List<ClientViewModel>> GetClientsByIdsAsync(List<string> clientIds)
     {
         var clients = new List<ClientViewModel>();
         foreach (var clientId in clientIds)
         {
+            // Fetch client data for each ID.
             var clientData = await firebase
                 .Child("users")
                 .Child(clientId)
                 .OnceSingleAsync<dynamic>();
 
+            // Ensure the user is not an admin (client role).
             if (clientData != null && clientData.role != "admin") // Assuming clients don't have role "admin"
             {
                 var client = new ClientViewModel
@@ -1033,6 +1099,8 @@ public class FirebaseService
         }
         return clients;
     }
+
+    // Fetch all sessions for a trainer, grouped by clients.
     public async Task<List<ClientSessionsViewModel>> GetAllSessionsForTrainerAsync(string trainerId)
     {
         var sessionsList = new List<ClientSessionsViewModel>();
@@ -1090,6 +1158,8 @@ public class FirebaseService
 
         return sessionsList;
     }
+
+    // Fetch all clients from Firebase.
     public async Task<List<ClientViewModel>> GetAllClientsAsync()
     {
         var clients = new List<ClientViewModel>();
