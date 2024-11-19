@@ -6,26 +6,15 @@ jobs:
       - image: mcr.microsoft.com/dotnet/sdk:6.0
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - nuget-packages-{{ checksum "YourSolution.sln" }}
-            - nuget-packages-
       - run:
           name: Restore NuGet packages
           command: dotnet restore
-      - save_cache:
-          paths:
-            - ~/.nuget/packages
-          key: nuget-packages-{{ checksum "YourSolution.sln" }}
       - run:
           name: Build solution
           command: dotnet build --no-restore --configuration Release
       - run:
           name: Run unit tests
-          command: dotnet test --no-build --configuration Release --logger "trx;LogFileName=test_results.trx"
-      - store_test_results:
-          path: .
-          when: always
+          command: dotnet test --no-build --verbosity normal --configuration Release
 
 workflows:
   build-and-test-workflow:
