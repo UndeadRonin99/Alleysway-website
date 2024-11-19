@@ -1,4 +1,5 @@
-﻿using Firebase.Auth;
+// Import statements for Firebase Authentication, Google APIs, MVC framework, etc.
+using Firebase.Auth;
 using FirebaseAdmin;
 using FirebaseAdmin.Auth;
 using Google.Apis.Auth.OAuth2;
@@ -14,20 +15,24 @@ using XBCAD.ViewModels;
 
 namespace XBCAD.Controllers
 {
+    // Controller class for client-related actions
     public class ClientController : Controller
     {
+        // Services for Google Calendar and Firebase operations
         private readonly GoogleCalendarService googleCalendarService;
         private readonly FirebaseService _firebaseService;
 
+        // Constructor to initialize the services
         public ClientController(FirebaseService firebaseService, GoogleCalendarService calendarService)
         {
             _firebaseService = firebaseService;
             googleCalendarService = calendarService;
         }
 
-
+        // Action method for client chat functionality
         public async Task<IActionResult> Chat()
         {
+            // Retrieve the user's ID and name from claims
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var name = User.FindFirstValue(ClaimTypes.Name);
             ViewBag.UserId = userId;
@@ -48,19 +53,17 @@ namespace XBCAD.Controllers
                 .Select(g => g.First())
                 .ToList();
 
+            // Pass the list of contacts to the view
             ViewBag.Contacts = allTrainers;
 
-            // Generate a custom Firebase Auth token
+            // Generate a custom Firebase Auth token for the user
             var firebaseToken = await GenerateFirebaseTokenAsync(userId);
             ViewBag.FirebaseToken = firebaseToken;
 
             return View();
         }
 
-
-
-
-
+        // Private method to generate a custom Firebase token
         private async Task<string> GenerateFirebaseTokenAsync(string userId)
         {
             // Initialize Firebase Admin SDK if not already done
@@ -77,10 +80,10 @@ namespace XBCAD.Controllers
             return customToken;
         }
 
-
-
+        // Action method to display the calendar
         public async Task<IActionResult> Calendar()
         {
+            // Retrieve user details from claims
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var name = User.FindFirstValue(ClaimTypes.Name);
             ViewBag.UserId = userId;
@@ -90,6 +93,7 @@ namespace XBCAD.Controllers
 
             if (!string.IsNullOrEmpty(accessToken))
             {
+                // Get the calendar embed link using the Google Calendar service
                 var embedLink = await googleCalendarService.GetCalendarEmbedLinkAsync(accessToken, email);
                 ViewBag.CalendarEmbedLink = embedLink;
             }
@@ -105,11 +109,12 @@ namespace XBCAD.Controllers
         public IActionResult Dashboard()
         {
             ViewData["Title"] = "Client Dashboard";
-            var name = User.FindFirstValue(ClaimTypes.Name); // Retrieve Name
+            var name = User.FindFirstValue(ClaimTypes.Name); // Retrieve user's name
             ViewBag.Name = name;
             return View();
         }
 
+        // Action method to delete the client's profile
         [HttpPost]
         public async Task<IActionResult> DeleteProfile()
         {
@@ -125,7 +130,7 @@ namespace XBCAD.Controllers
                 // Delete the user from Firebase Authentication
                 await FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance.DeleteUserAsync(userId);
 
-                // Optionally, you could also remove user data from the Realtime Database
+                // Optionally, remove user data from the Realtime Database
                 await _firebaseService.DeleteUserDataAsync(userId);
 
                 // Sign out the user after deletion
@@ -136,15 +141,17 @@ namespace XBCAD.Controllers
             }
             catch (Exception ex)
             {
+                // Handle exceptions during profile deletion
                 ModelState.AddModelError("", $"Profile deletion failed: {ex.Message}");
                 return RedirectToAction("Settings");
             }
         }
 
+        // Action method to save profile changes
         [HttpPost]
         public async Task<IActionResult> SaveProfile(IFormFile photo, string rate)
         {
-            TempData["ActiveTab"] = "editProfile"; // Set the active tab to "addPT"
+            TempData["ActiveTab"] = "editProfile"; // Set the active tab to "editProfile"
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -152,12 +159,10 @@ namespace XBCAD.Controllers
             {
                 string imageUrl = null;
 
-
                 // If a photo was uploaded, upload it to Firebase Storage
                 if (photo != null && photo.Length > 0)
                 {
                     imageUrl = await _firebaseService.UploadProfileImageAsync(userId, photo);
-
 
                     // Save the image URL to Firebase Realtime Database
                     await _firebaseService.SaveProfileImageUrlAsync(userId, imageUrl);
@@ -166,22 +171,23 @@ namespace XBCAD.Controllers
                 // Save the rate to Firebase Realtime Database
                 await _firebaseService.SaveRateAsync(userId, rate);
 
-
                 TempData["SuccessMessage"] = "Profile updated successfully.";
             }
             catch (Exception ex)
             {
+                // Handle exceptions during profile update
                 ModelState.AddModelError("", $"Profile update failed: {ex.Message}");
             }
 
             return RedirectToAction("Settings");
         }
 
+        // Action method to display client settings
         public async Task<IActionResult> Settings()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var email = User.FindFirstValue(ClaimTypes.Email);
-            var Name = User.FindFirstValue(ClaimTypes.Name); //Retrieve Name
+            var Name = User.FindFirstValue(ClaimTypes.Name); // Retrieve user's name
             ViewBag.Name = Name;
             ViewBag.Email = email;
 
@@ -210,16 +216,17 @@ namespace XBCAD.Controllers
             return View(model); // Pass the availability data to the view
         }
 
+        // Action method to display the list of trainers for booking
         public async Task<IActionResult> BookTrainer()
         {
-            var Name = User.FindFirstValue(ClaimTypes.Name); //Retrieve Name
+            var Name = User.FindFirstValue(ClaimTypes.Name); // Retrieve user's name
             ViewBag.Name = Name;
             // Fetch all trainers' data from Firebase (admins only)
             var trainers = await _firebaseService.GetAllTrainersAsync();
             return View(trainers); // Pass the trainer data to the view
         }
 
-
+        // Action method to book a session with a trainer
         [HttpPost]
         public async Task<IActionResult> BookSession(TrainerAvailabilityViewModel model)
         {
@@ -291,7 +298,6 @@ namespace XBCAD.Controllers
             return RedirectToAction("Calendar");
         }
 
-
         // Helper method to create a calendar event
         private async Task<string> CreateCalendarEvent(string accessToken, string clientEmail, string trainerEmail, DateTime startDateTime, DateTime endDateTime, string trainerName)
         {
@@ -318,9 +324,9 @@ namespace XBCAD.Controllers
                     TimeZone = "Africa/Johannesburg",
                 },
                 Attendees = new List<EventAttendee>()
-        {
-            new EventAttendee() { Email = trainerEmail }
-        },
+                {
+                    new EventAttendee() { Email = trainerEmail }
+                },
                 Reminders = new Event.RemindersData()
                 {
                     UseDefault = true
@@ -336,6 +342,7 @@ namespace XBCAD.Controllers
             return createdEvent.Id;
         }
 
+        // Action method for Google Login
         [HttpGet]
         public IActionResult GoogleLogin(string returnUrl = "/Client/Calendar")
         {
@@ -343,6 +350,7 @@ namespace XBCAD.Controllers
             return Challenge(properties, GoogleDefaults.AuthenticationScheme);
         }
 
+        // Action method to handle Google sign-in response
         [HttpGet("signin-google-client")]
         public async Task<IActionResult> GoogleResponse(string returnUrl = "/Client/Calendar")
         {
@@ -354,7 +362,7 @@ namespace XBCAD.Controllers
             return LocalRedirect(returnUrl);  // Redirect to the calendar page after Google sign-in
         }
 
-
+        // Action method to display a trainer's availability
         public async Task<IActionResult> TrainerAvailability(string id)
         {
             var Name = User.FindFirstValue(ClaimTypes.Name);
@@ -380,7 +388,7 @@ namespace XBCAD.Controllers
 
             for (int i = 0; i < 7; i++)
             {
-                var date = today.AddDays(i+1).ToString("yyyy-MM-dd");
+                var date = today.AddDays(i + 1).ToString("yyyy-MM-dd");
                 var slots = await _firebaseService.GetDateSpecificAvailabilityAsync(id, date);
 
                 if (slots.Any())
@@ -468,7 +476,7 @@ namespace XBCAD.Controllers
             return View(viewModel);
         }
 
-
+        // Action method to view sessions with a specific trainer
         public async Task<IActionResult> TrainerSessions(string trainerId)
         {
             var clientId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -487,11 +495,10 @@ namespace XBCAD.Controllers
                 Sessions = sessions // Ensure this matches the type in the ViewModel
             };
 
-            return View(viewModel); // Ensure you're returning the view model, not the sessions list
+            return View(viewModel); // Return the view model
         }
 
-
-
+        // Action method to display client's sessions
         public async Task<IActionResult> MySessions()
         {
             var clientId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -501,9 +508,10 @@ namespace XBCAD.Controllers
             // Fetch all sessions for the client
             var clientSessions = await _firebaseService.GetClientSessionsAsync(clientId);
 
-            return View(clientSessions); // Ensure you're returning the correct view/model
+            return View(clientSessions); // Return the sessions
         }
 
+        // Action method to cancel a session
         [HttpPost]
         public async Task<IActionResult> CancelSession(string sessionId, string trainerId)
         {
@@ -549,13 +557,14 @@ namespace XBCAD.Controllers
             }
             catch (Exception ex)
             {
+                // Handle exceptions during session cancellation
                 TempData["ErrorMessage"] = $"Error canceling session: {ex.Message}";
             }
 
             return RedirectToAction("MySessions");
         }
 
-
+        // Helper method to delete a calendar event
         private async Task DeleteCalendarEvent(string accessToken, string eventId)
         {
             var credential = GoogleCredential.FromAccessToken(accessToken);
@@ -571,13 +580,12 @@ namespace XBCAD.Controllers
 
             await request.ExecuteAsync();
         }
+
+        // Action method to view client portfolio
         public async Task<IActionResult> ClientPortfolio()
         {
-            var clients = await _firebaseService.GetAllClientsAsync(); // Replace with the correct method name
+            var clients = await _firebaseService.GetAllClientsAsync(); // Fetch all clients
             return View(clients);
         }
-
-
     }
-
 }
