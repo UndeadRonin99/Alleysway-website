@@ -1972,14 +1972,3 @@ namespace XBCAD.Controllers
 
 
 
-
-
-
-
-
-
-
-
-
-
-
