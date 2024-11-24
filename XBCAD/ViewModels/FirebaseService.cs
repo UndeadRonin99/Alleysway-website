@@ -285,7 +285,7 @@ public class FirebaseService : IFirebaseService
             senderId = userID,
             receiverId = trainerID,
             senderName = userName,
-            text = $"I've booked a session with you on {dateTime:dd/MM/yyyy} at {dateTime:HH:mm}",
+            text = $"I've booked a session with you on {dateTime:dd/MM/yyyy} at {dateTime.AddHours(2):HH:mm}",
             timestamp = Timestamp.GetCurrentTimestamp()
         };
 
