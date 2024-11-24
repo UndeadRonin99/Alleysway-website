@@ -1,7 +1,7 @@
 # **Alleysway Website**
 
 ### A robust ASP.NET Core MVC web application designed to deliver a modern and interactive web experience.
-
+ 
 ---
 
 ## **Table of Contents**
@@ -11,14 +11,12 @@
 4. [Installation](#installation)
 5. [Configuration](#configuration) 
 6. [Usage](#usage)
-7. [Screenshots](#screenshots)
-8. [Technologies Used](#technologies-used)
-9. [Contributing](#contributing)
+7. [Technologies Used](#technologies-used)
 
 ---
 
 ## **Overview**
-XBCAD is a full-featured web application developed with **ASP.NET Core MVC**. It leverages a clean Model-View-Controller architecture to ensure scalability and maintainability. The platform is designed to:
+Alleysway Website is a full-featured web application developed with **ASP.NET Core MVC**. It leverages a clean Model-View-Controller architecture to ensure scalability and maintainability. The platform is designed to:
 - Manage user interactions effectively.
 - Provide dynamic, server-side rendered web pages.
 - Include a rich, responsive user interface.
@@ -51,7 +49,6 @@ The project is organized as follows:
 ### Prerequisites
 - **.NET SDK**: Version 6.0 or later.
 - **IDE**: Visual Studio 2022 or JetBrains Rider.
-- **Database**: (Optional) If using a database, ensure you have SQL Server or a compatible database installed.
 
 ### Steps
 1. Clone the repository:
@@ -103,34 +100,10 @@ The project is organized as follows:
 
 ---
 
-## **Screenshots**
-*(Add screenshots of your application here for better visualization.)*
-
----
-
 ## **Technologies Used**
 - **Framework**: ASP.NET Core MVC
 - **Language**: C#
 - **Frontend**: Razor Views, CSS, JavaScript
-- **Database**: SQL Server (if applicable)
+- **Database**: Firebase
 - **IDE**: Visual Studio 2022
-- **Tools**: NuGet, Entity Framework Core (if used)
-
----
-
-## **Contributing**
-We welcome contributions! Follow these steps:
-1. Fork the repository.
-2. Create a new branch:
-   ```
-   git checkout -b feature/your-feature
-   ```
-3. Commit your changes:
-   ```
-   git commit -m "Add your feature"
-   ```
-4. Push your changes:
-   ```
-   git push origin feature/your-feature
-   ```
-5. Submit a pull request for review.
+- **Tools**: NuGet, Entity Framework Core
