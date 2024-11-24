@@ -104,6 +104,6 @@ The project is organized as follows:
 - **Framework**: ASP.NET Core MVC
 - **Language**: C#
 - **Frontend**: Razor Views, CSS, JavaScript
-- **Database**: SQL Server (if applicable)
+- **Database**: Firebase
 - **IDE**: Visual Studio 2022
 - **Tools**: NuGet, Entity Framework Core
